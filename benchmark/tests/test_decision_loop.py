@@ -11,12 +11,12 @@ from benchmark.runtime.policies import FixedPolicy
 from benchmark.runtime.simulator import EpisodeOutcome, Observation, Regime
 
 
-def test_posterior_uses_observable_functional_evidence_only() -> None:
+def test_posterior_uses_observable_evidence_only() -> None:
     history = (
-        Observation(channel="functional", failed=True),
+        Observation(channel="functional", failed=False),
         Observation(channel="environment_validation", failed=False),
     )
-    assert abs(posterior_system_bad(history) - 0.8) < 1e-12
+    assert abs(posterior_system_bad(history) - 0.13043478260869568) < 1e-12
 
 
 def test_loss_derived_rule_produces_three_terminal_decisions() -> None:

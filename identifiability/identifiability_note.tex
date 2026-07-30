@@ -1,0 +1,68 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,booktabs,hyperref}
+\title{Identifiability of System State and Evidence Quality}
+\author{Guillaume Harbonnier}
+\date{ED-POMDP Research Edition v1.1.0}
+\begin{document}
+\maketitle
+\begin{abstract}
+This note examines when latent system condition $S$ and latent evidence-production quality $E$ can be separated from assurance observations. It provides a worked non-identifiability counterexample, a heterogeneous-evidence separating construction, and a controlled-intervention case with an explicit intervention noise floor. It supports claim \texttt{CLM-IDENT-001} in the canonical claim registry and does not claim empirical identifiability.
+\end{abstract}
+
+\section{Problem}
+Let observations follow $P(O\mid S,E)$. The factorization is useful only if distinct values of $S$ and $E$ can be distinguished under stated assumptions.
+
+\section{Case A: non-identifiability}
+If two latent pairs induce the same observation law,
+\[
+P(O\mid S=s_1,E=e_1)=P(O\mid S=s_2,E=e_2),
+\]
+then repeated evidence from that unchanged channel cannot separate them. More samples reduce variance but do not repair structural aliasing.
+
+\subsection{Worked binary counterexample}
+Let $O\in\{\mathrm{fail},\mathrm{pass}\}$ and compare the distinct latent pairs $(S=\mathrm{bad},E=\mathrm{good})$ and $(S=\mathrm{good},E=\mathrm{bad})$. Define
+\begin{align*}
+P(\mathrm{fail}\mid \mathrm{bad},\mathrm{good}) &= 0.80, &
+P(\mathrm{pass}\mid \mathrm{bad},\mathrm{good}) &= 0.20,\\
+P(\mathrm{fail}\mid \mathrm{good},\mathrm{bad}) &= 0.80, &
+P(\mathrm{pass}\mid \mathrm{good},\mathrm{bad}) &= 0.20.
+\end{align*}
+For any sequence with $k$ failures in $n$ conditionally independent repetitions, both pairs assign likelihood
+\[
+0.80^k\,0.20^{n-k}.
+\]
+Posterior odds therefore remain equal to prior odds for every sample size. The latent pairs are structurally non-identifiable from this unchanged channel.
+
+\section{Case B: heterogeneous evidence}
+Let $F$ be a functional-test channel and $V$ an evidence-environment validation channel. Consider the following conditional failure probabilities:
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+Latent pair & $P(F=\mathrm{fail})$ & $P(V=\mathrm{fail})$\\
+\midrule
+$(\mathrm{bad},\mathrm{good})$ & 0.80 & 0.20\\
+$(\mathrm{good},\mathrm{bad})$ & 0.20 & 0.80\\
+\bottomrule
+\end{tabular}
+\end{center}
+Under conditional independence given $(S,E)$,
+\begin{align*}
+P(F=\mathrm{fail},V=\mathrm{pass}\mid \mathrm{bad},\mathrm{good}) &= 0.80\times 0.80=0.64,\\
+P(F=\mathrm{fail},V=\mathrm{pass}\mid \mathrm{good},\mathrm{bad}) &= 0.20\times 0.20=0.04.
+\end{align*}
+The corresponding likelihood ratio is $16{:}1$. The reverse asymmetric event, $(F=\mathrm{pass},V=\mathrm{fail})$, yields the reciprocal separation. Thus heterogeneous channels remove the specific aliasing of Case A in this toy construction.
+
+This result is conditional on the stated channel structure. It does not establish identifiability for arbitrary industrial data. A minimal design requirement is that the joint observation map have distinct rows, at least up to decision-relevant equivalence classes.
+
+\section{Case C: controlled intervention}
+Changing an evidence-production condition while holding the build nominally fixed can increase information about $E$. Yet the system is never perfectly invariant between runs. Flakiness, timing, hidden state, load and environmental drift create an intervention noise floor $\epsilon_{\mathrm{drift}}$.
+
+Hence an intervention identifies $E$ only relative to an explicit stability assumption and only above that noise floor. Paired runs, randomized order, invariant checks and nuisance-variable logging are required before attributing an observation change to $E$.
+
+\section{Practical implications}
+Identifiability comes from experimental structure rather than evidence volume alone. Assurance designs should therefore include environment smoke tests, observability and oracle validation, heterogeneous channels, paired cross-environment execution and controlled interventions with nuisance logging.
+
+\section{Current epistemic status}
+Case A establishes a formal counterexample to unconditional identifiability. Case B gives a concrete separating construction under stated assumptions. Neither establishes empirical identifiability in an industrial setting. Step 2 must test identifiable, weakly identifiable and non-identifiable regimes separately.
+\end{document}

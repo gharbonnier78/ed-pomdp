@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.2.2-step2.2-decision-loop — 2026-07-30
+- Added terminal `GO`, `NO_GO` and `CONDITIONAL_GO` decisions.
+- Added an observable-only Bayesian posterior baseline over system risk.
+- Added threshold-based stopping that may leave budget unspent.
+- Added asymmetric terminal loss, evidence cost, unsafe-GO and unnecessary-NO-GO endpoints.
+- Replaced equal-spend validation with budget-ceiling validation for stopping policies.
+- Deliberately fixed the inference model to the identifiable functional-channel likelihoods so non-identifiable and misspecified environments can be evaluated as robustness tests rather than silently changing the agent model.
+- Kept `CLM-VOI-001` and `CLM-EQ-001` at evidence level `NONE`; the final ED-POMDP policy and headline matched-budget experiment are not yet implemented.
+
 ## v1.2.1-step2.1-execution-core — 2026-07-30
 - Added a deterministic synthetic release simulator with explicit latent system and evidence-quality states.
 - Implemented identifiable and deliberately non-identifiable observation regimes aligned with the identifiability note.

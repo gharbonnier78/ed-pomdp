@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+title: "ED-POMDP Research Edition v1.0 — Scientific Foundations"
+message: "Please cite this research package."
+type: software
+authors:
+  - family-names: Harbonnier
+    given-names: Guillaume
+version: 1.0.0-step1
+date-released: 2026-07-30
+license: CC-BY-4.0

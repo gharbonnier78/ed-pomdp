@@ -1,0 +1,8 @@
+id,statement,type,maturity,evidence_level,artifact,next_step
+CLM-PO-001,"Software release assurance is structurally partially observable",Conceptual claim,Formalized,FORMAL,paper/main.tex,"Formal counterexample comparison"
+CLM-VOI-001,"Decision-aware value of information reduces matched-budget decision loss",Hypothesis,Falsifiable,NONE,paper/main.tex,"Step 2 benchmark"
+CLM-EQ-001,"Modelling evidence-production quality improves calibration",Hypothesis,Falsifiable,NONE,paper/main.tex,"Step 2 degradation experiments"
+CLM-CON-001,"Hard assurance constraints can be integrated",Formal proposal,Formalized,FORMAL,appendix/mathematical_appendix.tex,"Executable zero-violation tests"
+CLM-IDENT-001,"S and E require structural assumptions for identifiability",Formal claim,"Counterexample established; empirical status open",FORMAL,identifiability/identifiability_note.tex,"Synthetic identifiability regimes"
+CLM-IND-001,"Industrial models can be calibrated from governed release data",Open question,"Blocked by data gate",NONE,governance/DATA_READINESS_GATE.md,"Data readiness assessment"
+CLM-XDOM-001,"Framework generalises to biometrics and UAV",Future hypothesis,"North-Star only",NONE,research_program/research_program.tex,"Separate external-validity studies"

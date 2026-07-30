@@ -1,0 +1,150 @@
+\documentclass[11pt]{report}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{amsmath,amssymb,booktabs,array,longtable,tabularx,multirow}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit}
+\hypersetup{colorlinks=true,linkcolor=blue!45!black,citecolor=blue!45!black,urlcolor=blue!45!black}
+\setlist{nosep,leftmargin=*}
+\pagestyle{fancy}\fancyhf{}\lhead{ED-POMDP Research Edition v1.0}\rhead{Scientific Foundations}\cfoot{\thepage}
+\newcommand{\edp}{ED-POMDP}
+\newcommand{\stratq}{STRAT-Q}
+\newcommand{\risk}{\mathcal{R}}
+\newcommand{\evidence}{\mathcal{E}}
+
+\title{ED-POMDP Research Programme 2026--2030\\Scientific, Experimental and Industrial Validation Roadmap}
+\author{Guillaume Harbonnier -- STRAT-Q Research Programme}
+\date{July 2026}
+\begin{document}\maketitle\tableofcontents
+\chapter{Programme vision}
+The programme investigates whether governed engineering evidence can support auditable sequential decisions under partial observability. Software release assurance is the first validation domain. The programme deliberately separates conceptual plausibility, synthetic falsification, retrospective empirical validation, shadow operation, and authorised deployment.
+
+\chapter{Scientific objectives}
+\begin{enumerate}
+\item Formalise system risk, evidence quality, decision context, and model uncertainty without reducing quality to one score.
+\item Establish matched-budget performance and failure regimes of Decision-VoI.
+\item Develop calibration methods for sparse, biased, dependent industrial evidence.
+\item Integrate hard legal, contractual, safety, and governance constraints.
+\item Produce replayable decision traces and human-accountable recommendations.
+\item Assess generalisability only after software validation.
+\end{enumerate}
+
+\chapter{Programme principles}
+Claims mature through five evidence levels: L0 conceptual coherence; L1 synthetic falsification; L2 retrospective replay; L3 prospective shadow mode; L4 governed operational use. No result is promoted to a higher level by narrative alone. Every experiment is versioned, reproducible, and accompanied by failure criteria.
+
+\chapter{Work packages}
+\section{WP0 -- Scientific positioning and preregistration}
+\textbf{Objective:} define scope, terminology, novelty boundaries, and non-claims.\\
+\textbf{Inputs:} POMDP, Bayesian decision theory, software reliability, assurance cases, adaptive testing, runtime evidence.\\
+\textbf{Methods:} systematic search protocol, comparison matrix, reviewer panels.\\
+\textbf{Deliverables:} main paper, survey, reviewer companion, ontology.\\
+\textbf{Exit:} all hypotheses have measurable outcomes and refutation criteria.
+
+\section{WP1 -- Synthetic benchmark and matched-budget evaluation}
+\textbf{Objective:} test mathematical and algorithmic claims under controlled conditions.\\
+\textbf{Experiments:} budget curves, Pareto fronts, misspecified priors/likelihoods, correlation, shift, stale evidence, hard gates, ablations, computational scaling.\\
+\textbf{Baselines:} fixed order, random, entropy gain, risk-ranked, myopic DVoI, finite-horizon solver.\\
+\textbf{Exit:} results reproducible across seeds; negative regimes documented.
+
+\section{WP2 -- Industrial data model and calibration}
+\textbf{Objective:} determine which parameters are estimable from release data.\\
+\textbf{Data:} requirements, risk registers, changes, tests, defects, environments, OTEL signals, incidents, decisions, waivers.\\
+\textbf{Methods:} hierarchical Bayesian models, conservative bounds, missingness models, elicitation, calibration curves.\\
+\textbf{Risk:} labels reflect historical decisions rather than true latent quality.\\
+\textbf{Exit:} data dictionary, governance approval, identifiability report, calibrated candidate model.
+
+\section{WP3 -- Dependence, model uncertainty and drift}
+\textbf{Objective:} prevent double-counting and brittle posterior confidence.\\
+\textbf{Methods:} latent common-cause models, Bayesian networks, copulas where justified, robust Bayes, ensembles, online change detection.\\
+\textbf{Exit:} calibrated uncertainty under preregistered shifts and evidence correlations.
+
+\section{WP4 -- Constraints and human governance}
+\textbf{Objective:} represent mandatory evidence and accountable human authority.\\
+\textbf{Methods:} constrained POMDP, shielded policies, abstention, human review reliability, reason codes.\\
+\textbf{Exit:} zero simulated hard-gate violations and approved governance model.
+
+\section{WP5 -- Retrospective replay}
+\textbf{Objective:} compare ED-POMDP recommendations with historical release pathways on held-out releases.\\
+\textbf{Design:} time-respecting splits; blinded model fitting; counterfactual limitations documented.\\
+\textbf{Outcomes:} decision loss proxies, evidence cost, time to decision, calibration, action agreement, reviewer utility.\\
+\textbf{Exit:} independent review and predeclared go/no-go for shadow mode.
+
+\section{WP6 -- Shadow deployment}
+\textbf{Objective:} generate recommendations without influencing formal release authority.\\
+\textbf{Controls:} immutable evidence snapshots, policy versioning, human override, no automated deployment.\\
+\textbf{Exit:} stable calibration, acceptable false-escalation burden, complete audit replay.
+
+\section{WP7 -- Prospective governed evaluation}
+\textbf{Objective:} assess decision support with limited authority and monitored outcomes.\\
+\textbf{Design:} stepped-wedge or phased introduction where organisationally feasible.\\
+\textbf{Exit:} evidence of benefit without unacceptable safety, fairness, legal, or workload impact.
+
+\section{WP8 -- External-validity studies}
+Biometrics: adaptive multimodal evidence acquisition with PAD, quality, ageing and human review. UAV: continuous-state active perception with GNSS/INS/EO/IR and terrain. These studies test transfer of principles, not proof of universal equivalence.
+
+\chapter{Milestones}
+\begin{longtable}{p{0.1\textwidth}p{0.22\textwidth}p{0.43\textwidth}p{0.15\textwidth}}
+\toprule ID & Target & Acceptance evidence & Earliest period\\\midrule
+M1 & Scientific foundation & Reviewer-ready documents, ontology, preregistration & 2026 Q3\\
+M2 & Benchmark v1 & Matched-budget experiments and CI reproducibility & 2026 Q4\\
+M3 & Calibration study & Identifiability and data-governance report & 2027 H1\\
+M4 & Replay study & Held-out retrospective evaluation & 2027 H2\\
+M5 & Shadow mode & Prospective evidence traces without decision authority & 2028\\
+M6 & Governed pilot & Limited operational decision support & 2029\\
+M7 & External validation & Biometrics and UAV studies & 2029--2030\\\bottomrule
+\end{longtable}
+
+\chapter{Data and evidence plan}
+The data model uses immutable release snapshots. Direct identifiers are excluded from the research layer. Every feature has a source, owner, extraction rule, timestamp, validity window, missingness semantics, and allowed use. Labels are separated into observed outcomes, expert assessments, and latent variables. Production incidents cannot be naively treated as complete defect truth because detection and reporting are selective.
+
+\chapter{Evaluation plan}
+Primary comparison uses equal budgets. Secondary comparison uses minimum evidence cost to reach a target expected loss. Policies are evaluated on Pareto fronts, calibration, constraint violations, abstention, computational cost, and audit reproducibility. Sensitivity analyses vary all loss ratios and model assumptions. Statistical plans use paired simulations, bootstrap intervals, correction for multiple hypotheses where applicable, and effect sizes rather than p-values alone.
+
+\chapter{Governance, ethics and safety}
+ED-POMDP is decision support, not autonomous release authority. Mandatory evidence remains mandatory. Human decision makers receive reasons, uncertainty, missing-evidence warnings, and counterfactuals. The programme assesses automation bias, disparate effects, workload transfer, confidentiality, and strategic gaming. Biometrics and UAV work require separate ethical and legal review before real data or field trials.
+
+\chapter{Reproducibility and open science}
+Each release includes source, environment lock file, container recipe, seeds, configuration manifests, raw synthetic outputs, analysis notebooks, figure scripts, and a machine-readable claim-to-experiment map. Industrial data are not published; instead, schemas, synthetic surrogates, and controlled replication protocols are provided.
+
+\chapter{Publication strategy}
+\begin{enumerate}
+\item Position/methods paper: software release assurance under partial observability.
+\item Benchmark paper: matched-budget ED-POMDP evaluation and failure regimes.
+\item Calibration paper: dependence and uncertainty in engineering evidence.
+\item Industrial empirical study: retrospective and shadow validation.
+\item Biometrics study.
+\item UAV active-perception study.
+\item General theory only after domain evidence supports it.
+\end{enumerate}
+
+\chapter{Risk register}
+Major risks are non-identifiability, poor outcome labels, policy instability, computational burden, organisational resistance, and false precision. Mitigations include conservative bounds, abstention, simple baselines, human governance, and explicit termination criteria. A negative result---for example, fixed policies outperforming DVoI under realistic costs---is a valid programme outcome.
+
+\chapter{Decision gates}
+At each milestone, continuation requires evidence. Failure to outperform simple baselines under matched budgets blocks claims of optimisation advantage. Failure to calibrate blocks shadow mode. Any hard-gate violation blocks operational use. Lack of independent replay blocks auditability claims.
+
+\begin{thebibliography}{99}
+\bibitem{kaelbling1998planning} Kaelbling, L. P., Littman, M. L., and Cassandra, A. R. Planning and acting in partially observable stochastic domains. \emph{Artificial Intelligence}, 101(1--2), 99--134, 1998.
+\bibitem{lauri2023robotics} Lauri, M., Hsu, D., and Pajarinen, J. Partially observable Markov decision processes in robotics: A survey. \emph{IEEE Transactions on Robotics}, 39(1), 21--40, 2023.
+\bibitem{silver2010pomcp} Silver, D. and Veness, J. Monte-Carlo planning in large POMDPs. \emph{NeurIPS}, 2010.
+\bibitem{sarraute2013hackers} Sarraute, C., Buffet, O., and Hoffmann, J. POMDPs make better hackers: Accounting for uncertainty in penetration testing. arXiv:1307.7809, 2013.
+\bibitem{wu2020active} Wu, B. et al. Constrained active classification using partially observable Markov decision processes. arXiv:2008.04768, 2020.
+\bibitem{arora2019multimodal} Arora, A., Fitch, R., and Sukkarieh, S. Multi-modal active perception for information gathering in science missions. \emph{Autonomous Robots}, 2019.
+\bibitem{rahbar2025active} Rahbar, A., Aronsson, L., and Chehreghani, M. H. A survey on active feature acquisition strategies. arXiv:2502.11067, 2025.
+\bibitem{wong2024revisiting} Wong, W. E. et al. Revisiting software reliability modeling and testing. \emph{IEEE Transactions on Reliability}, 2024.
+\bibitem{ieee1633} IEEE. \emph{IEEE Recommended Practice on Software Reliability}, IEEE Std 1633-2016, 2017.
+\bibitem{fenton2012risk} Fenton, N. and Neil, M. \emph{Risk Assessment and Decision Analysis with Bayesian Networks}. CRC Press, 2012.
+\bibitem{howard1966information} Howard, R. A. Information value theory. \emph{IEEE Transactions on Systems Science and Cybernetics}, 2(1), 22--26, 1966.
+\end{thebibliography}
+\end{document}

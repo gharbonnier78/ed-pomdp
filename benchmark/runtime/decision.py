@@ -1,4 +1,4 @@
-"""Terminal decision semantics and preregistered loss endpoints for Step 2.2.
+"""Terminal decision semantics and preregistered loss endpoints.
 
 The decision policy receives observations only. Ground-truth latent state is used
 strictly after termination to score the decision.
@@ -8,6 +8,10 @@ likelihoods (0.80/0.20). It is not made regime-aware. Future evaluation against
 non-identifiable or likelihood-misspecified environments therefore measures
 robustness to model misspecification rather than silently adapting the agent to
 the data-generating regime.
+
+Terminal decisions are Bayes-optimal under ``LossWeights``. This same rule is used
+by the episode runner and by decision-aware acquisition policies, preventing the
+look-ahead model from optimizing against a different terminal decision-maker.
 """
 from __future__ import annotations
 
@@ -43,13 +47,7 @@ class DecisionScore:
 
 
 def posterior_system_bad(history: tuple[Observation, ...], prior: float = 0.5) -> float:
-    """Bayesian posterior under the fixed identifiable functional-channel model.
-
-    Environment-validation observations are intentionally excluded from the
-    system-state likelihood; they inform evidence quality in later increments.
-    The assumed likelihood remains fixed across true simulator regimes so later
-    robustness experiments can expose misspecification effects explicitly.
-    """
+    """Bayesian posterior under the fixed identifiable functional-channel model."""
     if not 0.0 < prior < 1.0:
         raise ValueError("prior must be between zero and one")
     log_odds = log(prior / (1.0 - prior))
@@ -63,21 +61,45 @@ def posterior_system_bad(history: tuple[Observation, ...], prior: float = 0.5) -
     return odds / (1.0 + odds)
 
 
+def expected_terminal_risk(
+    probability_bad: float,
+    decision: ReleaseDecision,
+    *,
+    weights: LossWeights = LossWeights(),
+) -> float:
+    """Expected terminal loss for one decision at posterior risk ``probability_bad``."""
+    if not 0.0 <= probability_bad <= 1.0:
+        raise ValueError("probability_bad must be in [0, 1]")
+    if decision is ReleaseDecision.GO:
+        return weights.unsafe_go * probability_bad
+    if decision is ReleaseDecision.NO_GO:
+        return weights.unnecessary_no_go * (1.0 - probability_bad)
+    return (
+        weights.conditional_bad * probability_bad
+        + weights.conditional_good * (1.0 - probability_bad)
+    )
+
+
 def decide_from_posterior(
     probability_bad: float,
     *,
-    go_threshold: float = 0.20,
-    no_go_threshold: float = 0.80,
+    weights: LossWeights = LossWeights(),
 ) -> ReleaseDecision:
-    if not 0.0 <= probability_bad <= 1.0:
-        raise ValueError("probability_bad must be in [0, 1]")
-    if not 0.0 <= go_threshold < no_go_threshold <= 1.0:
-        raise ValueError("thresholds must satisfy 0 <= go < no_go <= 1")
-    if probability_bad <= go_threshold:
-        return ReleaseDecision.GO
-    if probability_bad >= no_go_threshold:
-        return ReleaseDecision.NO_GO
-    return ReleaseDecision.CONDITIONAL_GO
+    """Return the Bayes-optimal terminal decision under ``weights``.
+
+    Ties are resolved deterministically in the order GO, CONDITIONAL_GO, NO_GO.
+    """
+    ordered = (
+        ReleaseDecision.GO,
+        ReleaseDecision.CONDITIONAL_GO,
+        ReleaseDecision.NO_GO,
+    )
+    return min(
+        ordered,
+        key=lambda decision: expected_terminal_risk(
+            probability_bad, decision, weights=weights
+        ),
+    )
 
 
 def score_decision(

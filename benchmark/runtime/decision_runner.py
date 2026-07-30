@@ -1,13 +1,16 @@
-"""Stopping-capable episode runner for Step 2.2.
-
-This increment adds terminal release decisions and decision loss. It does not yet
-implement the final decision-aware ED-POMDP acquisition policy.
-"""
+"""Stopping-capable episode runner using the same loss model as VoI planning."""
 from __future__ import annotations
 
 from dataclasses import dataclass
 
-from .decision import DecisionScore, decide_from_posterior, posterior_system_bad, score_decision
+from .decision import (
+    DecisionScore,
+    LossWeights,
+    ReleaseDecision,
+    decide_from_posterior,
+    posterior_system_bad,
+    score_decision,
+)
 from .policies import AcquisitionPolicy
 from .simulator import Observation, Regime, SyntheticReleaseEnvironment
 
@@ -32,8 +35,7 @@ def run_decision_episode(
     policy: AcquisitionPolicy,
     budget: float,
     minimum_acquisitions: int = 2,
-    go_threshold: float = 0.20,
-    no_go_threshold: float = 0.80,
+    weights: LossWeights = LossWeights(),
 ) -> DecisionEpisodeRecord:
     if budget <= 0:
         raise ValueError("budget must be positive")
@@ -52,20 +54,15 @@ def run_decision_episode(
         spent += observation.cost
 
         probability_bad = posterior_system_bad(tuple(history))
-        if len(history) >= minimum_acquisitions and (
-            probability_bad <= go_threshold or probability_bad >= no_go_threshold
-        ):
+        decision = decide_from_posterior(probability_bad, weights=weights)
+        if len(history) >= minimum_acquisitions and decision is not ReleaseDecision.CONDITIONAL_GO:
             stopped_early = spent + 1.0 <= budget
             break
 
     probability_bad = posterior_system_bad(tuple(history))
-    decision = decide_from_posterior(
-        probability_bad,
-        go_threshold=go_threshold,
-        no_go_threshold=no_go_threshold,
-    )
+    decision = decide_from_posterior(probability_bad, weights=weights)
     outcome = environment.finish()
-    score = score_decision(outcome, decision)
+    score = score_decision(outcome, decision, weights=weights)
     return DecisionEpisodeRecord(
         seed=seed,
         regime=regime.value,

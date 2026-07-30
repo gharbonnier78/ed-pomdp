@@ -1,6 +1,8 @@
 from benchmark.runtime.decision import (
+    LossWeights,
     ReleaseDecision,
     decide_from_posterior,
+    expected_terminal_risk,
     posterior_system_bad,
     score_decision,
 )
@@ -14,13 +16,27 @@ def test_posterior_uses_observable_functional_evidence_only() -> None:
         Observation(channel="functional", failed=True),
         Observation(channel="environment_validation", failed=False),
     )
-    assert posterior_system_bad(history) == 0.8
+    assert abs(posterior_system_bad(history) - 0.8) < 1e-12
 
 
-def test_thresholds_produce_three_terminal_decisions() -> None:
-    assert decide_from_posterior(0.1) is ReleaseDecision.GO
-    assert decide_from_posterior(0.5) is ReleaseDecision.CONDITIONAL_GO
-    assert decide_from_posterior(0.9) is ReleaseDecision.NO_GO
+def test_loss_derived_rule_produces_three_terminal_decisions() -> None:
+    assert decide_from_posterior(0.05) is ReleaseDecision.GO
+    assert decide_from_posterior(0.10) is ReleaseDecision.CONDITIONAL_GO
+    assert decide_from_posterior(0.50) is ReleaseDecision.NO_GO
+
+
+def test_terminal_rule_minimizes_configured_expected_loss() -> None:
+    weights = LossWeights()
+    for probability_bad in (0.0, 0.05, 0.10, 0.25, 0.50, 0.90, 1.0):
+        selected = decide_from_posterior(probability_bad, weights=weights)
+        selected_risk = expected_terminal_risk(
+            probability_bad, selected, weights=weights
+        )
+        all_risks = [
+            expected_terminal_risk(probability_bad, decision, weights=weights)
+            for decision in ReleaseDecision
+        ]
+        assert selected_risk == min(all_risks)
 
 
 def test_unsafe_go_has_larger_loss_than_unnecessary_no_go() -> None:

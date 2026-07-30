@@ -2,6 +2,7 @@
 
 ## v1.1.0-step1.1 — 2026-07-30
 - Added a formal S/E identifiability note with non-identifiability, heterogeneous-evidence and controlled-intervention cases.
+- Added worked numeric non-identifiability and heterogeneous-channel separation cases so `CLM-IDENT-001` legitimately satisfies the `FORMAL` evidence label.
 - Added an explicit intervention noise floor for imperfectly controlled reruns.
 - Promoted `docs/CLAIMS.md` to the canonical epistemic registry.
 - Added machine-readable claim registries in CSV and JSON.

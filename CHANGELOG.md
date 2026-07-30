@@ -1,14 +1,18 @@
 # Changelog
 
-## v1.2.4-step2.4-protocol-freeze — 2026-07-30
+## v1.2.4-step2.4-evidence-quality-mechanism — 2026-07-30
 - Restored and strengthened the preregistered analysis-freeze commitment before any headline experiment.
 - Required publication of the analysis Git commit SHA plus SHA-256 digests for the analysis entry point and locked dependency/configuration manifest.
 - Required a dated freeze manifest under `benchmark/protocol/` to be committed before headline raw results are generated.
 - Froze the entropy baseline as expected Shannon-entropy reduction over the full joint belief `P(S,E | history)`.
 - Froze the complete confirmatory multiplicity family and Holm family-wise error correction at `alpha = 0.05`.
 - Reordered the remaining Step 2 increments so the evidence-quality/degradation mechanism precedes policy-matrix completion.
-- Documented why the classical-POMDP-versus-ED-POMDP contrast is empty while evidence-quality acquisition has zero decision VoI.
-- Kept `CLM-VOI-001` and `CLM-EQ-001` at evidence level `NONE`; the causal evidence-quality runtime mechanism is not yet implemented.
+- Added a causal evidence model in which bad `E` destroys functional-channel discrimination while environment validation informs that reliability.
+- Replaced the separate execution posterior with the same joint `P(S,E | history)` used by ED-POMDP look-ahead.
+- Added identifiable, evidence-degraded and likelihood-misspecified executable regimes while retaining the deliberate non-identifiable regime.
+- Added a regression where environment validation has gross decision VoI approximately `0.1898454746` and is selected over another functional acquisition.
+- Added fixed-seed tests for causal relevance, observable regime separation, shared posterior semantics and absence of privileged latent-state access.
+- Kept `CLM-VOI-001` and `CLM-EQ-001` at evidence level `NONE`; no headline policy-matrix result is claimed.
 
 ## v1.2.3-step2.3-voi-policy — 2026-07-30
 - Added an observable-history posterior over joint system and evidence-quality hypotheses.

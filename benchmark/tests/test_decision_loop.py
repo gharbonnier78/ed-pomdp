@@ -16,7 +16,7 @@ def test_posterior_uses_observable_functional_evidence_only() -> None:
         Observation(channel="functional", failed=True),
         Observation(channel="environment_validation", failed=False),
     )
-    assert posterior_system_bad(history) == 0.8
+    assert abs(posterior_system_bad(history) - 0.8) < 1e-12
 
 
 def test_loss_derived_rule_produces_three_terminal_decisions() -> None:

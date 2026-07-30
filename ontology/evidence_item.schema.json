@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ED-POMDP Evidence Item",
+  "type": "object",
+  "required": ["id", "type", "claim_ids", "source", "timestamp", "environment_id", "hash", "admissibility"],
+  "properties": {
+    "id": {"type": "string"},
+    "type": {"type": "string"},
+    "claim_ids": {"type": "array", "items": {"type": "string"}},
+    "source": {
+      "type": "object",
+      "required": ["system", "owner"],
+      "properties": {
+        "system": {"type": "string"},
+        "owner": {"type": "string"}
+      }
+    },
+    "timestamp": {"type": "string", "format": "date-time"},
+    "environment_id": {"type": "string"},
+    "hash": {"type": "string"},
+    "quality": {
+      "type": "object",
+      "properties": {
+        "validity": {"type": "number", "minimum": 0, "maximum": 1},
+        "reliability": {"type": "number", "minimum": 0, "maximum": 1},
+        "representativity": {"type": "number", "minimum": 0, "maximum": 1},
+        "freshness": {"type": "number", "minimum": 0, "maximum": 1},
+        "completeness": {"type": "number", "minimum": 0, "maximum": 1},
+        "reproducibility": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "dependencies": {"type": "array", "items": {"type": "string"}},
+    "admissibility": {"enum": ["admitted", "conditional", "rejected", "unknown"]},
+    "cost": {"type": "number", "minimum": 0},
+    "duration_seconds": {"type": "number", "minimum": 0}
+  }
+}

@@ -6,7 +6,7 @@
     {"id":"CLM-VOI-001","type":"hypothesis","maturity":"falsifiable","evidence_level":"NONE","artifact":"paper/main.tex"},
     {"id":"CLM-EQ-001","type":"hypothesis","maturity":"falsifiable","evidence_level":"NONE","artifact":"paper/main.tex"},
     {"id":"CLM-CON-001","type":"formal_proposal","maturity":"formalized","evidence_level":"FORMAL","artifact":"appendix/mathematical_appendix.tex"},
-    {"id":"CLM-IDENT-001","type":"formal_claim","maturity":"counterexample_established_empirical_open","evidence_level":"FORMAL","artifact":"identifiability/identifiability_note.tex"},
+    {"id":"CLM-IDENT-001","type":"formal_claim","maturity":"worked_counterexample_and_separating_construction_empirical_open","evidence_level":"FORMAL","artifact":"identifiability/identifiability_note.tex"},
     {"id":"CLM-IND-001","type":"open_question","maturity":"blocked_by_data_gate","evidence_level":"NONE","artifact":"governance/DATA_READINESS_GATE.md"},
     {"id":"CLM-XDOM-001","type":"future_hypothesis","maturity":"north_star_only","evidence_level":"NONE","artifact":"research_program/research_program.tex"}
   ]

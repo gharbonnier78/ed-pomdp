@@ -1,8 +1,18 @@
 from benchmark.runtime.evidence_model import (
+    EvidenceModel,
     IDENTIFIABLE_AGENT_MODEL,
     MISSPECIFIED_TRUE_MODEL,
 )
 from benchmark.runtime.simulator import Regime, SyntheticReleaseEnvironment
+
+
+def test_evidence_model_rejects_invalid_probabilities() -> None:
+    try:
+        EvidenceModel(degraded_functional_fail=1.1)
+    except ValueError as error:
+        assert "degraded_functional_fail" in str(error)
+    else:
+        raise AssertionError("invalid evidence probabilities must be rejected")
 
 
 def test_bad_evidence_erases_functional_state_separation() -> None:

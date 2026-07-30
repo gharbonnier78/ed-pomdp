@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.2.3-step2.3-voi-policy — 2026-07-30
+- Added an observable-history posterior over joint system and evidence-quality hypotheses.
+- Added a fixed-model one-step look-ahead acquisition policy minimizing expected terminal decision loss plus evidence cost.
+- Added tests for joint-posterior semantics, decision-relevant channel selection and absence of privileged latent-state inputs.
+- Explicitly limited this increment to the first executable decision-aware VoI policy; evidence quality does not yet alter terminal loss or functional-channel reliability.
+- Kept `CLM-VOI-001` and `CLM-EQ-001` at evidence level `NONE`; no matched-budget headline result or calibration claim is produced.
+
 ## v1.2.2-step2.2-decision-loop — 2026-07-30
 - Added terminal `GO`, `NO_GO` and `CONDITIONAL_GO` decisions.
 - Added an observable-only Bayesian posterior baseline over system risk.

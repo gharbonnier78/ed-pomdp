@@ -1,0 +1,55 @@
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{amsmath,amssymb,booktabs,array,longtable,tabularx,multirow}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit}
+\hypersetup{colorlinks=true,linkcolor=blue!45!black,citecolor=blue!45!black,urlcolor=blue!45!black}
+\setlist{nosep,leftmargin=*}
+\pagestyle{fancy}\fancyhf{}\lhead{ED-POMDP Research Edition v1.0}\rhead{Scientific Foundations}\cfoot{\thepage}
+\newcommand{\edp}{ED-POMDP}
+\newcommand{\stratq}{STRAT-Q}
+\newcommand{\risk}{\mathcal{R}}
+\newcommand{\evidence}{\mathcal{E}}
+
+\title{ED-POMDP Evidence Ontology v1.0}
+\author{Scientific Foundations}
+\date{July 2026}
+\begin{document}\maketitle
+\section{Purpose}
+The ontology defines the minimum auditable vocabulary connecting engineering claims, evidence, risks, and decisions. It is conceptual and serialisable; it is not yet an OWL standard.
+\section{Core entities}
+\begin{longtable}{p{0.18\textwidth}p{0.66\textwidth}}
+\toprule Entity & Definition\\\midrule
+Claim & A proposition about system behaviour, quality, compliance, or readiness.\\
+Risk & Uncertain adverse consequence linked to assets, scenarios, likelihood, and impact.\\
+EvidenceAction & A controlled activity intended to produce evidence.\\
+EvidenceItem & Immutable artefact resulting from observation, analysis, review, or execution.\\
+Observation & Value interpreted by an observation model; not identical to the evidence artefact.\\
+EvidenceQuality & Latent or assessed properties: validity, reliability, freshness, completeness, representativity, reproducibility.\\
+Environment & Configuration and operating conditions under which evidence is produced.\\
+DependenceLink & Shared cause or reuse relation that can make evidence non-independent.\\
+Constraint & Non-compensatory condition limiting feasible decisions or actions.\\
+BeliefSnapshot & Versioned probability distribution and model uncertainty at a decision time.\\
+Decision & GO, CONDITIONAL GO, NO-GO, abstain, escalate, remediate, or acquire evidence.\\
+Policy & Versioned mapping from belief and context to an action recommendation.\\
+AuditRecord & Hash-linked record of inputs, versions, reasoning outputs, and authority.\\\bottomrule
+\end{longtable}
+\section{Relations}
+A Claim \emph{isSupportedBy} EvidenceItem. EvidenceItem \emph{isProducedBy} EvidenceAction and \emph{wasProducedIn} Environment. EvidenceItem \emph{observes} Observation and \emph{hasQuality} EvidenceQuality. DependenceLink \emph{connects} EvidenceItems. Risk \emph{threatens} Claim. Constraint \emph{restricts} Decision. BeliefSnapshot \emph{uses} EvidenceItems and ModelVersion. Policy \emph{recommends} Decision. AuditRecord \emph{records} the complete chain.
+\section{Evidence lifecycle}
+Planned $\rightarrow$ acquired $\rightarrow$ validated $\rightarrow$ admitted $\rightarrow$ consumed $\rightarrow$ stale/superseded. Rejected evidence remains in the ledger with rejection reason and is never silently deleted.
+\section{Machine-readable profile}
+The repository contains a JSON Schema defining identifiers, provenance, timestamps, hashes, dependency links, admissibility, and quality assessments. Future versions may map to PROV-O, OpenTelemetry semantic conventions, assurance-case vocabularies, and test-management schemas.
+\end{document}

@@ -1,0 +1,85 @@
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{amsmath,amssymb,booktabs,array,longtable,tabularx,multirow}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit}
+\hypersetup{colorlinks=true,linkcolor=blue!45!black,citecolor=blue!45!black,urlcolor=blue!45!black}
+\setlist{nosep,leftmargin=*}
+\pagestyle{fancy}\fancyhf{}\lhead{ED-POMDP Research Edition v1.0}\rhead{Scientific Foundations}\cfoot{\thepage}
+\newcommand{\edp}{ED-POMDP}
+\newcommand{\stratq}{STRAT-Q}
+\newcommand{\risk}{\mathcal{R}}
+\newcommand{\evidence}{\mathcal{E}}
+
+\title{Related Work Survey and Novelty Boundary for Evidence-Driven Release Decisions}
+\author{ED-POMDP Research Edition v1.0}
+\date{July 2026}
+\begin{document}\maketitle\tableofcontents
+\section{Scope and method}
+This survey supports scientific positioning rather than claiming systematic-review completeness. It defines search families, inclusion criteria, and a novelty boundary to be expanded in WP0. Included families are POMDP planning, active information acquisition, software reliability, adaptive testing, Bayesian assurance, assurance cases, runtime verification, and constrained decision-making.
+
+\section{POMDP and active information acquisition}
+POMDPs separate latent state, action, stochastic transition, and imperfect observation \cite{kaelbling1998planning}. Robotics work emphasises active perception: actions may acquire information before acting on the world \cite{lauri2023robotics,arora2019multimodal}. Active classification formalises confidence targets, budgets, and safe belief sets \cite{wu2020active}. Active feature acquisition studies per-instance sequential acquisition under cost \cite{rahbar2025active}. The novelty boundary is therefore not ``use POMDP for evidence acquisition''.
+
+\section{Software reliability and release timing}
+Software reliability growth models estimate failure behaviour and support release timing decisions \cite{ieee1633,wong2024revisiting}. Their strengths are explicit uncertainty, failure processes, and cost trade-offs. Their limitations for the present objective are narrower evidence semantics, limited provenance, and difficulty representing heterogeneous claims such as security, performance, environment representativity, and assurance completeness.
+
+\section{Bayesian assurance and causal evidence}
+Bayesian networks combine diverse evidence and expert knowledge \cite{fenton2012risk}. They support causal decomposition and dependence better than naive score aggregation. However, many applications estimate a posterior without optimising sequential evidence acquisition, hard gates, and stopping. ED-POMDP uses such networks as possible observation models rather than competitors to be discarded.
+
+\section{Adaptive and risk-based testing}
+Adaptive testing selects or prioritises tests based on prior outcomes, change, coverage, or predicted fault yield. These methods can reduce test cost, but the terminal objective is often test effectiveness rather than an explicit release decision loss. Risk-based testing connects tests to business and technical impact; ED-POMDP adds probabilistic belief, acquisition cost, and explicit decision feasibility.
+
+\section{Assurance cases and governance}
+Assurance cases provide structured claims, arguments, and evidence. Their strengths are traceability, admissibility, and human review. Their limitation is that they generally do not compute an optimal next evidence action. ED-POMDP should complement, not replace, assurance cases: the assurance case states what must be justified; the decision model estimates which admissible evidence most improves a pending decision.
+
+\section{Runtime verification and observability}
+Runtime verification and OpenTelemetry expose behaviour after deployment and during representative tests. Their value depends on instrumentation completeness, semantic conventions, data retention, and environment. ED-POMDP treats these properties as evidence-quality variables, avoiding the assumption that more telemetry automatically creates more decision value.
+
+\section{Constrained decision-making}
+Constrained POMDP formulations optimise an objective subject to expected-cost constraints, while safety shields and temporal logic can impose stronger restrictions. Release governance also requires non-compensatory rules: no economic benefit can compensate for absent mandatory evidence. The research must compare expected constraints, almost-sure constraints, and rule-based admissibility.
+
+\section{Novelty boundary}
+The proposed contribution is the combination of: software release as the primary terminal decision; governed evidence as a first-class object; latent evidence-process quality; dependence and provenance; matched-budget Decision-VoI; non-compensatory gates; and deterministic audit replay. Each component has predecessors. Novelty must be argued in the integration and validated utility, not in isolated ingredients.
+
+\section{Comparison matrix}
+\begin{longtable}{p{0.18\textwidth}*{6}{p{0.11\textwidth}}}
+\toprule Family & Sequential & Cost-aware & Quality of evidence & Dependence & Hard gates & Replayability\\\midrule
+POMDP active sensing & Yes & Yes & Sensor likelihood & Often & Sometimes & Rare\\
+Active feature acquisition & Yes & Yes & Usually fixed & Limited & Sometimes & Limited\\
+SRGM & Partial & Yes & Failure process & Model-specific & No & Moderate\\
+Bayesian assurance & Partial & Partial & Strong & Strong & Partial & Moderate\\
+Adaptive testing & Yes & Yes & Usually implicit & Limited & No & Moderate\\
+Assurance cases & No & No & Strong & Argument links & Strong & Strong\\
+ED-POMDP target & Yes & Yes & Latent + governed & Explicit & Strong & Strong\\\bottomrule
+\end{longtable}
+
+\section{Required systematic expansion}
+The next survey iteration will document databases, queries, date ranges, duplicate removal, inclusion/exclusion reasons, quality scoring, and extraction forms. It will add optimal stopping, reliability demonstration, conservative Bayesian inference, dynamic assurance cases, test selection under budget, and empirical software release studies.
+
+\begin{thebibliography}{99}
+\bibitem{kaelbling1998planning} Kaelbling, L. P., Littman, M. L., and Cassandra, A. R. Planning and acting in partially observable stochastic domains. \emph{Artificial Intelligence}, 101(1--2), 99--134, 1998.
+\bibitem{lauri2023robotics} Lauri, M., Hsu, D., and Pajarinen, J. Partially observable Markov decision processes in robotics: A survey. \emph{IEEE Transactions on Robotics}, 39(1), 21--40, 2023.
+\bibitem{silver2010pomcp} Silver, D. and Veness, J. Monte-Carlo planning in large POMDPs. \emph{NeurIPS}, 2010.
+\bibitem{sarraute2013hackers} Sarraute, C., Buffet, O., and Hoffmann, J. POMDPs make better hackers: Accounting for uncertainty in penetration testing. arXiv:1307.7809, 2013.
+\bibitem{wu2020active} Wu, B. et al. Constrained active classification using partially observable Markov decision processes. arXiv:2008.04768, 2020.
+\bibitem{arora2019multimodal} Arora, A., Fitch, R., and Sukkarieh, S. Multi-modal active perception for information gathering in science missions. \emph{Autonomous Robots}, 2019.
+\bibitem{rahbar2025active} Rahbar, A., Aronsson, L., and Chehreghani, M. H. A survey on active feature acquisition strategies. arXiv:2502.11067, 2025.
+\bibitem{wong2024revisiting} Wong, W. E. et al. Revisiting software reliability modeling and testing. \emph{IEEE Transactions on Reliability}, 2024.
+\bibitem{ieee1633} IEEE. \emph{IEEE Recommended Practice on Software Reliability}, IEEE Std 1633-2016, 2017.
+\bibitem{fenton2012risk} Fenton, N. and Neil, M. \emph{Risk Assessment and Decision Analysis with Bayesian Networks}. CRC Press, 2012.
+\bibitem{howard1966information} Howard, R. A. Information value theory. \emph{IEEE Transactions on Systems Science and Cybernetics}, 2(1), 22--26, 1966.
+\end{thebibliography}
+\end{document}

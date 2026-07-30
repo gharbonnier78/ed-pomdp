@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.2.4-step2.4-protocol-freeze — 2026-07-30
+- Restored and strengthened the preregistered analysis-freeze commitment before any headline experiment.
+- Required publication of the analysis Git commit SHA plus SHA-256 digests for the analysis entry point and locked dependency/configuration manifest.
+- Required a dated freeze manifest under `benchmark/protocol/` to be committed before headline raw results are generated.
+- Froze the entropy baseline as expected Shannon-entropy reduction over the full joint belief `P(S,E | history)`.
+- Froze the complete confirmatory multiplicity family and Holm family-wise error correction at `alpha = 0.05`.
+- Reordered the remaining Step 2 increments so the evidence-quality/degradation mechanism precedes policy-matrix completion.
+- Documented why the classical-POMDP-versus-ED-POMDP contrast is empty while evidence-quality acquisition has zero decision VoI.
+- Kept `CLM-VOI-001` and `CLM-EQ-001` at evidence level `NONE`; the causal evidence-quality runtime mechanism is not yet implemented.
+
 ## v1.2.3-step2.3-voi-policy — 2026-07-30
 - Added an observable-history posterior over joint system and evidence-quality hypotheses.
 - Added a fixed-model one-step look-ahead acquisition policy minimizing expected terminal decision loss plus evidence cost.

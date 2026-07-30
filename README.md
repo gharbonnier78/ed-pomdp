@@ -1,6 +1,6 @@
-# ED-POMDP Research Edition v1.1 — Step 1.1: Epistemic Foundations
+# ED-POMDP Research Edition v1.2 — Step 2: Matched-Budget Benchmark
 
-This repository is the reviewer-oriented scientific foundation for **Evidence-Driven Partially Observable Markov Decision Processes applied to software release assurance**.
+This repository develops **Evidence-Driven Partially Observable Markov Decision Processes applied to software release assurance**.
 
 <p align="center">
   <a href="./paper/main.pdf"><img src="https://img.shields.io/badge/Open-Main%20Paper-0B5FFF?style=for-the-badge&logo=adobeacrobatreader&logoColor=white" alt="Open Main Paper PDF"></a>
@@ -16,13 +16,21 @@ This repository is the reviewer-oriented scientific foundation for **Evidence-Dr
 
 ## Status
 
-Step 1 is shipped. Step 1.1 is the current de-risking increment and must not be confused with completion of Step 1. It adds identifiability analysis, epistemic governance, a canonical claim registry, programme re-scoping and a mandatory data-readiness gate.
+Step 1 and Step 1.1 are shipped. Step 2 is the current quantitative-validation increment.
 
-The identifiability note now contains a worked numeric non-identifiability counterexample and a heterogeneous-channel separating construction. This supports the `FORMAL` evidence label for `CLM-IDENT-001` without claiming empirical or industrial identifiability.
+Step 2 introduces a reusable synthetic benchmark, matched-budget comparison rules, explicit baselines, metric contracts and preregistered refutation criteria for `CLM-VOI-001` and `CLM-EQ-001`.
 
-No operational superiority, real-data calibration or cross-domain validation is claimed.
+No benchmark result has yet been produced. Both claims remain at evidence level `NONE` until reproducible experiments, statistical review and synchronized claim-registry updates are complete.
 
-## Documents
+## Step 2 benchmark
+
+- `benchmark/README.md` — scope, benchmark families and policy matrix
+- `benchmark/protocol/PREREGISTRATION.md` — hypotheses, endpoints and refutation criteria
+- `benchmark/config/benchmark_matrix.yaml` — machine-readable experiment matrix
+- `benchmark/METRICS.md` — auditable metric definitions
+- `benchmark/src/contracts.py` — policy, observation and matched-budget interfaces
+
+## Foundation documents
 
 - `paper/main.tex` — main scientific paper source
 - `identifiability/identifiability_note.tex` — worked Cases A/B/C and intervention noise floor
@@ -36,7 +44,7 @@ No operational superiority, real-data calibration or cross-domain validation is 
 - `governance/DATA_READINESS_GATE.md` — industrial-data decision gate
 - `roadmap/RESEARCH_TRACKS.md` — Committed, Conditional and North-Star tracks
 
-Compiled PDFs are generated from the LaTeX sources. The relative PDF buttons above become active when the compiled PDFs are present in the repository or release package.
+Compiled PDFs are generated from the LaTeX sources. The relative PDF buttons become active when compiled PDFs are present in the repository or release package.
 
 ## Build
 
@@ -45,17 +53,17 @@ make all
 make check
 ```
 
-Requirements: `latexmk`, `pdflatex`, and Python 3. Bibliography is embedded for portable builds.
+Requirements: `latexmk`, `pdflatex`, and Python 3.
 
 ## Scientific posture
 
-The primary domain is software release assurance. Biometrics and UAV active perception remain North-Star external-validity studies. The central open question is whether evidence quality and system state can be identified and calibrated robustly from governed assurance data.
+The primary domain is software release assurance. Biometrics and UAV active perception remain North-Star external-validity studies. Step 2 tests whether decision-aware evidence acquisition and explicit evidence-quality modelling improve decisions under controlled, matched-budget conditions.
 
 ## Repository roadmap
 
 - Step 1 — Scientific Foundations: shipped
-- Step 1.1 — Epistemic Foundations and Identifiability: current increment
-- Step 2 — Matched-budget benchmark and software-release demonstrator
+- Step 1.1 — Epistemic Foundations and Identifiability: shipped
+- Step 2 — Matched-budget benchmark and software-release demonstrator: current increment
 - Step 3 — Conditional industrial calibration and retrospective replay
 - Step 4 — Conditional shadow deployment and governed evaluation
 

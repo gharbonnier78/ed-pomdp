@@ -18,12 +18,14 @@ This repository is the reviewer-oriented scientific foundation for **Evidence-Dr
 
 Step 1 is shipped. Step 1.1 is the current de-risking increment and must not be confused with completion of Step 1. It adds identifiability analysis, epistemic governance, a canonical claim registry, programme re-scoping and a mandatory data-readiness gate.
 
+The identifiability note now contains a worked numeric non-identifiability counterexample and a heterogeneous-channel separating construction. This supports the `FORMAL` evidence label for `CLM-IDENT-001` without claiming empirical or industrial identifiability.
+
 No operational superiority, real-data calibration or cross-domain validation is claimed.
 
 ## Documents
 
 - `paper/main.tex` — main scientific paper source
-- `identifiability/identifiability_note.tex` — S/E identifiability note and intervention noise floor
+- `identifiability/identifiability_note.tex` — worked Cases A/B/C and intervention noise floor
 - `research_program/research_program.tex` — research programme source
 - `survey/related_work.tex` — related-work survey and novelty boundary
 - `reviewer/reviewer_companion.tex` — reviewer companion

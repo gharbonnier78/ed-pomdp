@@ -1,4 +1,4 @@
-DOCS = paper/main research_program/research_program survey/related_work reviewer/reviewer_companion ontology/evidence_ontology appendix/mathematical_appendix
+DOCS = paper/main research_program/research_program survey/related_work reviewer/reviewer_companion ontology/evidence_ontology appendix/mathematical_appendix identifiability/identifiability_note
 
 .PHONY: all clean check
 all:

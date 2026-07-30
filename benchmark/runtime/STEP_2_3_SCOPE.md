@@ -10,7 +10,16 @@ Step 1 and Step 1.1 are already shipped. Step 2 remains open until the preregist
 - fixed identifiable likelihoods that do not adapt to the simulator's true regime;
 - one-step look-ahead expected terminal decision loss;
 - acquisition-channel selection by minimum expected decision loss plus evidence cost;
-- tests for posterior semantics, channel selection and absence of privileged state inputs.
+- a single Bayes-optimal terminal rule derived from `LossWeights` and shared by the runner and VoI planner;
+- tests for posterior semantics, channel selection, terminal-rule consistency and absence of privileged state inputs.
+
+## Decision-rule consistency
+
+The terminal decision executed by the episode runner and the terminal decision assumed inside VoI look-ahead are now the same function. Both minimize the configured expected loss over `GO`, `CONDITIONAL_GO` and `NO_GO`.
+
+The earlier fixed posterior thresholds `0.20/0.80` were not derived from the asymmetric loss weights and are therefore not used by the Step 2.3 decision path. Under the default weights, for example, posterior risk `p=0.5` correctly selects `NO_GO`, because its expected loss is lower than the alternatives.
+
+This alignment is mandatory: otherwise the acquisition policy would optimize an idealized decision-maker while the runner realized a different terminal loss.
 
 ## Deliberate limitation
 

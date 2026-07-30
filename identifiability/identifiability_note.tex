@@ -1,0 +1,36 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,booktabs,hyperref}
+\title{Identifiability of System State and Evidence Quality}
+\author{Guillaume Harbonnier}
+\date{ED-POMDP Research Edition v1.1.0}
+\begin{document}
+\maketitle
+\begin{abstract}
+This note examines when latent system condition $S$ and latent evidence-production quality $E$ can be separated from assurance observations. It provides a non-identifiability counterexample, a heterogeneous-evidence case, and a controlled-intervention case with an explicit intervention noise floor. It supports claim \texttt{CLM-IDENT-001} in the canonical claim registry and does not claim empirical identifiability.
+\end{abstract}
+
+\section{Problem}
+Let observations follow $P(O\mid S,E)$. The factorization is useful only if distinct values of $S$ and $E$ can be distinguished under stated assumptions.
+
+\section{Case A: non-identifiability}
+If two latent pairs induce the same observation law,
+\[
+P(O\mid S=s_1,E=e_1)=P(O\mid S=s_2,E=e_2),
+\]
+then repeated evidence from that unchanged channel cannot separate them. More samples reduce variance but do not repair structural aliasing.
+
+\section{Case B: heterogeneous evidence}
+Separation can become possible when channels have different sensitivity profiles. A functional test may be primarily sensitive to $S$, while an environment validation probe is primarily sensitive to $E$. The joint observation map must have distinct rows, at least up to the equivalence classes relevant to the decision.
+
+\section{Case C: controlled intervention}
+Changing an evidence-production condition while holding the build nominally fixed can increase information about $E$. Yet the system is never perfectly invariant between runs. Flakiness, timing, hidden state, load and environmental drift create an intervention noise floor $\epsilon_{\mathrm{drift}}$.
+
+Hence an intervention identifies $E$ only relative to an explicit stability assumption and only above that noise floor. Paired runs, randomized order, invariant checks and nuisance-variable logging are required before attributing an observation change to $E$.
+
+\section{Practical implications}
+Identifiability comes from experimental structure rather than evidence volume alone. Assurance designs should therefore include environment smoke tests, observability and oracle validation, heterogeneous channels, paired cross-environment execution and controlled interventions with nuisance logging.
+
+\section{Current epistemic status}
+The $S/E$ factorization is formally meaningful, but empirical identifiability is not established. Step 2 must test identifiable, weakly identifiable and non-identifiable regimes separately.
+\end{document}

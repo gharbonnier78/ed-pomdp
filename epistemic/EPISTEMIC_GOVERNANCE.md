@@ -2,9 +2,13 @@
 
 `docs/CLAIMS.md` is the canonical epistemic registry for this repository.
 
+`benchmark/protocol/PREREGISTRATION.md` is the canonical Step 2 experimental preregistration.
+
 ## Rule
 
 Papers, notes, programmes, experiments and reviewer responses reference claim IDs. They must not independently redefine a claim's maturity or evidence level.
+
+Experimental documents, scripts and reports must not independently redefine preregistered hypotheses, matched-budget rules, seeds, endpoints, exclusion rules, robustness checks or refutation criteria.
 
 ## Claim lifecycle
 
@@ -46,4 +50,10 @@ A reviewer comment must link to the claim, assumption, gate or document it affec
 
 ## Anti-drift rule
 
-When two documents disagree, `docs/CLAIMS.md` governs epistemic status. The inconsistency is treated as a defect and corrected before release.
+When documents disagree about epistemic status, `docs/CLAIMS.md` governs.
+
+When documents disagree about the Step 2 experimental protocol, `benchmark/protocol/PREREGISTRATION.md` governs.
+
+`docs/PREREGISTRATION.md` is a non-normative compatibility pointer only and must not contain a duplicate protocol.
+
+Any inconsistency is treated as a repository defect and corrected before release or execution of headline experiments.

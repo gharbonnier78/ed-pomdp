@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.2.0-step2-scaffold — 2026-07-30
+- Opened Step 2 as a separate matched-budget quantitative-validation increment.
+- Added benchmark families for identifiable, weakly identifiable and non-identifiable regimes.
+- Added evidence degradation, channel dependence and likelihood misspecification regimes.
+- Added ED-POMDP and six baseline policy definitions.
+- Added a preregistration for `CLM-VOI-001` and `CLM-EQ-001` with explicit refutation criteria.
+- Added machine-readable benchmark configuration and an auditable metric contract.
+- Added policy and matched-budget software interfaces.
+- Kept both empirical claims at evidence level `NONE`; no result is claimed by this scaffold.
+
 ## v1.1.0-step1.1 — 2026-07-30
 - Added a formal S/E identifiability note with non-identifiability, heterogeneous-evidence and controlled-intervention cases.
 - Added worked numeric non-identifiability and heterogeneous-channel separation cases so `CLM-IDENT-001` legitimately satisfies the `FORMAL` evidence label.

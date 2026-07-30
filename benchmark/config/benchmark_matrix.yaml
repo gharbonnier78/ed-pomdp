@@ -1,0 +1,50 @@
+schema_version: 0.1.0
+benchmark: ed-pomdp-step2
+status: scaffold
+claims_under_test:
+  - CLM-VOI-001
+  - CLM-EQ-001
+budgets: [2, 4, 8, 12]
+seeds: 30
+regimes:
+  identifiability:
+    - identifiable
+    - weakly_identifiable
+    - non_identifiable
+  evidence_quality:
+    - nominal
+    - degraded_oracle
+    - degraded_environment
+    - missing_provenance
+  dependence:
+    - conditionally_independent
+    - weakly_correlated
+    - strongly_correlated
+  likelihood:
+    - correctly_specified
+    - mildly_misspecified
+    - severely_misspecified
+policies:
+  - ed_pomdp_voi
+  - classical_pomdp
+  - entropy_acquisition
+  - fixed_plan
+  - random_acquisition
+  - risk_only
+  - rule_based
+primary_metrics:
+  - decision_loss
+  - unsafe_go_rate
+  - brier_score
+  - expected_calibration_error
+secondary_metrics:
+  - unnecessary_no_go_rate
+  - residual_risk
+  - evidence_cost
+  - acquisition_count
+  - hard_constraint_violations
+matched_budget:
+  enforce_equal_total_cost: true
+  enforce_equal_channel_access: true
+  enforce_equal_horizon: true
+  prohibit_ground_truth_access: true

@@ -1,8 +1,9 @@
-# Step-2 preregistration skeleton
+# Step 2 Preregistration Pointer
 
-1. Freeze hypotheses H1–H6.
-2. Freeze scenario generator families and budget grid.
-3. Separate generative and inference models.
-4. Predefine baselines, seeds, metrics, confidence intervals, and exclusion rules.
-5. Publish analysis script hash before running headline experiments.
-6. Report every regime, including degenerate and negative results.
+The canonical Step 2 preregistration is:
+
+`benchmark/protocol/PREREGISTRATION.md`
+
+This file is intentionally non-normative and retained only as a stable compatibility pointer for earlier links and references.
+
+Do not duplicate or restate hypotheses, budgets, seeds, metrics, confidence intervals, exclusion rules, robustness checks, or refutation criteria here. Any change to the Step 2 experimental protocol must be made in the canonical preregistration and reviewed through the Step 2 pull request history.

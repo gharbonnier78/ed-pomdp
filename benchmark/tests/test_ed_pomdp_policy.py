@@ -1,10 +1,15 @@
-from benchmark.runtime.decision import LossWeights
+from benchmark.runtime.decision import (
+    LossWeights,
+    decide_from_posterior,
+    expected_terminal_risk,
+)
 from benchmark.runtime.ed_pomdp_policy import (
     EvidenceDrivenVoIPolicy,
     expected_one_step_loss,
     joint_posterior,
     marginal_evidence_bad,
     marginal_system_bad,
+    terminal_policy_risk,
 )
 from benchmark.runtime.simulator import Observation
 
@@ -41,6 +46,16 @@ def test_voi_prefers_channel_that_can_reduce_current_decision_risk() -> None:
     assert EvidenceDrivenVoIPolicy().choose(
         history, ("functional", "environment_validation")
     ) == "functional"
+
+
+def test_voi_terminal_risk_matches_executed_terminal_rule() -> None:
+    weights = LossWeights()
+    for probability_bad in (0.05, 0.10, 0.50, 0.90):
+        decision = decide_from_posterior(probability_bad, weights=weights)
+        expected = expected_terminal_risk(
+            probability_bad, decision, weights=weights
+        )
+        assert terminal_policy_risk(probability_bad, weights) == expected
 
 
 def test_policy_interface_contains_no_true_latent_state_or_regime() -> None:

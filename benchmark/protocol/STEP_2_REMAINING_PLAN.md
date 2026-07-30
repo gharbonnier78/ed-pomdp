@@ -4,22 +4,26 @@
 
 Step 2.4 precedes policy-matrix completion because the central contrast between a classical POMDP without explicit `E` and ED-POMDP is not meaningful while evidence quality has no causal effect on observation reliability, calibration, governed constraints or terminal loss.
 
-Under the current Step 2.3 model, `environment_validation` changes only the marginal belief over `E`; it does not change the marginal belief over `S` or terminal decision risk. Its decision VoI is therefore zero, and the two central policies can collapse to identical behavior.
+Under the former Step 2.3 model, `environment_validation` changed only the marginal belief over `E`; it did not change the marginal belief over `S` or terminal decision risk. Its decision VoI was therefore zero, and the two central policies could collapse to identical behavior.
 
 ## Step 2.4 — Evidence-quality and degradation mechanism
 
-Implement and test a non-privileged mechanism in which latent evidence quality affects observable evidence production. Required properties:
+Implemented on the Step 2.4 branch:
 
-- `E` changes functional-channel reliability, calibration or governed release constraints;
-- the policy never observes true `E` or the simulator's true regime;
-- environment-validation observations can change expected future decision loss;
-- identifiable, degraded and likelihood-misspecified regimes are distinguishable in generated data;
-- tests demonstrate non-zero decision value for evidence-quality acquisition in at least one preregistered configuration;
+- `E` controls functional-channel discrimination without being exposed to the policy;
+- the runner and look-ahead share one joint posterior `P(S,E | history)`;
+- environment-validation observations can recalibrate system risk after functional evidence;
+- identifiable, evidence-degraded, likelihood-misspecified and non-identifiable regimes are executable;
+- fixed-seed tests show the degraded and misspecified regimes are observably distinct;
+- a regression configuration with two successful functional observations gives environment validation gross decision VoI of approximately `0.1898454746`;
+- in that configuration the ED-POMDP policy selects environment validation over another functional acquisition;
 - no claim promotion occurs.
+
+The model, numeric regression and claim boundary are documented in `benchmark/runtime/STEP_2_4_SCOPE.md`.
 
 ## Step 2.5 — Policy matrix completion
 
-Implement the remaining preregistered policies only after Step 2.4 makes the central contrast operational:
+Implement the remaining preregistered policies after Step 2.4 makes the central contrast operational:
 
 - fixed;
 - random;

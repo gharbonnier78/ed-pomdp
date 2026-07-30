@@ -1,0 +1,68 @@
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{amsmath,amssymb,booktabs,array,longtable,tabularx,multirow}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit}
+\hypersetup{colorlinks=true,linkcolor=blue!45!black,citecolor=blue!45!black,urlcolor=blue!45!black}
+\setlist{nosep,leftmargin=*}
+\pagestyle{fancy}\fancyhf{}\lhead{ED-POMDP Research Edition v1.0}\rhead{Scientific Foundations}\cfoot{\thepage}
+\newcommand{\edp}{ED-POMDP}
+\newcommand{\stratq}{STRAT-Q}
+\newcommand{\risk}{\mathcal{R}}
+\newcommand{\evidence}{\mathcal{E}}
+
+\title{Mathematical and Experimental Appendix}
+\author{ED-POMDP Research Edition v1.0}
+\date{July 2026}
+\begin{document}\maketitle
+\section{Belief update with latent evidence quality}
+Let $x=(s,e,\theta)$. For an evidence action $a$ and observation $o$,
+\[
+b'(s',e',\theta)\propto Z(o\mid s',e',a,\theta)\sum_{s,e}T(s',e'\mid s,e,a,\theta)b(s,e,\theta).
+\]
+When evidence quality is static during acquisition, $e'=e$; when remediation changes the environment or oracle, $T$ models that transition.
+\section{Decision loss and abstention}
+Terminal decisions minimise posterior expected loss over the feasible set. Abstention has explicit cost but prevents forced confidence. Under model uncertainty, robust risk is
+\[
+\rho_{rob}(d,b)=\sup_{\theta\in\Theta_b}\mathbb{E}[L(d,S)\mid b,\theta].
+\]
+\section{Matched-budget evaluation}
+For budget $B$, policy performance is
+\[
+J_B(\pi)=\mathbb{E}[L(d_\tau,S)]\quad\text{s.t.}\quad \mathbb{E}\sum_{t<\tau}c(a_t)\le B.
+\]
+Policies are compared across a preregistered grid of budgets. Pareto dominance requires no greater cost and no greater loss, with at least one strict improvement.
+\section{Calibration}
+Calibration is assessed using Brier score, expected calibration error, reliability diagrams, and decision calibration: predicted Bayes risk versus realised loss. Classical calibration can be good while decision calibration is poor under asymmetric losses.
+\section{Dependence generator}
+Synthetic evidence dependence is generated through latent common causes $U$: $P(o_1,o_2\mid s)=\sum_uP(u\mid s)P(o_1\mid s,u)P(o_2\mid s,u)$. The naive model omits $U$; the dependence-aware model includes or marginalises it.
+\section{Computational questions}
+Exact POMDP planning is generally intractable at realistic scale. The programme compares myopic DVoI, rollout, point-based methods, and Monte Carlo planning \cite{silver2010pomcp}. Engineering feasibility may favour bounded-horizon or hierarchical policies over theoretical optimality.
+\section{Audit replay invariant}
+Given immutable evidence payload hashes, model version, policy version, configuration, and deterministic seed, replay must reproduce the recommended action and reason code exactly. Probabilistic solvers must persist sampled trajectories or use deterministic pseudo-random streams.
+\begin{thebibliography}{99}
+\bibitem{kaelbling1998planning} Kaelbling, L. P., Littman, M. L., and Cassandra, A. R. Planning and acting in partially observable stochastic domains. \emph{Artificial Intelligence}, 101(1--2), 99--134, 1998.
+\bibitem{lauri2023robotics} Lauri, M., Hsu, D., and Pajarinen, J. Partially observable Markov decision processes in robotics: A survey. \emph{IEEE Transactions on Robotics}, 39(1), 21--40, 2023.
+\bibitem{silver2010pomcp} Silver, D. and Veness, J. Monte-Carlo planning in large POMDPs. \emph{NeurIPS}, 2010.
+\bibitem{sarraute2013hackers} Sarraute, C., Buffet, O., and Hoffmann, J. POMDPs make better hackers: Accounting for uncertainty in penetration testing. arXiv:1307.7809, 2013.
+\bibitem{wu2020active} Wu, B. et al. Constrained active classification using partially observable Markov decision processes. arXiv:2008.04768, 2020.
+\bibitem{arora2019multimodal} Arora, A., Fitch, R., and Sukkarieh, S. Multi-modal active perception for information gathering in science missions. \emph{Autonomous Robots}, 2019.
+\bibitem{rahbar2025active} Rahbar, A., Aronsson, L., and Chehreghani, M. H. A survey on active feature acquisition strategies. arXiv:2502.11067, 2025.
+\bibitem{wong2024revisiting} Wong, W. E. et al. Revisiting software reliability modeling and testing. \emph{IEEE Transactions on Reliability}, 2024.
+\bibitem{ieee1633} IEEE. \emph{IEEE Recommended Practice on Software Reliability}, IEEE Std 1633-2016, 2017.
+\bibitem{fenton2012risk} Fenton, N. and Neil, M. \emph{Risk Assessment and Decision Analysis with Bayesian Networks}. CRC Press, 2012.
+\bibitem{howard1966information} Howard, R. A. Information value theory. \emph{IEEE Transactions on Systems Science and Cybernetics}, 2(1), 22--26, 1966.
+\end{thebibliography}
+\end{document}

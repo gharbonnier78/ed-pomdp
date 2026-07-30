@@ -15,17 +15,17 @@ Step 1 and Step 1.1 are already shipped. Step 2 remains open until the preregist
 
 ## Decision-rule consistency
 
-The terminal decision executed by the episode runner and the terminal decision assumed inside VoI look-ahead are now the same function. Both minimize the configured expected loss over `GO`, `CONDITIONAL_GO` and `NO_GO`.
+The terminal decision executed by the episode runner and the terminal decision assumed inside VoI look-ahead are the same function. Both minimize the configured expected loss over `GO`, `CONDITIONAL_GO` and `NO_GO`.
 
 The earlier fixed posterior thresholds `0.20/0.80` were not derived from the asymmetric loss weights and are therefore not used by the Step 2.3 decision path. Under the default weights, for example, posterior risk `p=0.5` correctly selects `NO_GO`, because its expected loss is lower than the alternatives.
 
 This alignment is mandatory: otherwise the acquisition policy would optimize an idealized decision-maker while the runner realized a different terminal loss.
 
-## Deliberate limitation
+## Deliberate limitation at Step 2.3
 
-In the current identifiable agent model, the functional channel informs system quality and the environment-validation channel informs evidence-production quality. The terminal loss used by this increment depends on system-release risk only. Consequently, this increment is the first executable decision-aware VoI policy for `CLM-VOI-001`, but it does not yet constitute a fair test of `CLM-EQ-001`.
+At the time Step 2.3 was merged, the functional channel informed system quality and the environment-validation channel informed evidence-production quality, but evidence quality did not alter functional reliability or terminal release loss. Step 2.3 therefore established the first executable decision-aware VoI policy for `CLM-VOI-001`, but it was not yet a fair test of `CLM-EQ-001`.
 
-A later evidence-degradation increment must make evidence quality affect observation reliability, calibration or governed release constraints before an environment-validation acquisition can have decision value. That experiment must not expose the simulator's true `E` or true regime to the policy.
+That limitation is historical: Step 2.4 subsequently introduces a causal evidence-quality mechanism and is documented separately in `benchmark/runtime/STEP_2_4_SCOPE.md`.
 
 ## Claim boundary
 

@@ -1,0 +1,17 @@
+name: build-documents
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: xu-cheng/latex-action@v3
+        with:
+          root_file: |
+            paper/main.tex
+            research_program/research_program.tex
+            survey/related_work.tex
+            reviewer/reviewer_companion.tex
+            ontology/evidence_ontology.tex
+            appendix/mathematical_appendix.tex
+      - run: python3 scripts/check_package.py

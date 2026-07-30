@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.2.1-step2.1-execution-core — 2026-07-30
+- Added a deterministic synthetic release simulator with explicit latent system and evidence-quality states.
+- Implemented identifiable and deliberately non-identifiable observation regimes aligned with the identifiability note.
+- Added observable-only fixed, random and failure-focused acquisition policies.
+- Added a matched-budget episode runner and invariant validation.
+- Added tests for seed stability, budget equality and absence of privileged latent-state inputs.
+- Explicitly limited this increment to acquisition-runtime validation: no stopping decision, terminal GO/NO-GO action or decision-loss endpoint is implemented yet.
+- Kept `CLM-VOI-001` and `CLM-EQ-001` at evidence level `NONE`; this increment does not exercise or validate decision-aware Value of Information.
+
 ## v1.2.0-step2-scaffold — 2026-07-30
 - Opened Step 2 as a separate matched-budget quantitative-validation increment.
 - Added benchmark families for identifiable, weakly identifiable and non-identifiable regimes.

@@ -8,7 +8,7 @@ quality, not system quality directly.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 
 State = tuple[bool, bool]  # (system_bad, evidence_bad)
 
@@ -22,9 +22,10 @@ class EvidenceModel:
     environment_bad_evidence_fail: float = 0.80
 
     def __post_init__(self) -> None:
-        for name, value in self.__dict__.items():
+        for field in fields(self):
+            value = getattr(self, field.name)
             if not 0.0 <= value <= 1.0:
-                raise ValueError(f"{name} must be in [0, 1]")
+                raise ValueError(f"{field.name} must be in [0, 1]")
 
     def failure_probability(self, channel: str, state: State) -> float:
         system_bad, evidence_bad = state

@@ -2,6 +2,12 @@
 
 The decision policy receives observations only. Ground-truth latent state is used
 strictly after termination to score the decision.
+
+The inference model is deliberately fixed to the identifiable functional-channel
+likelihoods (0.80/0.20). It is not made regime-aware. Future evaluation against
+non-identifiable or likelihood-misspecified environments therefore measures
+robustness to model misspecification rather than silently adapting the agent to
+the data-generating regime.
 """
 from __future__ import annotations
 
@@ -37,10 +43,12 @@ class DecisionScore:
 
 
 def posterior_system_bad(history: tuple[Observation, ...], prior: float = 0.5) -> float:
-    """Bayesian posterior under the identifiable functional-channel model.
+    """Bayesian posterior under the fixed identifiable functional-channel model.
 
     Environment-validation observations are intentionally excluded from the
     system-state likelihood; they inform evidence quality in later increments.
+    The assumed likelihood remains fixed across true simulator regimes so later
+    robustness experiments can expose misspecification effects explicitly.
     """
     if not 0.0 < prior < 1.0:
         raise ValueError("prior must be between zero and one")

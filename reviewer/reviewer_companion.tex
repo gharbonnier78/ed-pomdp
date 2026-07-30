@@ -1,0 +1,47 @@
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{amsmath,amssymb,booktabs,array,longtable,tabularx,multirow}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit}
+\hypersetup{colorlinks=true,linkcolor=blue!45!black,citecolor=blue!45!black,urlcolor=blue!45!black}
+\setlist{nosep,leftmargin=*}
+\pagestyle{fancy}\fancyhf{}\lhead{ED-POMDP Research Edition v1.0}\rhead{Scientific Foundations}\cfoot{\thepage}
+\newcommand{\edp}{ED-POMDP}
+\newcommand{\stratq}{STRAT-Q}
+\newcommand{\risk}{\mathcal{R}}
+\newcommand{\evidence}{\mathcal{E}}
+
+\title{Reviewer Companion: Response and Revision Commitments}
+\author{ED-POMDP Research Edition v1.0}
+\date{July 2026}
+\begin{document}\maketitle
+\section*{Purpose}
+This companion converts the initial reviewer assessment into explicit changes, experiments, and residual limitations.
+\begin{longtable}{p{0.20\textwidth}p{0.31\textwidth}p{0.36\textwidth}}
+\toprule Concern & Step-1 response & Step-2 verification\\\midrule
+Shared abstraction proves code reuse, not scientific necessity & Software release is primary; cross-domain claims downgraded. The paper states the expected scientific utility of the formalism. & Ablate the shared constructs and compare simpler domain-specific models.\\
+Hand-picked likelihoods & Abstract and non-claims explicitly state that parameters are not estimated. & Separate $Z_{true}$ from $\widehat Z$; estimate from finite samples; test calibration.\\
+Identifiability unsupported & Reframed as RQ7 and an open programme risk. & Identifiability analysis, posterior geometry, conservative bounds, elicitation study.\\
+No matched budgets & H1 rewritten for fixed budgets and paired intervals. & Budget-loss curves, target-loss cost curves, Pareto fronts.\\
+Dependence and shift absent & Central threats and WP3. & Common-cause generators, shift regimes, robust models.\\
+Unused hard constraints $\mathcal K$ & Formal admissibility defined and mandatory scenarios specified. & Constraint explorer and zero-violation tests.\\
+Which domain first? & Software release is the only primary validation domain. & Retrospective STRAT-Q-style replay before biometrics/UAV.\\
+UAV degenerate stopping & Retained as evidence of model-specification failure, not hidden. & Continuous-state UAV benchmark deferred to external validation.\\
+Thin related work & Dedicated survey and comparison matrix added. & Systematic-review protocol and expanded bibliography.\\
+Hypotheses not falsifiable & Every hypothesis includes a refutation criterion. & Machine-readable preregistration and locked analysis.\\\bottomrule
+\end{longtable}
+\section*{Residual limitations}
+Step 1 remains a scientific foundation. It contains no operational performance claim, no real-data calibration, and no proof that the framework is preferable to simpler decision rules. These are intentionally delegated to subsequent milestones with explicit stop conditions.
+\end{document}

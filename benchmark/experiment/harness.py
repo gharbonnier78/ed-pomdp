@@ -23,6 +23,14 @@ from benchmark.runtime.policy_matrix import POLICY_NAMES, build_policy_matrix
 from benchmark.runtime.simulator import Observation, Regime, SyntheticReleaseEnvironment
 
 
+CONFIRMATORY_METRICS = (
+    "decision_loss",
+    "brier_score",
+    "expected_calibration_error",
+)
+MANDATORY_SAFETY_METRICS = ("unsafe_go_rate",)
+
+
 @dataclass(frozen=True)
 class HeadlineEpisodeRecord:
     config_id: str
@@ -98,6 +106,38 @@ def validate_headline_config(config: Mapping[str, object]) -> None:
         raise ValueError("all LossWeights values must be explicit in headline config")
     if any(float(value) < 0.0 for value in loss_weights.values()):
         raise ValueError("LossWeights values must be non-negative")
+
+    if tuple(config.get("confirmatory_metrics", ())) != CONFIRMATORY_METRICS:
+        raise ValueError("headline confirmatory metrics must match the frozen registry")
+    if tuple(config.get("mandatory_safety_metrics", ())) != MANDATORY_SAFETY_METRICS:
+        raise ValueError("headline safety metrics must match the frozen registry")
+    if set(CONFIRMATORY_METRICS) & set(MANDATORY_SAFETY_METRICS):
+        raise AssertionError("safety reporting must remain outside confirmatory inference")
+
+    calibration = config.get("calibration")
+    if not isinstance(calibration, Mapping):
+        raise ValueError("calibration section is required")
+    bin_edges = tuple(float(value) for value in calibration.get("bin_edges", ()))
+    expected_bin_edges = tuple(index / 10.0 for index in range(11))
+    if bin_edges != expected_bin_edges:
+        raise ValueError("headline ECE must use the frozen ten equal-width bins")
+    if calibration.get("report_resolution_diagnostics") is not True:
+        raise ValueError("ECE resolution diagnostics must be enabled")
+
+    analysis = config.get("analysis")
+    if not isinstance(analysis, Mapping):
+        raise ValueError("analysis section is required")
+    multiplicity = analysis.get("multiplicity")
+    if not isinstance(multiplicity, Mapping):
+        raise ValueError("multiplicity section is required")
+    expected_family_size = (
+        len(regimes)
+        * len(budgets)
+        * len(tuple(config.get("confirmatory_baselines", ())))
+        * len(CONFIRMATORY_METRICS)
+    )
+    if multiplicity.get("expected_family_size") != expected_family_size:
+        raise ValueError("configured Holm family size does not match headline dimensions")
 
     randomness = config.get("randomness")
     if not isinstance(randomness, Mapping):

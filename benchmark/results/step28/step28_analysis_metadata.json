@@ -1,0 +1,53 @@
+{
+  "analysis_role": "post_hoc_descriptive",
+  "counts": {
+    "acquisition_rows": 1184,
+    "pairwise_rows": 2400,
+    "summary_rows": 125,
+    "threshold_rows": 112,
+    "transition_rows": 124
+  },
+  "decision_boundaries": {
+    "conditional_no_go": 0.2727272727272727,
+    "go_conditional": 0.07692307692307693
+  },
+  "generator": "benchmark/analysis/analyze_step28_mechanisms.py",
+  "generator_sha256": "39ed5139065eeff07764856f4aee075dfbe2a0c7cf8395619a7b1f85da7c5d7f",
+  "inferential_status": "descriptive_post_hoc_no_new_tests",
+  "inputs": {
+    "benchmark/results/headline_raw.csv": "6695ab664fb67ec1eeb60669273aadf6a355a4fcdb45994f3870f638775dd070",
+    "benchmark/results/step27_posthoc_directionality.csv": "fdad023ffb2ab82a65ec6b8f2cd962b0e0e3421192e4e30e399bed31c82c1339"
+  },
+  "outputs": {
+    "acquisition": {
+      "path": "benchmark/results/step28/step28_acquisition_summary.csv",
+      "sha256": "f406e32c4bf9621ae838ef6cdc057ceca41812a9c9b1a397f0b0c02832d471f4"
+    },
+    "pairwise": {
+      "path": "benchmark/results/step28/step28_pairwise_diagnostics.csv",
+      "sha256": "ab62c3457791ce90700c515f5f24bd7e703a59a559c4e406e2509754044616fc"
+    },
+    "report": {
+      "path": "benchmark/results/step28/STEP_2_8_CLAIM_ADJUDICATION.md",
+      "sha256": "8868d7b3a0880d0a3ca5be76eaac1bcd36afc914ef99cbbc19465e9cc1a82b4b"
+    },
+    "summary": {
+      "path": "benchmark/results/step28/step28_mechanism_summary.csv",
+      "sha256": "1419b3485adece948965503ef034e1663d534fe38ae9e56767b77c152c5e813f"
+    },
+    "thresholds": {
+      "path": "benchmark/results/step28/step28_threshold_occupancy.csv",
+      "sha256": "158d51877e5f054e53a703782d9195c5012091e97649231b538e9e88ad51dfdc"
+    },
+    "transitions": {
+      "path": "benchmark/results/step28/step28_decision_transitions.csv",
+      "sha256": "11a8edc4577a304316a194599754e9d5dcdcf1967431da22f6a69b7845954988"
+    }
+  },
+  "schema_version": "0.3.0",
+  "threshold_windows": [
+    0.01,
+    0.025,
+    0.05
+  ]
+}

@@ -2,13 +2,13 @@
 
 ## Ordering decision
 
-Step 2.4 precedes policy-matrix completion because the central contrast between a classical POMDP without explicit `E` and ED-POMDP is not meaningful while evidence quality has no causal effect on observation reliability, calibration, governed constraints or terminal loss.
+Step 2.4 preceded policy-matrix completion because the central contrast between a classical POMDP without explicit `E` and ED-POMDP was not meaningful while evidence quality had no causal effect on observation reliability, calibration, governed constraints or terminal loss.
 
 Under the former Step 2.3 model, `environment_validation` changed only the marginal belief over `E`; it did not change the marginal belief over `S` or terminal decision risk. Its decision VoI was therefore zero, and the two central policies could collapse to identical behavior.
 
 ## Step 2.4 — Evidence-quality and degradation mechanism
 
-Implemented on the Step 2.4 branch:
+Implemented and merged:
 
 - `E` controls functional-channel discrimination without being exposed to the policy;
 - the runner and look-ahead share one joint posterior `P(S,E | history)`;
@@ -23,24 +23,30 @@ The model, numeric regression and claim boundary are documented in `benchmark/ru
 
 ## Step 2.5 — Policy matrix completion
 
-Implement the remaining preregistered policies after Step 2.4 makes the central contrast operational:
+Implemented on the Step 2.5 branch:
 
-- fixed;
-- random;
-- risk/failure-focused;
-- entropy over the full joint belief `P(S,E | history)`;
-- risk-only;
-- classical POMDP without explicit `E`;
-- ED-POMDP decision-aware VoI.
+- fixed alternating plan;
+- seeded random acquisition;
+- failure-focused rule-based assurance;
+- entropy acquisition over the full joint belief `P(S,E | history)`;
+- risk-only acquisition minimizing expected marginal system uncertainty;
+- classical POMDP with evidence quality permanently marginalized at its prior;
+- ED-POMDP decision-aware VoI over the explicit joint belief;
+- canonical seven-policy registry with exact preregistered names and ordering;
+- common observable input, channel access, stopping rule and terminal loss semantics;
+- policy-specific observable posterior support in the shared decision runner;
+- regressions proving that the classical model cannot recalibrate from environment validation while ED-POMDP can.
 
-All policies must share observable inputs, available channels, budget accounting, stopping rules and terminal loss semantics.
+The definitions, invariants and claim boundary are documented in `benchmark/runtime/STEP_2_5_SCOPE.md`.
 
 ## Step 2.6 — Reproducible experiment harness and analysis freeze
 
-Before headline execution:
+Next increment, before headline execution:
 
-- freeze the complete regime × budget × policy matrix;
+- freeze the complete executable regime × budget × policy matrix;
+- reconcile scaffold regime labels with the four implemented simulator regimes;
 - freeze primary and secondary metric implementations;
+- define the matched-budget headline runner, including explicit treatment of early stopping and equal total acquisition cost;
 - freeze the confirmatory multiplicity family and Holm correction;
 - commit the analysis scripts and locked dependency/configuration manifest;
 - publish the Git commit SHA and SHA-256 hashes in a dated analysis-freeze manifest;

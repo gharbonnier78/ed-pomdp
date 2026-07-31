@@ -1,14 +1,23 @@
 name: build-documents
 on: [push, pull_request]
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Verify committed close-out PDF manifest
+        run: sha256sum -c paper/step2_closeout.sha256
+
+      - name: Preserve committed close-out PDF
+        run: cp paper/step2_closeout.pdf /tmp/step2_closeout.committed.pdf
+
       - uses: xu-cheng/latex-action@v3
         with:
           root_file: |
             paper/main.tex
+            paper/step2_closeout.tex
             research_program/research_program.tex
             survey/related_work.tex
             reviewer/reviewer_companion.tex
@@ -16,6 +25,36 @@ jobs:
             appendix/mathematical_appendix.tex
             benchmark/results/STEP_2_7_EXECUTIVE_STATUS_NOTE.tex
           work_in_root_file_dir: true
+
+      - name: Preserve first deterministic close-out build
+        run: cp paper/step2_closeout.pdf /tmp/step2_closeout.first.pdf
+
+      - name: Remove close-out build products
+        run: |
+          rm -f paper/step2_closeout.pdf \
+                paper/step2_closeout.aux \
+                paper/step2_closeout.fdb_latexmk \
+                paper/step2_closeout.fls \
+                paper/step2_closeout.log \
+                paper/step2_closeout.out \
+                paper/step2_closeout.toc \
+                paper/step2_closeout.synctex.gz
+
+      - name: Rebuild close-out from a clean state
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: paper/step2_closeout.tex
+          work_in_root_file_dir: true
+
+      - name: Verify bit-for-bit PDF reproducibility
+        run: |
+          cmp /tmp/step2_closeout.first.pdf paper/step2_closeout.pdf
+          cmp /tmp/step2_closeout.committed.pdf paper/step2_closeout.pdf
+          sha256sum -c paper/step2_closeout.sha256
+          sha256sum /tmp/step2_closeout.committed.pdf \
+                    /tmp/step2_closeout.first.pdf \
+                    paper/step2_closeout.pdf
+
       - run: python3 scripts/check_package.py
 
   test-runtime:

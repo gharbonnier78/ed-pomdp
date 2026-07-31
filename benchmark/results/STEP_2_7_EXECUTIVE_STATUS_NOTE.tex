@@ -73,7 +73,7 @@ Seven decision policies were compared over \textbf{3,360 simulated episodes} in 
   \item a non-identifiable case in which system state and evidence quality cannot be reliably disentangled.
 \end{itemize}
 
-Four acquisition budgets were used, with 30 frozen seeds and the same latent scenarios for every policy. Rules, endpoints, parameters, bootstrap and permutation counts, and multiplicity correction were locked before execution. The reviewer then independently checked the hashes and row counts and reimplemented Holm step-down with \textbf{zero discrepancies across all 240 adjusted values}.
+Four acquisition budgets were used, with 30 frozen seeds and the same latent scenarios for every policy. Rules, endpoints, parameters, bootstrap and permutation counts, and multiplicity correction were locked before execution. The reviewer independently checked the frozen hashes and exact row counts, reimplemented Holm step-down with \textbf{zero discrepancies across all 240 adjusted values}, and recomputed every row of the post-hoc directionality audit with \textbf{zero discrepancies}.
 
 \section*{The result}
 

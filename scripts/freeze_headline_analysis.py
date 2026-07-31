@@ -32,6 +32,7 @@ FROZEN_ARTIFACTS = (
     "benchmark/config/headline_matrix.json",
     "benchmark/METRICS.md",
     "benchmark/protocol/PREREGISTRATION.md",
+    "benchmark/protocol/PRE_FREEZE_POWER_REVIEW.md",
     "benchmark/runtime/evidence_model.py",
     "benchmark/runtime/simulator.py",
     "benchmark/runtime/decision.py",
@@ -92,7 +93,7 @@ def create_lock() -> None:
         raise RuntimeError(f"frozen artifact inventory is incomplete: {missing!r}")
     source_commit = _git("rev-parse", "HEAD")
     lock = {
-        "schema_version": "0.2.0",
+        "schema_version": "0.2.1",
         "status": "frozen_artifact_lock",
         "source_commit": source_commit,
         "python": {
@@ -138,7 +139,7 @@ def create_manifest() -> None:
         raise RuntimeError("headline config is not frozen")
     frozen_artifact_commit = _git("rev-parse", "HEAD")
     manifest = {
-        "schema_version": "0.2.0",
+        "schema_version": "0.2.1",
         "status": "frozen",
         "created_date": "2026-07-31",
         "frozen_artifact_commit": frozen_artifact_commit,
@@ -162,6 +163,9 @@ def create_manifest() -> None:
             "policies": config["policies"],
         },
         "loss_weights": config["loss_weights"],
+        "confirmatory_metrics": config["confirmatory_metrics"],
+        "mandatory_safety_metrics": config["mandatory_safety_metrics"],
+        "calibration": config["calibration"],
         "randomness": config["randomness"],
         "multiplicity": config["analysis"]["multiplicity"],
         "raw_results_absent_at_freeze": True,

@@ -1,0 +1,34 @@
+name: step-2.8-closeout-pdf
+
+on:
+  push:
+    branches:
+      - step-2.8-claim-adjudication
+    paths:
+      - .github/workflows/step28-closeout-pdf.yml
+
+jobs:
+  compile-and-upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: step-2.8-claim-adjudication
+
+      - uses: xu-cheng/latex-action@v3
+        with:
+          root_file: paper/step2_closeout.tex
+          work_in_root_file_dir: true
+
+      - name: Verify PDF
+        run: |
+          test -s paper/step2_closeout.pdf
+          test "$(stat -c%s paper/step2_closeout.pdf)" -gt 5000
+          sha256sum paper/step2_closeout.pdf
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: step2.8-closeout-pdf
+          path: paper/step2_closeout.pdf
+          retention-days: 90

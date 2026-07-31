@@ -1,0 +1,126 @@
+{
+  "analysis_entrypoint": {
+    "path": "benchmark/analysis/analyze_headline.py",
+    "sha256": "37eb86889abb1c34826b333a3025be104c0ab710f82e5ba6c4d9b869b4cf072e"
+  },
+  "calibration": {
+    "bin_edges": [
+      0.0,
+      0.1,
+      0.2,
+      0.3,
+      0.4,
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0
+    ],
+    "report_resolution_diagnostics": true,
+    "small_budget_interpretation": "ECE is confirmatory but low-resolution when posterior support is sparse; report distinct posterior values and populated bins for every cell."
+  },
+  "confirmatory_metrics": [
+    "decision_loss",
+    "brier_score",
+    "expected_calibration_error"
+  ],
+  "created_date": "2026-07-31",
+  "frozen_artifact_commit": "8e86d655bd4d9873c87b60c1a541c7712df389ce",
+  "headline_config": "benchmark/config/headline_matrix.json",
+  "headline_config_sha256": "63488217d88e34f7c7789cd01c88fe5b7669aa31d7c6dbe53c09e4f10259f87c",
+  "headline_dimensions": {
+    "budgets": [
+      2,
+      4,
+      8,
+      12
+    ],
+    "policies": [
+      "ed_pomdp_voi",
+      "classical_pomdp",
+      "entropy_acquisition",
+      "fixed_plan",
+      "random_acquisition",
+      "risk_only",
+      "rule_based"
+    ],
+    "regimes": [
+      "identifiable",
+      "evidence_degraded",
+      "likelihood_misspecified",
+      "non_identifiable"
+    ],
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29
+    ]
+  },
+  "lock_file": "benchmark/config/FROZEN_ARTIFACTS.json",
+  "lock_sha256": "7acac871ae85343b71b3bbd0cbc399b74075dd45aa4a7f8cdb8acb7f3bf23dd8",
+  "loss_weights": {
+    "conditional_bad": 4.0,
+    "conditional_good": 0.5,
+    "evidence_cost": 0.1,
+    "unnecessary_no_go": 2.0,
+    "unsafe_go": 10.0
+  },
+  "mandatory_safety_metrics": [
+    "unsafe_go_rate"
+  ],
+  "multiplicity": {
+    "alpha": 0.05,
+    "expected_family_size": 240,
+    "method": "holm_step_down"
+  },
+  "python_exact_version": "3.12.13",
+  "randomness": {
+    "environment_noise_index": "acquisition_step",
+    "environment_pairing_key": [
+      "regime",
+      "budget",
+      "seed"
+    ],
+    "environment_stream": "sha256_named_common_random_numbers",
+    "fresh_environment_instance_per_policy": true,
+    "fresh_policy_instance_per_experimental_unit": true,
+    "policy_stream": "sha256_derived_seed",
+    "policy_stream_is_distinct_from_environment": true,
+    "shared_counterfactual_environment_tape_per_cell": true
+  },
+  "raw_results_absent_at_freeze": true,
+  "runner_entrypoint": {
+    "path": "benchmark/experiment/run_headline.py",
+    "sha256": "20f62862692bfe1134b7a7e059da090b255dc8e3f782eedd1a468b9640153f92"
+  },
+  "schema_version": "0.2.1",
+  "status": "frozen"
+}

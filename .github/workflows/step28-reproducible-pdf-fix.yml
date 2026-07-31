@@ -1,0 +1,53 @@
+name: step-2.8-reproducible-pdf-fix
+
+on:
+  push:
+    branches:
+      - step-2.8-claim-adjudication
+    paths:
+      - .github/workflows/step28-reproducible-pdf-fix.yml
+
+jobs:
+  compile-twice:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SOURCE_DATE_EPOCH: "1785456000"
+      FORCE_SOURCE_DATE: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: step-2.8-claim-adjudication
+
+      - uses: xu-cheng/latex-action@v3
+        with:
+          root_file: paper/step2_closeout.tex
+          work_in_root_file_dir: true
+
+      - name: Preserve first build and clean products
+        run: |
+          cp paper/step2_closeout.pdf /tmp/step2_closeout.first.pdf
+          rm -f paper/step2_closeout.pdf \
+                paper/step2_closeout.aux \
+                paper/step2_closeout.fdb_latexmk \
+                paper/step2_closeout.fls \
+                paper/step2_closeout.log \
+                paper/step2_closeout.out \
+                paper/step2_closeout.toc \
+                paper/step2_closeout.synctex.gz
+
+      - uses: xu-cheng/latex-action@v3
+        with:
+          root_file: paper/step2_closeout.tex
+          work_in_root_file_dir: true
+
+      - name: Verify deterministic binary
+        run: |
+          cmp /tmp/step2_closeout.first.pdf paper/step2_closeout.pdf
+          sha256sum /tmp/step2_closeout.first.pdf paper/step2_closeout.pdf
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: step2.8-reproducible-closeout-pdf
+          path: paper/step2_closeout.pdf
+          retention-days: 90

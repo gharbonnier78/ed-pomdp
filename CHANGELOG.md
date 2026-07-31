@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.2.5-step2.5-policy-matrix — 2026-07-31
+- Completed the seven preregistered acquisition policies with exact canonical names and deterministic registry ordering.
+- Added entropy acquisition over the full joint belief `P(S,E | history)`.
+- Added a risk-only baseline minimizing expected marginal system-state uncertainty without terminal loss weights.
+- Added a classical POMDP baseline that maintains only `P(S | history)` and permanently marginalizes evidence quality at its prior.
+- Preserved the fixed, seeded-random and failure-focused rule-based baselines under the common observable-only policy contract.
+- Extended every policy with an observable `posterior_bad(history)` belief used by the shared stopping and terminal-decision runner.
+- Ensured the runner applies common budget, stopping, Bayes terminal-action and realized-loss semantics while allowing the preregistered classical-versus-explicit-`E` inference contrast.
+- Added regressions for full policy completeness, latent-state isolation, entropy semantics, risk-only semantics, classical non-learning from environment validation and classical/ED posterior divergence.
+- Marked the machine-readable matrix as policy-complete but still pending Step 2.6 executable-matrix reconciliation and analysis freeze.
+- Kept `CLM-VOI-001` and `CLM-EQ-001` at evidence level `NONE`; no headline experiment or superiority claim is produced.
+
 ## v1.2.4-step2.4-evidence-quality-mechanism — 2026-07-30
 - Restored and strengthened the preregistered analysis-freeze commitment before any headline experiment.
 - Required publication of the analysis Git commit SHA plus SHA-256 digests for the analysis entry point and locked dependency/configuration manifest.

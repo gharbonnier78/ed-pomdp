@@ -1,0 +1,33 @@
+name: step-2.7-build-executive-note
+
+on:
+  push:
+    branches:
+      - step-2.7-headline-execution
+    paths:
+      - .github/workflows/step27-build-executive-note.yml
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: step-2.7-headline-execution
+          fetch-depth: 0
+      - uses: xu-cheng/latex-action@v3
+        with:
+          root_file: benchmark/results/STEP_2_7_NOTE_ETAT_EXECUTIVE_FR.tex
+          work_in_root_file_dir: true
+      - name: Verify and commit PDF
+        run: |
+          test -s benchmark/results/STEP_2_7_NOTE_ETAT_EXECUTIVE_FR.pdf
+          pdfinfo benchmark/results/STEP_2_7_NOTE_ETAT_EXECUTIVE_FR.pdf | grep -q 'Pages:'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add benchmark/results/STEP_2_7_NOTE_ETAT_EXECUTIVE_FR.pdf
+          git commit -m 'Add compiled French Step 2.7 executive status note'
+          git push origin HEAD:step-2.7-headline-execution

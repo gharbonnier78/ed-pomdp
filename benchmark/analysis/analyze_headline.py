@@ -8,7 +8,9 @@ from pathlib import Path
 from typing import Mapping, Sequence
 
 from benchmark.analysis.metrics import (
-    PRIMARY_ENDPOINTS,
+    CONFIRMATORY_ENDPOINTS,
+    MANDATORY_SAFETY_ENDPOINTS,
+    SUMMARY_ENDPOINTS,
     group_records,
     holm_step_down,
     metric_summary,
@@ -108,6 +110,11 @@ def analyze_records(
     records: Sequence[Mapping[str, object]], config: Mapping[str, object]
 ) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
     validate_raw_matrix(records, config)
+    if tuple(config["confirmatory_metrics"]) != CONFIRMATORY_ENDPOINTS:
+        raise ValueError("confirmatory endpoint registry drifted from frozen analysis")
+    if tuple(config["mandatory_safety_metrics"]) != MANDATORY_SAFETY_ENDPOINTS:
+        raise ValueError("mandatory safety endpoint registry drifted from frozen analysis")
+
     groups = group_records(records)
     calibration = config["calibration"]
     analysis = config["analysis"]
@@ -124,7 +131,7 @@ def analyze_records(
         for budget in config["budgets"]:
             for policy in config["policies"]:
                 group = groups[(str(regime), int(budget), str(policy))]
-                for endpoint in PRIMARY_ENDPOINTS:
+                for endpoint in SUMMARY_ENDPOINTS:
                     key = f"summary|{regime}|{budget}|{policy}|{endpoint}"
                     summary_rows.append(
                         {
@@ -132,6 +139,11 @@ def analyze_records(
                             "budget": budget,
                             "policy": policy,
                             "endpoint": endpoint,
+                            "inference_role": (
+                                "confirmatory"
+                                if endpoint in CONFIRMATORY_ENDPOINTS
+                                else "mandatory_safety_descriptive"
+                            ),
                             **metric_summary(
                                 group,
                                 endpoint=endpoint,
@@ -151,7 +163,7 @@ def analyze_records(
             for baseline in config["confirmatory_baselines"]:
                 baseline_group = groups[(str(regime), int(budget), str(baseline))]
                 pairs = pair_policy_records(ed_group, baseline_group)
-                for endpoint in PRIMARY_ENDPOINTS:
+                for endpoint in CONFIRMATORY_ENDPOINTS:
                     key = f"contrast|{regime}|{budget}|{baseline}|{endpoint}"
                     contrast_rows.append(
                         {
@@ -178,21 +190,23 @@ def analyze_records(
     assert isinstance(multiplicity, Mapping)
     if multiplicity.get("method") != "holm_step_down":
         raise ValueError("only frozen Holm step-down correction is permitted")
+    expected_contrasts = (
+        len(config["regimes"])
+        * len(config["budgets"])
+        * len(config["confirmatory_baselines"])
+        * len(CONFIRMATORY_ENDPOINTS)
+    )
+    if multiplicity.get("expected_family_size") != expected_contrasts:
+        raise ValueError("configured Holm family size does not match frozen dimensions")
+    if len(contrast_rows) != expected_contrasts:
+        raise AssertionError("confirmatory family size drifted from frozen matrix")
+
     holm = holm_step_down(
         [float(row["p_value"]) for row in contrast_rows],
         alpha=float(multiplicity["alpha"]),
     )
     for row, correction in zip(contrast_rows, holm):
         row.update(correction)
-
-    expected_contrasts = (
-        len(config["regimes"])
-        * len(config["budgets"])
-        * len(config["confirmatory_baselines"])
-        * len(PRIMARY_ENDPOINTS)
-    )
-    if len(contrast_rows) != expected_contrasts:
-        raise AssertionError("confirmatory family size drifted from frozen matrix")
     return summary_rows, contrast_rows
 
 
@@ -248,6 +262,7 @@ def main() -> None:
             {
                 "summary_rows": len(summary_rows),
                 "confirmatory_contrasts": len(contrast_rows),
+                "mandatory_safety_endpoint": MANDATORY_SAFETY_ENDPOINTS[0],
             },
             sort_keys=True,
         )

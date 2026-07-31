@@ -5,7 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
-from typing import Mapping
+from typing import Mapping, Sequence
 
 
 def sha256_path(path: str | Path) -> str:
@@ -31,13 +31,31 @@ def _run_git(repo_root: Path, *arguments: str) -> str:
     return completed.stdout.strip()
 
 
+def _dirty_paths(status: str) -> set[str]:
+    paths: set[str] = set()
+    for line in status.splitlines():
+        if len(line) < 4:
+            continue
+        path = line[3:]
+        if " -> " in path:
+            path = path.split(" -> ", 1)[1]
+        paths.add(path.strip('"'))
+    return paths
+
+
 def verify_analysis_freeze(
     manifest_path: str | Path,
     *,
     repo_root: str | Path = ".",
     require_git: bool = True,
+    allowed_dirty_paths: Sequence[str | Path] = (),
 ) -> dict[str, object]:
-    """Verify manifest, lock inventory, explicit loss weights and clean Git state."""
+    """Verify manifest, lock inventory, loss weights and controlled Git state.
+
+    Headline generation supplies no allowed dirty paths. Analysis may allow only
+    the raw table and its metadata, whose hashes are checked independently by
+    the analysis entry point.
+    """
     root = Path(repo_root).resolve()
     manifest_file = (root / manifest_path).resolve()
     if not manifest_file.is_file():
@@ -104,8 +122,17 @@ def verify_analysis_freeze(
             raise RuntimeError("analysis-freeze manifest is not committed") from error
         if not tracked:
             raise RuntimeError("analysis-freeze manifest is not tracked")
-        if _run_git(root, "status", "--porcelain"):
-            raise RuntimeError("headline execution refused: working tree is not clean")
+
+        status = _run_git(root, "status", "--porcelain", "--untracked-files=all")
+        actual_dirty = _dirty_paths(status)
+        allowed = {Path(path).as_posix() for path in allowed_dirty_paths}
+        unexpected = actual_dirty - allowed
+        if unexpected:
+            raise RuntimeError(
+                "headline execution refused: unexpected dirty paths: "
+                + ", ".join(sorted(unexpected))
+            )
+
         frozen_commit = manifest.get("frozen_artifact_commit")
         if not isinstance(frozen_commit, str) or len(frozen_commit) < 7:
             raise RuntimeError("manifest does not publish a frozen artifact commit")

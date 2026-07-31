@@ -1,0 +1,106 @@
+{
+  "schema_version": "1.0.0",
+  "authoritative_source": "docs/CLAIMS.md",
+  "last_revision": "2026-07-31",
+  "claims": [
+    {
+      "id": "CLM-PO-001",
+      "statement": "Software release assurance is structurally partially observable.",
+      "type": "Conceptual claim",
+      "maturity": "Formalized",
+      "evidence_level": "FORMAL",
+      "evidence_polarity": "SUPPORTIVE",
+      "disposition": "ACTIVE",
+      "refutation_gate": "Produce a complete observable-state formulation with no hidden decision-relevant variable.",
+      "supporting_artifacts": ["paper/main.tex"],
+      "next_step": "Formal counterexample comparison",
+      "last_revision": "2026-07-31"
+    },
+    {
+      "id": "CLM-VOI-001",
+      "statement": "Decision-aware value of information reduces matched-budget decision loss relative to fixed and entropy policies.",
+      "type": "Falsifiable hypothesis",
+      "maturity": "Step 2 adjudicated",
+      "evidence_level": "SYNTHETIC",
+      "evidence_polarity": "ADVERSE_MIXED",
+      "disposition": "NOT_SUPPORTED_STEP2",
+      "refutation_gate": "Reject if no material improvement under preregistered matched budgets and confidence intervals. No decision-loss contrast survived Holm correction; claim-relevant aggregate directions were 10 favourable, 16 adverse and 38 equal.",
+      "supporting_artifacts": [
+        "benchmark/results/headline_contrasts.csv",
+        "benchmark/results/step27_posthoc_directionality.csv",
+        "benchmark/results/step28/STEP_2_8_CLAIM_ADJUDICATION.md"
+      ],
+      "next_step": "Do not promote. Any redesigned VOI claim requires a new preregistration, new development seeds and new untouched confirmatory seeds.",
+      "last_revision": "2026-07-31"
+    },
+    {
+      "id": "CLM-EQ-001",
+      "statement": "Modelling evidence-production quality improves calibration under evidence degradation.",
+      "type": "Falsifiable hypothesis",
+      "maturity": "Step 2 adjudicated and narrowed",
+      "evidence_level": "SYNTHETIC",
+      "evidence_polarity": "MIXED_NARROW_POSITIVE",
+      "disposition": "BROAD_FORM_NOT_SUPPORTED_NARROW_ECE_SIGNAL",
+      "refutation_gate": "Reject broad form if calibration and decision loss do not improve across degradation and misspecification. One degraded-evidence, budget-2 ECE contrast survived Holm, but its bootstrap interval crossed zero and posterior support was sparse.",
+      "supporting_artifacts": [
+        "benchmark/results/headline_contrasts.csv",
+        "benchmark/results/STEP_2_7_RESULTS_REVIEW.md",
+        "benchmark/results/step28/STEP_2_8_CLAIM_ADJUDICATION.md"
+      ],
+      "next_step": "Retain only the bounded calibration observation. Any general claim requires a new preregistered study.",
+      "last_revision": "2026-07-31"
+    },
+    {
+      "id": "CLM-CON-001",
+      "statement": "Hard non-compensatory assurance constraints can be integrated into the decision process.",
+      "type": "Formal proposal",
+      "maturity": "Formalized",
+      "evidence_level": "FORMAL",
+      "evidence_polarity": "SUPPORTIVE",
+      "disposition": "ACTIVE",
+      "refutation_gate": "Reject implementation if any forbidden action is selected in exhaustive constrained test cases.",
+      "supporting_artifacts": ["appendix/mathematical_appendix.tex"],
+      "next_step": "Executable zero-violation tests",
+      "last_revision": "2026-07-31"
+    },
+    {
+      "id": "CLM-IDENT-001",
+      "statement": "System state S and evidence quality E are not identifiable from arbitrary repeated observations; separation requires structural assumptions such as heterogeneous channels or controlled interventions.",
+      "type": "Formal claim",
+      "maturity": "Worked counterexample and separating construction established; empirical status open",
+      "evidence_level": "FORMAL",
+      "evidence_polarity": "SUPPORTIVE",
+      "disposition": "ACTIVE_EMPIRICAL_GATE_OPEN",
+      "refutation_gate": "Refute the non-identifiability case by distinguishing the numerically aliased latent pairs from the unchanged channel alone.",
+      "supporting_artifacts": ["identifiability/identifiability_note.tex"],
+      "next_step": "Synthetic identifiable / weak / non-identifiable regimes and later industrial calibration",
+      "last_revision": "2026-07-31"
+    },
+    {
+      "id": "CLM-IND-001",
+      "statement": "Industrial likelihood and evidence-quality models can be calibrated from governed release data.",
+      "type": "Open question",
+      "maturity": "Blocked by data gate",
+      "evidence_level": "NONE",
+      "evidence_polarity": "UNTESTED",
+      "disposition": "BLOCKED",
+      "refutation_gate": "Requires G_data=READY and successful calibration with held-out evaluation.",
+      "supporting_artifacts": ["governance/DATA_READINESS_GATE.md"],
+      "next_step": "Data readiness assessment",
+      "last_revision": "2026-07-31"
+    },
+    {
+      "id": "CLM-XDOM-001",
+      "statement": "The framework generalises to biometrics and UAV active perception.",
+      "type": "Future hypothesis",
+      "maturity": "North-Star only",
+      "evidence_level": "NONE",
+      "evidence_polarity": "UNTESTED",
+      "disposition": "DEFERRED",
+      "refutation_gate": "Requires separate domain protocols and independent evaluation.",
+      "supporting_artifacts": ["research_program/research_program.tex"],
+      "next_step": "External-validity studies, not on the critical path",
+      "last_revision": "2026-07-31"
+    }
+  ]
+}

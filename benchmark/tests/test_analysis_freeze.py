@@ -186,17 +186,25 @@ def test_freeze_guard_rejects_missing_manifest(tmp_path: Path) -> None:
         raise AssertionError("headline execution must refuse a missing manifest")
 
 
-def test_freeze_guard_checks_artifacts_dimensions_and_loss_weights(tmp_path: Path) -> None:
+def _write_guard_fixture(tmp_path: Path) -> tuple[dict[str, object], Path, Path]:
     artifact = tmp_path / "benchmark/analysis/entry.py"
     artifact.parent.mkdir(parents=True)
     artifact.write_text("print('frozen')\n", encoding="utf-8")
 
-    config = {
+    multiplicity = {
+        "method": "holm_step_down",
+        "alpha": 0.05,
+        "expected_family_size": 3,
+    }
+    config: dict[str, object] = {
         "status": "frozen",
         "regimes": ["identifiable"],
         "budgets": [2],
         "seeds": list(range(30)),
         "policies": ["ed_pomdp_voi"],
+        "confirmatory_metrics": ["decision_loss", "brier_score", "expected_calibration_error"],
+        "mandatory_safety_metrics": ["unsafe_go_rate"],
+        "analysis": {"multiplicity": multiplicity},
         "loss_weights": {
             "unsafe_go": 10.0,
             "unnecessary_no_go": 2.0,
@@ -226,6 +234,9 @@ def test_freeze_guard_checks_artifacts_dimensions_and_loss_weights(tmp_path: Pat
         "python_exact_version": platform.python_version(),
         "headline_config": "benchmark/config/headline_matrix.json",
         "loss_weights": config["loss_weights"],
+        "confirmatory_metrics": config["confirmatory_metrics"],
+        "mandatory_safety_metrics": config["mandatory_safety_metrics"],
+        "multiplicity": multiplicity,
         "headline_dimensions": {
             "regimes": config["regimes"],
             "budgets": config["budgets"],
@@ -237,7 +248,11 @@ def test_freeze_guard_checks_artifacts_dimensions_and_loss_weights(tmp_path: Pat
     manifest_path = tmp_path / "benchmark/protocol/ANALYSIS_FREEZE.json"
     manifest_path.parent.mkdir(parents=True)
     manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    return config, config_path, manifest_path
 
+
+def test_freeze_guard_checks_artifacts_dimensions_and_loss_weights(tmp_path: Path) -> None:
+    config, config_path, manifest_path = _write_guard_fixture(tmp_path)
     assert verify_analysis_freeze(
         "benchmark/protocol/ANALYSIS_FREEZE.json",
         repo_root=tmp_path,
@@ -256,3 +271,29 @@ def test_freeze_guard_checks_artifacts_dimensions_and_loss_weights(tmp_path: Pat
         assert "hash mismatch" in str(error)
     else:
         raise AssertionError("changed LossWeights/config must invalidate the freeze")
+
+
+def test_freeze_guard_checks_endpoint_registry_even_with_rehashed_config(tmp_path: Path) -> None:
+    config, config_path, manifest_path = _write_guard_fixture(tmp_path)
+    config["confirmatory_metrics"] = ["decision_loss", "unsafe_go_rate"]
+    config_path.write_text(json.dumps(config), encoding="utf-8")
+
+    lock_path = tmp_path / "benchmark/config/FROZEN_ARTIFACTS.json"
+    lock = json.loads(lock_path.read_text(encoding="utf-8"))
+    lock["artifacts"]["benchmark/config/headline_matrix.json"] = sha256_path(config_path)
+    lock_path.write_text(json.dumps(lock), encoding="utf-8")
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["lock_sha256"] = sha256_path(lock_path)
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    try:
+        verify_analysis_freeze(
+            "benchmark/protocol/ANALYSIS_FREEZE.json",
+            repo_root=tmp_path,
+            require_git=False,
+        )
+    except RuntimeError as error:
+        assert "confirmatory metrics differ" in str(error)
+    else:
+        raise AssertionError("manifest must reject endpoint-registry drift")

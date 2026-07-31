@@ -1,0 +1,143 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[a4paper,margin=2.2cm]{geometry}
+\usepackage{xcolor}
+\usepackage{booktabs,tabularx,array}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tcolorbox}
+\hypersetup{colorlinks=true,linkcolor=blue!40!black,urlcolor=blue!40!black}
+\definecolor{deepblue}{HTML}{183B56}
+\definecolor{softblue}{HTML}{EAF2F8}
+\definecolor{softamber}{HTML}{FFF4D6}
+\definecolor{softred}{HTML}{FBE9E7}
+\definecolor{softgreen}{HTML}{E8F5E9}
+\definecolor{muted}{HTML}{5F6B76}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{ED-POMDP / STRAT-Q}
+\rhead{Step 2.7 Executive Status Note}
+\cfoot{\thepage}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+\setlist[itemize]{leftmargin=1.5em,itemsep=0.25em,topsep=0.25em}
+\titleformat{\section}{\large\bfseries\color{deepblue}}{}{0pt}{}
+\titleformat{\subsection}{\normalsize\bfseries\color{deepblue}}{}{0pt}{}
+\newcommand{\claimvoi}{\texttt{CLM-VOI-001}}
+\newcommand{\claimeq}{\texttt{CLM-EQ-001}}
+
+\begin{document}
+
+{\LARGE\bfseries\color{deepblue} ED-POMDP - Executive Status Note after Step 2.7}\par
+{\large Deciding with evidence without confusing system risk and evidence weakness}\par
+{\color{muted}31 July 2026 - Frozen results, executed and independently verified}
+
+\begin{tcolorbox}[colback=softblue,colframe=deepblue,boxrule=0.7pt,arc=2mm]
+\textbf{In one sentence.} ED-POMDP often produces better-calibrated probabilities, but this improvement does not translate into better final decisions in the current benchmark. The central claim of decision superiority is therefore not supported.
+\end{tcolorbox}
+
+\section*{What we were trying to solve}
+
+When an organisation decides whether to release a solution -- \textbf{GO}, \textbf{CONDITIONAL GO}, or \textbf{NO-GO} -- it observes test results, coverage, incidents, traces, and environment indicators. Conventional approaches often conflate two fundamentally different situations:
+
+\begin{itemize}
+  \item the system is genuinely risky or defective;
+  \item the available evidence is itself weak, obsolete, incomplete, or unrepresentative.
+\end{itemize}
+
+ED-POMDP represents the real state of the system and the quality of the available evidence separately. It also aims to determine \textbf{which evidence should be acquired next}, instead of accumulating tests through a fixed plan or opportunistically. This question is directly connected to the Test Authority role and to STRAT-Q: reducing decision uncertainty under a limited evidence budget.
+
+\section*{What we hoped to demonstrate}
+
+Two propositions were framed as falsifiable hypotheses, not as established truths:
+
+\begin{itemize}
+  \item \textbf{Claim 1 - value of information:} intelligently selecting the next item of evidence should improve the terminal decision at equal budget, compared with fixed, random, entropy-based, or risk-only strategies (\claimvoi).
+  \item \textbf{Claim 2 - evidence quality:} explicitly modelling evidence quality should improve probability calibration and, ideally, the final decision when evidence is degraded or the likelihood model is misspecified (\claimeq).
+\end{itemize}
+
+\section*{What was evaluated}
+
+Seven decision policies were compared over \textbf{3,360 simulated episodes} in four regimes:
+
+\begin{itemize}
+  \item identifiable and generally reliable evidence;
+  \item degraded evidence;
+  \item likelihood misspecification;
+  \item a non-identifiable case in which system state and evidence quality cannot be reliably disentangled.
+\end{itemize}
+
+Four acquisition budgets were used, with 30 frozen seeds and the same latent scenarios for every policy. Rules, endpoints, parameters, bootstrap and permutation counts, and multiplicity correction were locked before execution. The reviewer independently checked the frozen hashes and exact row counts, reimplemented Holm step-down with \textbf{zero discrepancies across all 240 adjusted values}, and recomputed every row of the post-hoc directionality audit with \textbf{zero discrepancies}.
+
+\section*{The result}
+
+Of the \textbf{240 preregistered confirmatory comparisons}, only one survives Holm correction: ED-POMDP improves expected calibration error relative to the classical POMDP in the degraded-evidence regime at budget 2. The evidence is narrow: the bootstrap interval for the difference \textbf{crosses zero}, and the cell contains only a small number of distinct posterior values.
+
+\begin{tcolorbox}[colback=softamber,colframe=orange!70!black,boxrule=0.7pt,arc=2mm]
+\textbf{Central finding.} For the terminal decision, the absence of a significant result does not mean only ``we do not know.'' Across the 64 comparisons directly targeted by the VOI claim:
+\begin{itemize}
+  \item ED-POMDP is better in 10 cells;
+  \item worse in 16 cells;
+  \item exactly equal in 38 cells.
+\end{itemize}
+ED-POMDP therefore \textbf{does not improve} the decision in 54 of 64 comparisons. This total contains many ties and an adverse direction among cells in which the methods differ; it must not be translated into ``ED is worse four times out of five.''
+\end{tcolorbox}
+
+The separation between probabilistic quality and decision quality is clear:
+
+\begin{center}
+\begin{tabularx}{\textwidth}{>{\bfseries}l r r r X}
+\toprule
+Endpoint & Favourable & Adverse & Equal & Descriptive interpretation \\
+\midrule
+Decision loss & 17/80 & 17/80 & 46/80 & Many ties; for the four VOI baselines, adverse directions dominate favourable directions 16 to 10. \\
+Brier score & 63/80 & 13/80 & 4/80 & ED-POMDP probabilities are more often closer to the latent truth. \\
+ECE & 53/80 & 23/80 & 4/80 & Calibration is often better, but only one cell is confirmed after Holm correction. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+In plain terms, ED-POMDP sometimes \textbf{estimates risk better}, but this improved estimate does not change the terminal action often enough, or does not change it in the right direction. It often ``thinks'' better without deciding better overall.
+
+\begin{tcolorbox}[colback=softgreen,colframe=green!45!black,boxrule=0.7pt,arc=2mm]
+\textbf{Safety signal - descriptive, not inferential.} Unsafe GO has weight 10 in the frozen loss function. ED-POMDP produced zero unsafe GO decisions in the three regimes where such errors were mathematically avoidable: identifiable, degraded evidence, and likelihood misspecification. The classical POMDP produced two in each of those regimes. In the non-identifiable regime, the counts were 17 for ED-POMDP and 18 for the classical POMDP. This favourable safety pattern must be preserved, but it was a mandatory descriptive endpoint and was not tested for statistical superiority.
+\end{tcolorbox}
+
+\section*{What this invalidates or limits}
+
+\begin{tcolorbox}[colback=softred,colframe=red!60!black,boxrule=0.7pt,arc=2mm]
+\textbf{Claim 1 - not supported.} The benchmark does not demonstrate that decision-aware evidence acquisition produces better final decisions at equal budget. The descriptive direction on the baselines directly targeted by the claim is concerning: among non-tied cells, adverse outcomes are more frequent than favourable outcomes.
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=softgreen,colframe=green!45!black,boxrule=0.7pt,arc=2mm]
+\textbf{Claim 2 - only very narrow support.} A confirmatory calibration improvement appears in one degraded-evidence, low-budget configuration. This supports neither general superiority under misspecification nor general improvement in terminal decisions.
+\end{tcolorbox}
+
+The broad forms of \claimvoi{} and \claimeq{} therefore remain unpromoted. The negative result is a real scientific contribution: it prevents an attractive intuition from becoming an unsupported promise.
+
+\section*{Next: Step 2.8}
+
+Step 2.8 must formalise the result and explain the mechanism. The main hypothesis to investigate is that calibration and terminal decision-making are insufficiently coupled: improving the belief state is not useful if the terminal rule, thresholds, horizon, or loss function do not exploit that improvement.
+
+Three paths are now open:
+
+\begin{itemize}
+  \item \textbf{revise the decision mechanism}: terminal rule, thresholds, VOI policy, asymmetric costs, and the way evidence quality influences action;
+  \item \textbf{test more realistic cases}: STRAT-Q flows, correlated evidence, representative environments, costs, and GO / CONDITIONAL GO / NO-GO decisions;
+  \item \textbf{document the limit rigorously}: reject or narrow the VOI claim for this benchmark and preserve null, adverse, and safety results in the paper.
+\end{itemize}
+
+\begin{tcolorbox}[colback=softblue,colframe=deepblue,boxrule=0.7pt,arc=2mm]
+\textbf{Scientific decision status.} Step 2.7 does not validate general ED-POMDP superiority. It reveals a more precise and useful research question: \emph{under which conditions does a better representation of evidence quality actually change an engineering decision, rather than merely improve probability calibration?}
+\end{tcolorbox}
+
+\vfill
+{\small\color{muted}Internal sources: frozen Step 2.6 protocol, immutable Step 2.7 results, SHA-256 audit, confirmatory analysis of 240 contrasts, post-hoc directionality audit, and independent review. This is an executive summary; detailed tables remain in the scientific package.}
+
+\end{document}

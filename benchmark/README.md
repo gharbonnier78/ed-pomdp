@@ -16,7 +16,8 @@ The benchmark controls:
 - likelihood misspecification and non-identifiability;
 - acquisition cost and exact budget;
 - terminal loss and posterior calibration;
-- random-stream pairing and analysis multiplicity.
+- random-stream pairing and analysis multiplicity;
+- exact analysis-runtime identity.
 
 ## Current executable state
 
@@ -33,7 +34,8 @@ The repository now includes:
 - explicit configured `LossWeights`;
 - raw episode-level evidence and metric schema;
 - fixed primary metric, paired bootstrap, paired permutation and Holm implementations;
-- a hash/Git guard that prevents unfreezed headline execution;
+- exact Python `3.12.13` runtime identity and pinned `pytest==9.1.1` test environment;
+- a hash/Git guard that prevents unfrozen headline execution;
 - a two-phase lock and dated-manifest generator.
 
 The Step 2.6 branch is still a **freeze candidate**. It deliberately contains no final lock, no final analysis-freeze manifest and no headline result. Those artifacts are generated only after review.
@@ -81,8 +83,12 @@ The executable registry is `runtime/policy_matrix.py`.
 
 Secondary and audit metrics include unnecessary NO-GO, posterior residual risk, evidence cost and acquisition count.
 
+## Frozen runtime
+
+Headline generation and analysis require exactly Python `3.12.13`. They use only the Python standard library. CI tests use the same Python version and pin `pytest==9.1.1`; pytest is not a headline runtime dependency.
+
 ## Execution boundary
 
-Headline generation is refused until `protocol/ANALYSIS_FREEZE.json` exists as a committed file and every frozen artifact hash, dimension and `LossWeights` value matches. Early-stopping runs are exploratory and cannot enter the confirmatory family.
+Headline generation is refused until `protocol/ANALYSIS_FREEZE.json` exists as a committed file and every frozen artifact hash, runtime version, dimension and `LossWeights` value matches. Early-stopping runs are exploratory and cannot enter the confirmatory family.
 
 No headline empirical claim is made by the current increment. Claim maturity changes only after Step 2.7 execution, independent statistical review and synchronized registry updates in Step 2.8.

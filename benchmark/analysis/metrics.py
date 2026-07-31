@@ -3,10 +3,9 @@ from __future__ import annotations
 
 import csv
 import hashlib
-import math
 from pathlib import Path
 import random
-from statistics import fmean, stdev
+from statistics import fmean, median, stdev
 from typing import Iterable, Mapping, Sequence
 
 
@@ -98,6 +97,57 @@ def endpoint_value(
 def _stable_seed(base_seed: int, key: str) -> int:
     digest = hashlib.sha256(f"{base_seed}|{key}".encode("utf-8")).digest()
     return int.from_bytes(digest[:8], "big")
+
+
+def metric_summary(
+    records: Sequence[Mapping[str, object]],
+    *,
+    endpoint: str,
+    bin_edges: Sequence[float],
+    confidence_level: float,
+    bootstrap_resamples: int,
+    analysis_seed: int,
+    summary_key: str,
+) -> dict[str, float | int]:
+    if not records:
+        raise ValueError("metric summary requires records")
+    if bootstrap_resamples <= 0:
+        raise ValueError("bootstrap_resamples must be positive")
+    observed = endpoint_value(records, endpoint, bin_edges)
+    rng = random.Random(_stable_seed(analysis_seed, summary_key))
+    sample_count = len(records)
+    bootstrap = []
+    for _ in range(bootstrap_resamples):
+        sample = [records[rng.randrange(sample_count)] for _ in range(sample_count)]
+        bootstrap.append(endpoint_value(sample, endpoint, bin_edges))
+    bootstrap.sort()
+    tail = (1.0 - confidence_level) / 2.0
+    lower_index = min(int(tail * bootstrap_resamples), bootstrap_resamples - 1)
+    upper_index = min(
+        int((1.0 - tail) * bootstrap_resamples), bootstrap_resamples - 1
+    )
+
+    if endpoint == "expected_calibration_error":
+        reported_median = median(bootstrap)
+        reported_sd = stdev(bootstrap) if len(bootstrap) > 1 else 0.0
+    else:
+        field = {
+            "decision_loss": "decision_loss",
+            "unsafe_go_rate": "unsafe_go",
+            "brier_score": "brier_score",
+        }[endpoint]
+        values = [float(record[field]) for record in records]
+        reported_median = median(values)
+        reported_sd = stdev(values) if len(values) > 1 else 0.0
+
+    return {
+        "value": observed,
+        "median": reported_median,
+        "standard_deviation": reported_sd,
+        "ci_lower": bootstrap[lower_index],
+        "ci_upper": bootstrap[upper_index],
+        "seed_count": sample_count,
+    }
 
 
 def pair_policy_records(

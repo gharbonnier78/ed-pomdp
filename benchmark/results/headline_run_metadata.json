@@ -1,0 +1,12 @@
+{
+  "frozen_artifact_commit": "8e86d655bd4d9873c87b60c1a541c7712df389ce",
+  "git_head": "58eeeacd4a887ed86b040364e050d177ca28cd1d",
+  "headline_config": "benchmark/config/headline_matrix.json",
+  "headline_config_sha256": "63488217d88e34f7c7789cd01c88fe5b7669aa31d7c6dbe53c09e4f10259f87c",
+  "manifest_path": "benchmark/protocol/ANALYSIS_FREEZE.json",
+  "manifest_sha256": "a131b7e4e86dc8a77f7eedfcff47c46f12b915924ead1706d122fd209f7bb5cf",
+  "raw_results": "benchmark/results/headline_raw.csv",
+  "raw_results_sha256": "6695ab664fb67ec1eeb60669273aadf6a355a4fcdb45994f3870f638775dd070",
+  "row_count": 3360,
+  "schema_version": "0.2.0"
+}

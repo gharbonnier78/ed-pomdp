@@ -9,6 +9,7 @@ jobs:
         with:
           root_file: |
             paper/main.tex
+            paper/step2_closeout.tex
             research_program/research_program.tex
             survey/related_work.tex
             reviewer/reviewer_companion.tex

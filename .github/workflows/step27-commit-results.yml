@@ -1,0 +1,57 @@
+name: step-2.7-commit-results
+
+on:
+  push:
+    branches:
+      - step-2.7-headline-execution
+    paths:
+      - .github/workflows/step27-commit-results.yml
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  commit-results:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: step-2.7-headline-execution
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: step2.7-headline-results
+          path: benchmark/results
+          repository: gharbonnier78/ed-pomdp
+          run-id: 30619187371
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Verify immutable artifact hashes
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          root = Path('benchmark/results')
+          audit = json.loads((root / 'step27_execution_audit.json').read_text())
+          for name, expected in audit['files'].items():
+              actual = hashlib.sha256((root / name).read_bytes()).hexdigest()
+              if actual != expected['sha256']:
+                  raise SystemExit(f'{name}: SHA-256 mismatch')
+          metadata = json.loads((root / 'headline_run_metadata.json').read_text())
+          if metadata['raw_results_sha256'] != audit['files']['headline_raw.csv']['sha256']:
+              raise SystemExit('raw result metadata mismatch')
+          print('verified immutable Step 2.7 artifacts')
+          PY
+      - name: Commit exact Step 2.7 artifacts
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add benchmark/results/headline_raw.csv \
+                  benchmark/results/headline_run_metadata.json \
+                  benchmark/results/headline_summary.csv \
+                  benchmark/results/headline_contrasts.csv \
+                  benchmark/results/step27_execution_audit.json
+          git commit -m 'Add frozen Step 2.7 headline results'
+          git push origin HEAD:step-2.7-headline-execution

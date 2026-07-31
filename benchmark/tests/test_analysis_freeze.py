@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import platform
 
 from benchmark.analysis.metrics import (
     expected_calibration_error,
@@ -106,10 +107,11 @@ def test_freeze_guard_checks_artifacts_dimensions_and_loss_weights(tmp_path: Pat
     config_path.write_text(json.dumps(config), encoding="utf-8")
 
     lock = {
+        "python": {"exact_version": platform.python_version()},
         "artifacts": {
             "benchmark/analysis/entry.py": sha256_path(artifact),
             "benchmark/config/headline_matrix.json": sha256_path(config_path),
-        }
+        },
     }
     lock_path = tmp_path / "benchmark/config/FROZEN_ARTIFACTS.json"
     lock_path.write_text(json.dumps(lock), encoding="utf-8")
@@ -118,6 +120,7 @@ def test_freeze_guard_checks_artifacts_dimensions_and_loss_weights(tmp_path: Pat
         "status": "frozen",
         "lock_file": "benchmark/config/FROZEN_ARTIFACTS.json",
         "lock_sha256": sha256_path(lock_path),
+        "python_exact_version": platform.python_version(),
         "headline_config": "benchmark/config/headline_matrix.json",
         "loss_weights": config["loss_weights"],
         "headline_dimensions": {

@@ -1,5 +1,20 @@
 # Changelog
 
+## v1.2.6-step2.6-experiment-harness-freeze-candidate — 2026-07-31
+- Added the exact executable headline matrix: four regimes, four budgets, thirty common seeds, seven policies and 3,360 episode rows.
+- Replaced mutable RNG consumption order in the simulator with named SHA-256 latent streams and a common-random-number observation tape indexed by acquisition step.
+- Required fresh environment instances for each policy while preserving the same latent scenario and exogenous noise quantiles within a paired `(regime, budget, seed)` cell.
+- Added a separate deterministic policy-local RNG stream and required a fresh policy instance for every experimental unit.
+- Froze headline execution to fixed-horizon exact cost and prohibited early stopping from the confirmatory family.
+- Added explicit configured `LossWeights` as a hashed experimental axis rather than relying on implicit defaults.
+- Added raw episode records with pairing keys, policy-local seed, latent audit outcomes, observable history, posterior risk, terminal decision, realized loss, Brier score, residual risk and exact acquisition cost.
+- Added fixed ten-bin ECE, deterministic 20,000-resample bootstrap summaries, seed-paired bootstrap contrasts and 50,000 within-seed label permutations.
+- Froze the complete 320-hypothesis Holm family at `alpha = 0.05`; rule-based comparisons remain descriptive.
+- Added a guarded headline runner that rejects missing/untracked manifests, dirty Git state, non-descendant commits, hash drift, dimension drift, `LossWeights` drift and existing output files.
+- Added a two-phase lock/manifest generator so the frozen-artifact commit and SHA-256 inventory are committed before any headline raw result can exist.
+- Marked the executable JSON configuration as a freeze candidate pending reviewer approval; no final lock, final manifest or headline result is included yet.
+- Kept `CLM-VOI-001` and `CLM-EQ-001` at evidence level `NONE`.
+
 ## v1.2.5-step2.5-policy-matrix — 2026-07-31
 - Completed the seven preregistered acquisition policies with exact canonical names and deterministic registry ordering.
 - Added entropy acquisition over the full joint belief `P(S,E | history)`.

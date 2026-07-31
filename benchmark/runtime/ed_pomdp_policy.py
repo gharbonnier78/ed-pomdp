@@ -88,7 +88,7 @@ class EvidenceDrivenVoIPolicy:
     """Choose the channel minimizing expected realized decision loss."""
 
     weights: LossWeights = LossWeights()
-    name: str = "ed_pomdp_one_step_voi"
+    name: str = "ed_pomdp_voi"
 
     def choose(self, history: Sequence[Observation], channels: Sequence[str]) -> str:
         if not channels:
@@ -98,3 +98,6 @@ class EvidenceDrivenVoIPolicy:
             for index, channel in enumerate(channels)
         ]
         return min(scored)[2]
+
+    def posterior_bad(self, history: Sequence[Observation]) -> float:
+        return marginal_system_bad(joint_posterior(history))

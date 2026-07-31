@@ -119,14 +119,14 @@ Neither the family definition, included configurations, metric implementation no
 
 Before any headline experiment is executed:
 
-1. final runner, analysis scripts, metric implementation, `LossWeights` and experiment matrix must be committed;
-2. a frozen-artifact lock must list SHA-256 digests for every runtime, model, policy, metric, configuration and protocol artifact capable of changing a result;
+1. final runner, analysis scripts, metric implementation, endpoint registries, ECE calibration bins, multiplicity settings, `LossWeights` and experiment matrix must be committed;
+2. a frozen-artifact lock must list SHA-256 digests for every runtime, model, policy, metric, configuration and protocol artifact capable of changing a result, including the held-out pre-freeze power review;
 3. the repository must publish the frozen-artifact Git commit SHA, the lock SHA-256, the runner entry-point SHA-256 and the analysis entry-point SHA-256;
-4. those identifiers, the complete headline dimensions and explicit `LossWeights` must be recorded in a dated `benchmark/protocol/ANALYSIS_FREEZE.json` manifest;
+4. those identifiers, the complete headline dimensions, explicit `LossWeights`, confirmatory and safety endpoint registries, ECE calibration settings and multiplicity rule must be recorded in a dated `benchmark/protocol/ANALYSIS_FREEZE.json` manifest;
 5. the final manifest must be committed while no headline raw result exists;
-6. headline execution must refuse a missing/untracked manifest, dirty working tree, non-descendant commit, hash mismatch, configuration mismatch or `LossWeights` mismatch.
+6. headline execution must refuse a missing or untracked manifest, dirty working tree, non-descendant commit, hash mismatch, runtime mismatch, dimension mismatch, `LossWeights` mismatch, endpoint-registry mismatch, ECE-calibration mismatch or multiplicity mismatch.
 
-Any later script, model, policy, metric, configuration or loss-weight change requires a new lock and manifest, an explicit protocol-deviation record and reclassification of affected analyses as exploratory unless the full headline experiment is rerun from the new frozen version.
+Any later script, model, policy, metric, endpoint registry, calibration setting, multiplicity rule, configuration or loss-weight change requires a new lock and manifest, an explicit protocol-deviation record and reclassification of affected analyses as exploratory unless the full headline experiment is rerun from the new frozen version.
 
 ## Refutation criteria
 

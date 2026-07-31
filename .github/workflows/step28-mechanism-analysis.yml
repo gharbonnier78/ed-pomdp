@@ -9,6 +9,14 @@ on:
       - benchmark/analysis/analyze_step28_mechanisms.py
       - benchmark/tests/test_step28_analysis.py
       - benchmark/protocol/STEP_2_8_ANALYSIS_PLAN.md
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/step28-mechanism-analysis.yml
+      - benchmark/analysis/analyze_step28_mechanisms.py
+      - benchmark/tests/test_step28_analysis.py
+      - benchmark/protocol/STEP_2_8_ANALYSIS_PLAN.md
 
 jobs:
   analyze:

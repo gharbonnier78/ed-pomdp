@@ -33,7 +33,9 @@ The repository now includes:
 - a separate deterministic policy RNG stream and fresh policy instance per experimental unit;
 - explicit configured `LossWeights`;
 - raw episode-level evidence and metric schema;
-- fixed primary metric, paired bootstrap, paired permutation and Holm implementations;
+- three confirmatory endpoints plus mandatory non-inferential unsafe-GO reporting;
+- fixed-bin ECE with posterior-support and bin-occupancy diagnostics;
+- paired bootstrap, paired permutation and Holm implementations;
 - exact Python `3.12.13` runtime identity and pinned `pytest==9.1.1` test environment;
 - a hash/Git guard that prevents unfrozen headline execution;
 - a two-phase lock and dated-manifest generator.
@@ -46,6 +48,7 @@ See:
 - `runtime/STEP_2_5_SCOPE.md` for policy definitions and fairness invariants;
 - `experiment/STEP_2_6_SCOPE.md` for pairing, exact-cost execution, statistics and freeze mechanics;
 - `config/headline_matrix.json` for the executable freeze candidate;
+- `protocol/PRE_FREEZE_POWER_REVIEW.md` for the held-out seeds `100–129` estimability review;
 - `protocol/STEP_2_REMAINING_PLAN.md` for the remaining Step 2 sequence;
 - `protocol/PREREGISTRATION.md` for the confirmatory protocol.
 
@@ -53,12 +56,13 @@ See:
 
 - 4 regimes
 - 4 budgets: 2, 4, 8, 12
-- 30 shared seeds
+- 30 shared headline seeds: 0–29
 - 7 policies
 - 3,360 raw episode rows
 - 5 confirmatory ED-POMDP-versus-baseline contrasts
-- 4 primary endpoints
-- 320 hypotheses in the complete Holm family
+- 3 confirmatory endpoints
+- 1 mandatory safety endpoint outside inferential testing
+- 240 hypotheses in the complete Holm family
 
 The former `config/benchmark_matrix.yaml` is retained as a historical scaffold pointer. The canonical executable matrix is `config/headline_matrix.json`.
 
@@ -74,14 +78,15 @@ The former `config/benchmark_matrix.yaml` is retained as a historical scaffold p
 
 The executable registry is `runtime/policy_matrix.py`.
 
-## Primary metrics
+## Confirmatory metrics
 
 - decision loss
-- unsafe GO rate
 - Brier score
 - fixed ten-bin expected calibration error
 
-Secondary and audit metrics include unnecessary NO-GO, posterior residual risk, evidence cost and acquisition count.
+`unsafe_go_rate` is mandatory safety reporting for every cell but receives no p-value and does not enter Holm correction. Secondary and audit metrics include unnecessary NO-GO, posterior residual risk, evidence cost and acquisition count.
+
+Every ECE row reports the number of distinct posterior values, populated bins and total frozen bins. Sparse support at small budgets is interpreted as low-resolution rather than hidden by post-hoc bin merging.
 
 ## Frozen runtime
 
@@ -89,6 +94,6 @@ Headline generation and analysis require exactly Python `3.12.13`. They use only
 
 ## Execution boundary
 
-Headline generation is refused until `protocol/ANALYSIS_FREEZE.json` exists as a committed file and every frozen artifact hash, runtime version, dimension and `LossWeights` value matches. Early-stopping runs are exploratory and cannot enter the confirmatory family.
+Headline generation is refused until `protocol/ANALYSIS_FREEZE.json` exists as a committed file and every frozen artifact hash, runtime version, dimension, endpoint registry, multiplicity setting and `LossWeights` value matches. Early-stopping runs are exploratory and cannot enter the confirmatory family.
 
 No headline empirical claim is made by the current increment. Claim maturity changes only after Step 2.7 execution, independent statistical review and synchronized registry updates in Step 2.8.

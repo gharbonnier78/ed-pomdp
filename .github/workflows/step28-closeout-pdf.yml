@@ -6,6 +6,11 @@ on:
       - step-2.8-claim-adjudication
     paths:
       - .github/workflows/step28-closeout-pdf.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/step28-closeout-pdf.yml
 
 jobs:
   compile-and-upload:

@@ -59,7 +59,7 @@ make check
 python -m pytest -q benchmark/tests
 ```
 
-Requirements: `latexmk`, `pdflatex`, Python 3.11+ and `pytest` for tests. Headline execution and analysis use only the Python standard library.
+Document builds require `latexmk` and `pdflatex`. The Step 2.6 frozen headline runner and analysis require exactly **Python 3.12.13** and use only the Python standard library. The CI test environment additionally pins **pytest 9.1.1**.
 
 ## Scientific posture
 

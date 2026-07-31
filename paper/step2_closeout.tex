@@ -27,12 +27,14 @@
 \cfoot{\thepage}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0.55em}
+\setlength{\emergencystretch}{2em}
 \setlist[itemize]{leftmargin=1.5em,itemsep=0.25em,topsep=0.25em}
 \titleformat{\section}{\large\bfseries\color{deepblue}}{}{0pt}{}
 \titleformat{\subsection}{\normalsize\bfseries\color{deepblue}}{}{0pt}{}
 \newcommand{\edp}{ED-POMDP}
 \newcommand{\voi}{\texttt{CLM-VOI-001}}
 \newcommand{\eqclaim}{\texttt{CLM-EQ-001}}
+\newcommand{\hashline}[1]{\par\vspace{-0.35em}{\footnotesize\ttfamily #1}\par\vspace{-0.15em}}
 
 \title{\textbf{ED-POMDP Step 2 Benchmark Close-Out}\\
 \large Frozen confirmatory results, mechanism diagnosis, and claim adjudication}
@@ -110,10 +112,14 @@ The execution and analysis were performed only after the runtime, matrix, endpoi
 Key identifiers are:
 
 \begin{itemize}
-  \item Step 2.6 frozen-artifact lock SHA-256: \texttt{7acac871ae85343b71b3bbd0cbc399b74075dd45aa4a7f8cdb8acb7f3bf23dd8};
-  \item analysis-freeze manifest SHA-256: \texttt{a131b7e4e86dc8a77f7eedfcff47c46f12b915924ead1706d122fd209f7bb5cf};
-  \item raw results SHA-256: \texttt{6695ab664fb67ec1eeb60669273aadf6a355a4fcdb45994f3870f638775dd070};
-  \item Step 2.8 directionality input SHA-256: \texttt{fdad023ffb2ab82a65ec6b8f2cd962b0e0e3421192e4e30e399bed31c82c1339}.
+  \item Step 2.6 frozen-artifact lock SHA-256:
+  \hashline{7acac871ae85343b71b3bbd0cbc399b74075dd45aa4a7f8cdb8acb7f3bf23dd8}
+  \item Analysis-freeze manifest SHA-256:
+  \hashline{a131b7e4e86dc8a77f7eedfcff47c46f12b915924ead1706d122fd209f7bb5cf}
+  \item Raw results SHA-256:
+  \hashline{6695ab664fb67ec1eeb60669273aadf6a355a4fcdb45994f3870f638775dd070}
+  \item Step 2.8 directionality input SHA-256:
+  \hashline{fdad023ffb2ab82a65ec6b8f2cd962b0e0e3421192e4e30e399bed31c82c1339}
 \end{itemize}
 
 The independent reviewer verified the frozen hashes and exact row counts, reimplemented Holm step-down with zero discrepancies over all 240 adjusted values, and independently recomputed every row of the Step 2.7 post-hoc directionality table.

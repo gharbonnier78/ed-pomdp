@@ -40,6 +40,8 @@ jobs:
       - name: Generate next freeze artifact
         id: freeze
         shell: bash
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
         run: |
           if [ -f benchmark/protocol/ANALYSIS_FREEZE.json ]; then
             echo "kind=none" >> "$GITHUB_OUTPUT"

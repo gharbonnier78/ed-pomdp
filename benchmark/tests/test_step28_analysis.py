@@ -20,7 +20,7 @@ from benchmark.analysis.analyze_step28_mechanisms import (
 
 RAW_SHA256 = "6695ab664fb67ec1eeb60669273aadf6a355a4fcdb45994f3870f638775dd070"
 DIRECTIONALITY_SHA256 = (
-    "813037afef4edfdad580bd17f99785156d629b4ab139c00fef55a49034ae2984"
+    "fdad023ffb2ab82a65ec6b8f2cd962b0e0e3421192e4e30e399bed31c82c1339"
 )
 
 

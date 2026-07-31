@@ -10,12 +10,17 @@
 - Added raw episode records with pairing keys, policy-local seed, latent audit outcomes, observable history, posterior risk, terminal decision, realized loss, Brier score, residual risk and exact acquisition cost.
 - Added raw-run metadata hashes and analysis-side validation that only the raw table and metadata may be uncommitted, paired cells share one latent scenario and the matrix is complete.
 - Added fixed ten-bin ECE, deterministic 20,000-resample bootstrap summaries, seed-paired bootstrap contrasts and 50,000 within-seed label permutations.
-- Froze the complete 320-hypothesis Holm family at `alpha = 0.05`; rule-based comparisons remain descriptive.
-- Added a guarded headline runner that rejects missing/untracked manifests, unexpected dirty paths, non-descendant commits, hash drift, dimension drift, `LossWeights` drift, runtime drift and existing output files.
+- Recorded a held-out pre-freeze estimability review using seeds `100–129`, never the headline seeds `0–29`.
+- Removed `unsafe_go_rate` from paired permutation testing after the held-out review showed near-zero cross-policy discordance under common random numbers; retained it as mandatory safety reporting for every cell.
+- Reduced the confirmatory Holm family from 320 to 240 estimable hypotheses: five baselines × four regimes × four budgets × decision loss, Brier score and ECE.
+- Added code-level rejection preventing the unsafe-GO endpoint from entering `paired_contrast` or Holm correction.
+- Added ECE resolution diagnostics for distinct posterior values, populated bins and total bins, with explicit low-resolution interpretation at small budgets.
+- Standardized all summary columns as observed `estimate`, `bootstrap_median`, `bootstrap_standard_deviation` and percentile confidence bounds; removed mixed raw/bootstrap dispersion semantics.
+- Added a guarded headline runner that rejects missing/untracked manifests, unexpected dirty paths, non-descendant commits, hash drift, dimension drift, `LossWeights` drift, endpoint-registry drift, multiplicity drift, runtime drift and existing output files.
 - Froze the analysis runtime to Python `3.12.13`, with no third-party headline dependency, and pinned test-only `pytest==9.1.1` in CI.
-- Added a reduced end-to-end regression executing 210 episodes through policy execution, summaries, paired contrasts and Holm correction; the complete suite contains 43 tests.
+- Added a reduced end-to-end regression executing 210 episodes through policy execution, summaries, paired contrasts and Holm correction.
 - Added a two-phase lock/manifest generator so the frozen-artifact commit and SHA-256 inventory are committed before any headline raw result can exist.
-- Included both the metric implementation and the normative metric contract in the frozen SHA-256 artifact inventory.
+- Included the metric implementation, normative metric contract, preregistration and held-out pre-freeze power review in the frozen SHA-256 artifact inventory.
 - Marked the executable JSON configuration as a freeze candidate pending reviewer approval; no final lock, final manifest or headline result is included yet.
 - Kept `CLM-VOI-001` and `CLM-EQ-001` at evidence level `NONE`.
 
@@ -35,7 +40,7 @@
 - Restored and strengthened the preregistered analysis-freeze commitment before any headline experiment.
 - Required publication of the analysis Git commit SHA plus SHA-256 digests for the analysis entry point and locked dependency/configuration manifest.
 - Required a dated freeze manifest under `benchmark/protocol/` to be committed before headline raw results are generated.
-- Froze the entropy baseline as expected Shannon-entropy reduction over the full joint belief `P(S,E | history)`.
+- Froze the entropy baseline as expected Shannon entropy reduction over the full joint belief `P(S,E | history)`.
 - Froze the complete confirmatory multiplicity family and Holm family-wise error correction at `alpha = 0.05`.
 - Reordered the remaining Step 2 increments so the evidence-quality/degradation mechanism precedes policy-matrix completion.
 - Added a causal evidence model in which bad `E` destroys functional-channel discrimination while environment validation informs that reliability.

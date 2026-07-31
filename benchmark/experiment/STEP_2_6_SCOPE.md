@@ -76,6 +76,8 @@ Each episode row preserves:
 
 Latent values are never passed to a policy.
 
+The raw runner also writes metadata containing the current Git head plus SHA-256 hashes of the manifest, executable configuration and raw table. Confirmatory analysis permits only the raw table and metadata as uncommitted artifacts, verifies those hashes before reading the table, rejects incomplete or duplicated cells and rechecks that each paired cell has one common latent scenario.
+
 ## Frozen analysis
 
 The analysis entry point computes:
@@ -90,6 +92,12 @@ The analysis entry point computes:
 
 ECE is recomputed after every paired resample or label permutation rather than replaced by a per-row surrogate.
 
+A reduced integration regression executes all seven policies over 30 seeds for one regime/budget cell, then traverses summaries, paired contrasts and Holm correction. It validates the complete assembly without using the frozen headline matrix or producing headline evidence.
+
+## Frozen runtime
+
+The lock and final manifest identify exactly Python `3.12.13`. The headline runner and analysis use only the Python standard library. CI uses the same Python version and pins test-only dependency `pytest==9.1.1`. A runtime-version mismatch blocks both generation and analysis.
+
 ## Freeze mechanism
 
 `scripts/freeze_headline_analysis.py` enforces a two-commit sequence:
@@ -97,17 +105,18 @@ ECE is recomputed after every paired resample or label permutation rather than r
 1. generate and commit `benchmark/config/FROZEN_ARTIFACTS.json` after all accepted code/configuration is committed;
 2. generate and commit `benchmark/protocol/ANALYSIS_FREEZE.json` referencing the commit containing that lock.
 
-The lock hashes every model, policy, runtime, runner, metric, analysis, configuration and protocol artifact capable of changing results. The final manifest repeats:
+The lock hashes every model, policy, runtime, runner, metric implementation, metric contract, analysis, configuration and protocol artifact capable of changing results. The final manifest repeats:
 
 - frozen artifact commit;
 - lock hash;
+- exact Python runtime;
 - runner and analysis entry-point hashes;
 - complete regimes, budgets, seeds and policies;
 - explicit `LossWeights`;
 - RNG design;
 - multiplicity rule.
 
-`run_headline.py` refuses execution unless the manifest is tracked, the Git tree is clean, the frozen commit is an ancestor, all hashes match, configuration dimensions match, `LossWeights` match and no previous output exists.
+`run_headline.py` refuses execution unless the manifest is tracked, the Git tree has no unexpected dirty paths, the frozen commit is an ancestor, all hashes match, the exact runtime matches, configuration dimensions match, `LossWeights` match and no previous output exists.
 
 ## Current branch state
 

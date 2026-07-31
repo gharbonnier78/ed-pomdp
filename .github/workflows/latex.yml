@@ -14,7 +14,7 @@ jobs:
             reviewer/reviewer_companion.tex
             ontology/evidence_ontology.tex
             appendix/mathematical_appendix.tex
-            benchmark/results/STEP_2_7_NOTE_ETAT_EXECUTIVE_FR.tex
+            benchmark/results/STEP_2_7_EXECUTIVE_STATUS_NOTE.tex
           work_in_root_file_dir: true
       - run: python3 scripts/check_package.py
 

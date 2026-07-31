@@ -14,7 +14,9 @@ The canonical candidate configuration is `benchmark/config/headline_matrix.json`
 - 7 reviewed policies;
 - 3,360 raw episode rows;
 - 5 confirmatory baselines and 1 descriptive rule-based baseline;
-- 4 primary endpoints and 320 confirmatory hypotheses.
+- 3 confirmatory endpoints;
+- 1 mandatory non-inferential safety endpoint;
+- 240 confirmatory hypotheses.
 
 The former YAML file is retained only as a pointer from the original research-family scaffold to the exact executable JSON matrix.
 
@@ -78,19 +80,43 @@ Latent values are never passed to a policy.
 
 The raw runner also writes metadata containing the current Git head plus SHA-256 hashes of the manifest, executable configuration and raw table. Confirmatory analysis permits only the raw table and metadata as uncommitted artifacts, verifies those hashes before reading the table, rejects incomplete or duplicated cells and rechecks that each paired cell has one common latent scenario.
 
+## Confirmatory and safety endpoints
+
+The confirmatory endpoints are:
+
+- decision loss;
+- Brier score;
+- expected calibration error.
+
+`unsafe_go_rate` remains mandatory safety reporting for every policy, regime and budget, but it receives no paired p-value and is excluded from Holm correction.
+
+This separation follows a pre-freeze estimability review using held-out seeds `100–129`, never the headline seeds `0–29`. The common-random-number coupling made unsafe-GO events highly concordant across policies, leaving almost no discordant pairs. With zero discordant pairs, paired randomization is structurally uninformative; including 80 such tests would only tighten Holm thresholds for endpoints capable of distinguishing policies. The complete rationale is preserved in `benchmark/protocol/PRE_FREEZE_POWER_REVIEW.md`.
+
+Absolute unsafe-GO counts and rates remain publication requirements. A future inferential safety comparison requires a separately powered and preregistered study.
+
 ## Frozen analysis
 
 The analysis entry point computes:
 
-- summaries for all policies, regimes, budgets and primary endpoints;
+- summaries for all policies, regimes, budgets, three confirmatory endpoints and the mandatory safety endpoint;
 - fixed ten-bin ECE;
-- seed-paired ED-minus-baseline effects;
+- ECE resolution diagnostics: distinct posterior count, populated bins and total bins;
+- seed-paired ED-minus-baseline effects for confirmatory endpoints only;
 - 20,000-resample percentile bootstrap intervals;
 - 50,000 within-pair label permutations;
 - deterministic analysis streams derived from seed `20260731`;
-- Holm step-down correction over the complete 320-hypothesis family.
+- Holm step-down correction over the complete 240-hypothesis family.
 
-ECE is recomputed after every paired resample or label permutation rather than replaced by a per-row surrogate.
+ECE is recomputed after every paired resample or label permutation rather than replaced by a per-row surrogate. Small-budget ECE is explicitly labelled low-resolution when posterior support is sparse; the ten frozen bins are not coarsened after inspection.
+
+All summary rows use one schema:
+
+- `estimate` is the statistic evaluated on the observed 30-seed cell;
+- `bootstrap_median` is the median of its deterministic bootstrap distribution;
+- `bootstrap_standard_deviation` is the standard deviation of that bootstrap distribution;
+- percentile confidence bounds use the same bootstrap distribution.
+
+The previous mixed raw-sample versus bootstrap meaning of `median` and `standard_deviation` is eliminated before freeze.
 
 A reduced integration regression executes all seven policies over 30 seeds for one regime/budget cell, then traverses summaries, paired contrasts and Holm correction. It validates the complete assembly without using the frozen headline matrix or producing headline evidence.
 
@@ -113,6 +139,7 @@ The lock hashes every model, policy, runtime, runner, metric implementation, met
 - runner and analysis entry-point hashes;
 - complete regimes, budgets, seeds and policies;
 - explicit `LossWeights`;
+- confirmatory metric and mandatory safety registries;
 - RNG design;
 - multiplicity rule.
 

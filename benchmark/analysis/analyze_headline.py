@@ -16,7 +16,7 @@ from benchmark.analysis.metrics import (
     paired_contrast,
     read_raw_csv,
 )
-from benchmark.experiment.freeze_guard import verify_analysis_freeze
+from benchmark.experiment.freeze_guard import sha256_path, verify_analysis_freeze
 from benchmark.experiment.harness import load_headline_config
 
 
@@ -32,6 +32,7 @@ def validate_raw_matrix(
         raise ValueError(f"raw matrix has {len(records)} rows; expected {expected_rows}")
 
     seen: set[tuple[str, int, int, str]] = set()
+    cell_latents: dict[tuple[str, int, int], set[tuple[bool, bool]]] = {}
     for record in records:
         key = (
             str(record["regime"]),
@@ -48,6 +49,13 @@ def validate_raw_matrix(
             raise ValueError("raw row violates fixed horizon")
         if float(record["evidence_cost"]) != float(key[1]):
             raise ValueError("raw row violates exact matched cost")
+        posterior = float(record["posterior_bad"])
+        if not 0.0 <= posterior <= 1.0:
+            raise ValueError("raw posterior probability is outside [0, 1]")
+        cell = key[:3]
+        cell_latents.setdefault(cell, set()).add(
+            (bool(record["true_system_bad"]), bool(record["true_evidence_bad"]))
+        )
 
     expected = {
         (regime, budget, seed, policy)
@@ -58,6 +66,8 @@ def validate_raw_matrix(
     }
     if seen != expected:
         raise ValueError("raw matrix is incomplete or contains unexpected cells")
+    if any(len(latents) != 1 for latents in cell_latents.values()):
+        raise ValueError("paired policies do not share one latent scenario per cell")
 
 
 def _write_csv(path: str | Path, rows: Sequence[Mapping[str, object]]) -> None:
@@ -69,6 +79,29 @@ def _write_csv(path: str | Path, rows: Sequence[Mapping[str, object]]) -> None:
         writer = csv.DictWriter(handle, fieldnames=tuple(rows[0].keys()))
         writer.writeheader()
         writer.writerows(rows)
+
+
+def verify_run_metadata(
+    *,
+    raw_path: Path,
+    metadata_path: Path,
+    config_path: Path,
+    manifest_path: Path,
+    manifest: Mapping[str, object],
+) -> dict[str, object]:
+    if not raw_path.is_file() or not metadata_path.is_file():
+        raise RuntimeError("raw results and run metadata must both exist")
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    expected = {
+        "raw_results_sha256": sha256_path(raw_path),
+        "headline_config_sha256": sha256_path(config_path),
+        "manifest_sha256": sha256_path(manifest_path),
+        "frozen_artifact_commit": manifest["frozen_artifact_commit"],
+    }
+    for key, value in expected.items():
+        if metadata.get(key) != value:
+            raise RuntimeError(f"run metadata mismatch: {key}")
+    return metadata
 
 
 def analyze_records(
@@ -165,7 +198,10 @@ def analyze_records(
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--raw", required=True)
+    parser.add_argument("--raw", default="benchmark/results/headline_raw.csv")
+    parser.add_argument(
+        "--metadata", default="benchmark/results/headline_run_metadata.json"
+    )
     parser.add_argument(
         "--config", default="benchmark/config/headline_matrix.json"
     )
@@ -180,12 +216,33 @@ def main() -> None:
     )
     arguments = parser.parse_args()
 
-    verify_analysis_freeze(arguments.manifest)
-    config = load_headline_config(arguments.config)
-    records = read_raw_csv(arguments.raw)
+    raw_path = Path(arguments.raw)
+    metadata_path = Path(arguments.metadata)
+    config_path = Path(arguments.config)
+    manifest_path = Path(arguments.manifest)
+    summary_path = Path(arguments.summary)
+    contrasts_path = Path(arguments.contrasts)
+    if summary_path.exists() or contrasts_path.exists():
+        raise RuntimeError("analysis output already exists; preserve prior analysis")
+
+    manifest = verify_analysis_freeze(
+        manifest_path,
+        allowed_dirty_paths=(raw_path, metadata_path),
+    )
+    metadata = verify_run_metadata(
+        raw_path=raw_path,
+        metadata_path=metadata_path,
+        config_path=config_path,
+        manifest_path=manifest_path,
+        manifest=manifest,
+    )
+    config = load_headline_config(config_path)
+    records = read_raw_csv(raw_path)
+    if metadata.get("row_count") != len(records):
+        raise RuntimeError("run metadata row count does not match raw results")
     summary_rows, contrast_rows = analyze_records(records, config)
-    _write_csv(arguments.summary, summary_rows)
-    _write_csv(arguments.contrasts, contrast_rows)
+    _write_csv(summary_path, summary_rows)
+    _write_csv(contrasts_path, contrast_rows)
     print(
         json.dumps(
             {

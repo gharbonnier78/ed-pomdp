@@ -18,17 +18,22 @@ This repository develops **Evidence-Driven Partially Observable Markov Decision 
 
 Step 1 and Step 1.1 are shipped. Step 2 is the current quantitative-validation increment.
 
-Step 2 introduces a reusable synthetic benchmark, matched-budget comparison rules, explicit baselines, metric contracts and preregistered refutation criteria for `CLM-VOI-001` and `CLM-EQ-001`.
+Steps 2.4 and 2.5 established a causally relevant evidence-quality model and the complete seven-policy matrix. Step 2.6 now provides the paired fixed-horizon harness, metric/statistical implementation and cryptographic freeze guard.
 
-No benchmark result has yet been produced. Both claims remain at evidence level `NONE` until reproducible experiments, statistical review and synchronized claim-registry updates are complete.
+The current Step 2.6 branch is a **freeze candidate**. No frozen-artifact lock, final analysis-freeze manifest or headline result has yet been produced. Both `CLM-VOI-001` and `CLM-EQ-001` remain at evidence level `NONE`.
 
 ## Step 2 benchmark
 
-- `benchmark/README.md` — scope, benchmark families and policy matrix
-- `benchmark/protocol/PREREGISTRATION.md` — hypotheses, endpoints and refutation criteria
-- `benchmark/config/benchmark_matrix.yaml` — machine-readable experiment matrix
-- `benchmark/METRICS.md` — auditable metric definitions
-- `benchmark/src/contracts.py` — policy, observation and matched-budget interfaces
+- `benchmark/README.md` — executable benchmark status and policy matrix
+- `benchmark/protocol/PREREGISTRATION.md` — hypotheses, pairing, endpoints and refutation criteria
+- `benchmark/config/headline_matrix.json` — canonical executable freeze candidate
+- `benchmark/config/benchmark_matrix.yaml` — historical scaffold pointer
+- `benchmark/METRICS.md` — frozen metric and inference definitions
+- `benchmark/experiment/STEP_2_6_SCOPE.md` — common seeds, exact cost and freeze mechanics
+- `benchmark/experiment/run_headline.py` — guarded raw-result entry point
+- `benchmark/analysis/analyze_headline.py` — frozen analysis entry point
+
+The candidate headline matrix contains four regimes, four budgets, thirty common seeds and seven policies: 3,360 episode rows and 320 confirmatory hypotheses.
 
 ## Foundation documents
 
@@ -46,18 +51,19 @@ No benchmark result has yet been produced. Both claims remain at evidence level 
 
 Compiled PDFs are generated from the LaTeX sources. The relative PDF buttons become active when compiled PDFs are present in the repository or release package.
 
-## Build
+## Build and tests
 
 ```bash
 make all
 make check
+python -m pytest -q benchmark/tests
 ```
 
-Requirements: `latexmk`, `pdflatex`, and Python 3.
+Document builds require `latexmk` and `pdflatex`. The Step 2.6 frozen headline runner and analysis require exactly **Python 3.12.13** and use only the Python standard library. The CI test environment additionally pins **pytest 9.1.1**.
 
 ## Scientific posture
 
-The primary domain is software release assurance. Biometrics and UAV active perception remain North-Star external-validity studies. Step 2 tests whether decision-aware evidence acquisition and explicit evidence-quality modelling improve decisions under controlled, matched-budget conditions.
+The primary domain is software release assurance. Biometrics and UAV active perception remain North-Star external-validity studies. Step 2 tests whether decision-aware evidence acquisition and explicit evidence-quality modelling improve decisions under controlled, paired and exactly matched-budget conditions.
 
 ## Repository roadmap
 

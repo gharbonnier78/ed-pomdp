@@ -1,0 +1,31 @@
+{
+  "artifacts": {
+    "benchmark/METRICS.md": "1acea0952fd48d49b6e95f70fb8353d06a70c0e8ca51c3e7d436e5bdb88dfc31",
+    "benchmark/analysis/analyze_headline.py": "37eb86889abb1c34826b333a3025be104c0ab710f82e5ba6c4d9b869b4cf072e",
+    "benchmark/analysis/metrics.py": "d1a29f0fe060046dc1ee533d16305823a58fd28546f481b4f074c6645e0da9e9",
+    "benchmark/config/headline_matrix.json": "63488217d88e34f7c7789cd01c88fe5b7669aa31d7c6dbe53c09e4f10259f87c",
+    "benchmark/experiment/freeze_guard.py": "39c9979e294679625e5744e06b45459d4700bcf23032c2c5fae4426b3aded6fc",
+    "benchmark/experiment/harness.py": "112df59ed00e9fd4d893a489868e82c4997d7f7239ede4f660a3aff3f5fccfaa",
+    "benchmark/experiment/run_headline.py": "20f62862692bfe1134b7a7e059da090b255dc8e3f782eedd1a468b9640153f92",
+    "benchmark/protocol/PREREGISTRATION.md": "585b0f018d97cc853a96ab43b5035c32afa1f409c71aa6032bb2e596435d4aab",
+    "benchmark/protocol/PRE_FREEZE_POWER_REVIEW.md": "523a53f7fb4d148516d1538a5eff29c96e01bc525b9a0fd02bdfd785a776e1ab",
+    "benchmark/runtime/baseline_policies.py": "879ba1df0782ab6398eaf9a90a6045a11f7faaadd422cf6ec4b4d93f0c9e193e",
+    "benchmark/runtime/decision.py": "01d2d6475801c8b6e03a058b0e66c532edab5bb84f9a49e31cadae4a5762389b",
+    "benchmark/runtime/ed_pomdp_policy.py": "3c8578a422b8f4f7be85659bc053a3ab88f37b9f5a1505a5707e2ea28b5af792",
+    "benchmark/runtime/evidence_model.py": "65e77df9c942146585f65dbab9033c41e46cd06d3e3b2515862e65c6519298b8",
+    "benchmark/runtime/policies.py": "6742aebc7f22d5e502f70435f129e849abff01ada490c5a7d3c82863d11df17b",
+    "benchmark/runtime/policy_matrix.py": "e03d3f83d6551e4554bef39ab6c96aff53e0c1a5be5df003d25957fea6556b92",
+    "benchmark/runtime/simulator.py": "036851b993926c3b00f42791afc89b4ce401ff0bd9543cafbe360275a4df7243",
+    "scripts/freeze_headline_analysis.py": "b1c66b56bdeda8aff2affbc0c33a4344c379b51dcda0b97fd67f99c87453f157"
+  },
+  "python": {
+    "analysis_runtime_dependencies": [],
+    "exact_version": "3.12.13",
+    "test_only_dependencies": [
+      "pytest==9.1.1"
+    ]
+  },
+  "schema_version": "0.2.1",
+  "source_commit": "938ad461056680db4503e6f7171b5eb751162282",
+  "status": "frozen_artifact_lock"
+}

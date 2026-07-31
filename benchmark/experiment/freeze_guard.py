@@ -122,6 +122,8 @@ def verify_analysis_freeze(
         raise RuntimeError(
             "mandatory safety metrics differ between config and freeze manifest"
         )
+    if config.get("calibration") != manifest.get("calibration"):
+        raise RuntimeError("calibration semantics differ from freeze manifest")
 
     config_analysis = config.get("analysis")
     if not isinstance(config_analysis, Mapping):

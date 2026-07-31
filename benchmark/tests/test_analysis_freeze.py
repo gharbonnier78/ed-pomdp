@@ -6,8 +6,10 @@ import platform
 
 from benchmark.analysis.analyze_headline import analyze_records
 from benchmark.analysis.metrics import (
+    calibration_resolution,
     expected_calibration_error,
     holm_step_down,
+    metric_summary,
     pair_policy_records,
     paired_contrast,
 )
@@ -38,6 +40,50 @@ def test_ece_uses_frozen_fixed_bins() -> None:
     assert abs(value - 0.1) < 1e-12
 
 
+def test_ece_resolution_diagnostics_report_sparse_support() -> None:
+    resolution = calibration_resolution(
+        [0.1, 0.1, 0.9], [0.0, 0.5, 1.0]
+    )
+    assert resolution == {
+        "distinct_prediction_count": 2,
+        "populated_bin_count": 2,
+        "total_bin_count": 2,
+    }
+
+
+def test_metric_summary_uses_consistent_bootstrap_column_semantics() -> None:
+    records = [
+        _record(0, "ed_pomdp_voi", 0.1, 0.5),
+        _record(1, "ed_pomdp_voi", 0.8, 1.0),
+    ]
+    loss = metric_summary(
+        records,
+        endpoint="decision_loss",
+        bin_edges=[0.0, 0.5, 1.0],
+        confidence_level=0.95,
+        bootstrap_resamples=20,
+        analysis_seed=17,
+        summary_key="loss",
+    )
+    ece = metric_summary(
+        records,
+        endpoint="expected_calibration_error",
+        bin_edges=[0.0, 0.5, 1.0],
+        confidence_level=0.95,
+        bootstrap_resamples=20,
+        analysis_seed=17,
+        summary_key="ece",
+    )
+    for summary in (loss, ece):
+        assert "estimate" in summary
+        assert "bootstrap_median" in summary
+        assert "bootstrap_standard_deviation" in summary
+        assert "median" not in summary
+        assert "standard_deviation" not in summary
+    assert loss["distinct_prediction_count"] is None
+    assert ece["distinct_prediction_count"] == 2
+
+
 def test_paired_contrast_is_deterministic_for_same_analysis_seed() -> None:
     ed = [_record(0, "ed_pomdp_voi", 0.1, 0.5), _record(1, "ed_pomdp_voi", 0.8, 1.0)]
     baseline = [_record(0, "fixed_plan", 0.3, 1.0), _record(1, "fixed_plan", 0.6, 2.0)]
@@ -66,6 +112,27 @@ def test_paired_contrast_is_deterministic_for_same_analysis_seed() -> None:
     assert first["difference_ed_minus_baseline"] < 0.0
 
 
+def test_unsafe_go_cannot_enter_confirmatory_contrast_function() -> None:
+    ed = [_record(0, "ed_pomdp_voi", 0.1, 0.5), _record(1, "ed_pomdp_voi", 0.8, 1.0)]
+    baseline = [_record(0, "fixed_plan", 0.3, 1.0), _record(1, "fixed_plan", 0.6, 2.0)]
+    pairs = pair_policy_records(ed, baseline)
+    try:
+        paired_contrast(
+            pairs,
+            endpoint="unsafe_go_rate",
+            bin_edges=[0.0, 0.5, 1.0],
+            confidence_level=0.95,
+            bootstrap_resamples=10,
+            permutation_resamples=10,
+            analysis_seed=17,
+            contrast_key="unsafe",
+        )
+    except ValueError as error:
+        assert "not in the frozen confirmatory family" in str(error)
+    else:
+        raise AssertionError("unsafe GO must remain descriptive safety reporting")
+
+
 def test_holm_step_down_controls_complete_family() -> None:
     corrected = holm_step_down([0.001, 0.02, 0.06], alpha=0.05)
     assert corrected[0]["reject_holm"] is True
@@ -84,14 +151,25 @@ def test_reduced_matrix_runs_end_to_end_through_holm() -> None:
     config["expected_episode_rows"] = 30 * 7
     config["analysis"]["bootstrap_resamples"] = 25
     config["analysis"]["permutation_resamples"] = 25
+    config["analysis"]["multiplicity"]["expected_family_size"] = 5 * 3
 
     records = [asdict(record) for record in iter_headline_records(config)]
     summaries, contrasts = analyze_records(records, config)
 
     assert len(records) == 210
     assert len(summaries) == 7 * 4
-    assert len(contrasts) == 5 * 4
+    assert len(contrasts) == 5 * 3
     assert {row["seed_count"] for row in contrasts} == {30}
+    assert {row["endpoint"] for row in contrasts} == {
+        "decision_loss",
+        "brier_score",
+        "expected_calibration_error",
+    }
+    safety_rows = [row for row in summaries if row["endpoint"] == "unsafe_go_rate"]
+    assert len(safety_rows) == 7
+    assert {row["inference_role"] for row in safety_rows} == {
+        "mandatory_safety_descriptive"
+    }
     assert all(0.0 <= row["adjusted_p_value"] <= 1.0 for row in contrasts)
 
 

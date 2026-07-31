@@ -1,0 +1,259 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[a4paper,margin=2.25cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs,tabularx,array,longtable}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tcolorbox}
+\hypersetup{colorlinks=true,linkcolor=blue!40!black,urlcolor=blue!40!black}
+\definecolor{deepblue}{HTML}{183B56}
+\definecolor{softblue}{HTML}{EAF2F8}
+\definecolor{softamber}{HTML}{FFF4D6}
+\definecolor{softred}{HTML}{FBE9E7}
+\definecolor{softgreen}{HTML}{E8F5E9}
+\definecolor{muted}{HTML}{5F6B76}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{ED-POMDP Research Edition}
+\rhead{Step 2 Benchmark Close-Out}
+\cfoot{\thepage}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+\setlist[itemize]{leftmargin=1.5em,itemsep=0.25em,topsep=0.25em}
+\titleformat{\section}{\large\bfseries\color{deepblue}}{}{0pt}{}
+\titleformat{\subsection}{\normalsize\bfseries\color{deepblue}}{}{0pt}{}
+\newcommand{\edp}{ED-POMDP}
+\newcommand{\voi}{\texttt{CLM-VOI-001}}
+\newcommand{\eqclaim}{\texttt{CLM-EQ-001}}
+
+\title{\textbf{ED-POMDP Step 2 Benchmark Close-Out}\\
+\large Frozen confirmatory results, mechanism diagnosis, and claim adjudication}
+\author{Guillaume Harbonnier\\Independent industrial research programme / STRAT-Q}
+\date{31 July 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This report closes the preregistered Step 2 synthetic benchmark for Evidence-Driven Partially Observable Markov Decision Processes (ED-POMDP) applied to software release assurance. Seven policies were evaluated over 3,360 paired episodes spanning four regimes, four fixed evidence budgets, and thirty frozen seeds. The confirmatory family contained 240 ED-POMDP-versus-baseline contrasts over terminal decision loss, Brier score, and expected calibration error, with paired resampling and Holm correction fixed before execution. One expected-calibration-error contrast survived Holm correction, under degraded evidence at budget two, but its bootstrap interval crossed zero and posterior support was sparse. No terminal-decision-loss contrast survived correction. A deterministic post-hoc diagnosis then showed that 1,054 of the 1,119 episode pairs in which ED-POMDP improved Brier score retained the same terminal action. The broad value-of-information superiority claim is therefore not supported in this benchmark. The broad evidence-quality claim is also not supported, although one narrow calibration signal is retained. The principal scientific result is a separation between probabilistic quality and decision quality: improved beliefs are not sufficient when the terminal decision architecture does not convert them into a different and better action.
+\end{abstract}
+
+\begin{tcolorbox}[colback=softblue,colframe=deepblue,boxrule=0.7pt,arc=2mm]
+\textbf{Close-out decision.} Step 2 does not validate general ED-POMDP superiority. It identifies a sharper engineering requirement: evidence-quality modelling must be evaluated together with the terminal decision rule, loss asymmetry, stopping policy, and action thresholds.
+\end{tcolorbox}
+
+\section*{1. Study boundary and frozen design}
+
+The benchmark tested two preregistered claims:
+
+\begin{itemize}
+  \item \voi: decision-aware value of information should reduce matched-budget terminal decision loss relative to simpler acquisition strategies;
+  \item \eqclaim: explicit evidence-quality modelling should improve calibration and decision quality under evidence degradation and likelihood misspecification.
+\end{itemize}
+
+The frozen matrix contained:
+
+\begin{center}
+\begin{tabular}{lr}
+\toprule
+Dimension & Frozen value \\
+\midrule
+Regimes & 4 \\
+Budgets & 2, 4, 8, 12 \\
+Headline seeds & 30 \\
+Policies & 7 \\
+Raw episode rows & 3,360 \\
+Confirmatory baselines & 5 \\
+Confirmatory endpoints & 3 \\
+Holm family & 240 contrasts \\
+Bootstrap resamples & 20,000 \\
+Permutation resamples & 50,000 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+All policies received the same latent scenario and common-random-number environment tape within each regime--budget--seed cell. The headline design enforced fixed horizons, equal channel access, unit acquisition cost, equal total evidence cost, and no early stopping. The agent could not observe simulator ground truth or regime labels.
+
+The terminal loss weights were frozen at:
+
+\[
+L_{unsafe\ GO}=10,\quad L_{unnecessary\ NO\!\!\!-\!\!GO}=2,
+\quad L_{conditional,bad}=4,\quad L_{conditional,good}=0.5.
+\]
+
+These weights imply deterministic posterior boundaries:
+
+\[
+P(S=bad)=\frac{1}{13}
+\]
+
+between GO and CONDITIONAL GO, and
+
+\[
+P(S=bad)=\frac{3}{11}
+\]
+
+between CONDITIONAL GO and NO-GO.
+
+\section*{2. Reproducibility and independent review}
+
+The execution and analysis were performed only after the runtime, matrix, endpoints, seeds, loss weights, resampling counts, and multiplicity procedure had been cryptographically frozen.
+
+Key identifiers are:
+
+\begin{itemize}
+  \item Step 2.6 frozen-artifact lock SHA-256: \texttt{7acac871ae85343b71b3bbd0cbc399b74075dd45aa4a7f8cdb8acb7f3bf23dd8};
+  \item analysis-freeze manifest SHA-256: \texttt{a131b7e4e86dc8a77f7eedfcff47c46f12b915924ead1706d122fd209f7bb5cf};
+  \item raw results SHA-256: \texttt{6695ab664fb67ec1eeb60669273aadf6a355a4fcdb45994f3870f638775dd070};
+  \item Step 2.8 directionality input SHA-256: \texttt{fdad023ffb2ab82a65ec6b8f2cd962b0e0e3421192e4e30e399bed31c82c1339}.
+\end{itemize}
+
+The independent reviewer verified the frozen hashes and exact row counts, reimplemented Holm step-down with zero discrepancies over all 240 adjusted values, and independently recomputed every row of the Step 2.7 post-hoc directionality table.
+
+\section*{3. Frozen confirmatory results}
+
+Exactly one contrast survived Holm correction:
+
+\begin{center}
+\begin{tabularx}{\textwidth}{l l r l r r}
+\toprule
+Regime & Budget & Comparison & Endpoint & ED--baseline & Holm $p$ \\
+\midrule
+Degraded evidence & 2 & ED-POMDP vs classical & ECE & $-0.042708$ & $0.004800$ \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+The paired bootstrap interval was approximately $[-0.0466,\,+0.0034]$, crossing zero. The ED-POMDP cell contained only three distinct posterior values occupying three of ten fixed bins. The rejection is therefore retained as narrow, discrete-support-sensitive evidence, not as broad proof of calibration superiority.
+
+Across the complete eighty aggregate cells per endpoint:
+
+\begin{center}
+\begin{tabular}{lrrr}
+\toprule
+Endpoint & Favourable & Adverse & Equal \\
+\midrule
+Decision loss & 17 & 17 & 46 \\
+Brier score & 63 & 13 & 4 \\
+Expected calibration error & 53 & 23 & 4 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+For the four acquisition baselines directly associated with the VOI claim, terminal decision loss was favourable in 10 of 64 cells, adverse in 16, and equal in 38. No decision-loss contrast survived Holm correction. At budget eight and under degraded evidence, none of the sixteen relevant cells was favourable.
+
+\section*{4. Post-hoc mechanism diagnosis}
+
+The Step 2.8 analysis is explicitly descriptive. It adds no hypothesis test, confidence interval, or retrospective change to the confirmatory family. It pairs every ED-POMDP episode with each of the five frozen confirmatory baselines, yielding 2,400 diagnostic rows.
+
+\subsection*{4.1 Calibration improvements are usually decision-inert}
+
+ED-POMDP had a lower Brier score in 1,119 of the 2,400 episode pairs. In 1,054 of these 1,119 pairs, the terminal action was unchanged:
+
+\[
+\frac{1054}{1119}=94.19\%.
+\]
+
+Only 65 Brier-improving pairs also changed the terminal decision. This is the primary mechanism behind the gap between calibration and realised decision loss: posterior improvement frequently remains on the same side of the frozen terminal boundaries.
+
+Across all 106 changed-action pairs, realised loss was lower for ED-POMDP in 65 and higher in 41. Counts alone do not determine aggregate performance because the frozen loss is strongly asymmetric. A small number of unsafe or insufficiently conservative decisions can outweigh a larger number of modest improvements.
+
+\subsection*{4.2 Baseline-specific action conversion}
+
+\begin{center}
+\small
+\begin{tabularx}{\textwidth}{lrrrrX}
+\toprule
+Baseline & Same action & Changed & ED better & ED worse & Mean loss delta on changed actions \\
+\midrule
+Fixed plan & 449/480 & 31 & 18 & 13 & $+1.0806$; fewer but larger adverse outcomes dominate. \\
+Random acquisition & 444/480 & 36 & 22 & 14 & $+0.4444$; asymmetric adverse losses dominate. \\
+Entropy acquisition & 462/480 & 18 & 15 & 3 & $-0.5278$; changed actions are descriptively favourable. \\
+Risk-only & 480/480 & 0 & 0 & 0 & Exactly identical terminal actions. \\
+Classical POMDP & 459/480 & 21 & 10 & 11 & $-2.2857$; safety-weighted gains dominate magnitude. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+The risk-only comparison is particularly diagnostic. ED-POMDP and risk-only used exactly the same acquisition trace in only 205 of 480 episodes and had a mean absolute posterior difference of 0.04539, yet selected the same terminal action in all 480 episodes. The additional decision-aware objective altered evidence selection and belief values without altering the downstream decision.
+
+The classical comparison shows a different pattern. Acquisition traces matched in 206 of 480 episodes, mean absolute posterior difference was 0.12734, and actions differed in 21 episodes. ED-POMDP had lower realised loss in 10 and higher loss in 11, but the mean changed-action loss difference was strongly favourable because avoided unsafe-GO losses carry much larger weight.
+
+\subsection*{4.3 Mandatory safety evidence}
+
+\begin{center}
+\begin{tabular}{lrrrr}
+\toprule
+Policy & Identifiable & Degraded & Misspecified & Non-identifiable \\
+\midrule
+ED-POMDP & 0 & 0 & 0 & 17 \\
+Classical POMDP & 2 & 2 & 2 & 18 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+ED-POMDP produced zero unsafe-GO decisions in the three regimes in which such errors were structurally avoidable, while the classical POMDP produced two in each. This pattern is operationally important under the frozen loss weights. It remains descriptive because unsafe-GO rate was deliberately excluded from the confirmatory p-value family.
+
+\section*{5. Claim adjudication}
+
+\begin{tcolorbox}[colback=softred,colframe=red!60!black,boxrule=0.7pt,arc=2mm]
+\textbf{\voi --- NOT SUPPORTED IN STEP 2.} No decision-loss contrast survived Holm correction. Claim-relevant aggregate directions were 10 favourable, 16 adverse, and 38 equal. Mechanism analysis shows that most calibration improvements do not change the terminal action, while changed actions do not yield stable baseline-independent gains.
+\end{tcolorbox}
+
+The disposition is bounded to the frozen benchmark. It does not prove that decision-aware VOI is universally ineffective. A redesigned claim would require a new preregistration, new development seeds, and new untouched confirmatory seeds.
+
+\begin{tcolorbox}[colback=softamber,colframe=orange!70!black,boxrule=0.7pt,arc=2mm]
+\textbf{\eqclaim --- BROAD FORM NOT SUPPORTED; NARROW ECE SIGNAL RETAINED.} One degraded-evidence, budget-two ECE contrast survived Holm correction. Sparse posterior support, a bootstrap interval crossing zero, mixed misspecification results, and no general decision-loss improvement prohibit broad promotion.
+\end{tcolorbox}
+
+The evidence level for both claims is now \texttt{SYNTHETIC}. This records the provenance of the adjudicating evidence, not positive support. Evidence polarity and disposition are recorded separately in the canonical claim registry.
+
+\section*{6. Implications for STRAT-Q and Test Authority}
+
+The benchmark supports four engineering lessons.
+
+\begin{itemize}
+  \item \textbf{Calibration is not decision value.} A quality-intelligence engine must be assessed on the action it changes, not only on probabilistic scores.
+  \item \textbf{Terminal thresholds are part of the model.} Better beliefs can be operationally inert when all candidate posteriors remain in the same decision region.
+  \item \textbf{Loss asymmetry changes interpretation.} Counts of favourable and adverse decisions cannot replace weighted decision loss, especially when unsafe GO is much more costly than unnecessary delay.
+  \item \textbf{Evidence-quality modelling can still matter for safety.} The descriptive unsafe-GO pattern warrants preservation and targeted future study, but not retrospective claim promotion.
+\end{itemize}
+
+For STRAT-Q, the practical consequence is that evidence acquisition, belief updating, and GO / CONDITIONAL GO / NO-GO governance must be designed as one coupled decision system. Optimising only the evidence-selection layer is insufficient.
+
+\section*{7. Boundary for the next experiment}
+
+A future confirmatory study should not tune on Step 2 headline seeds. Candidate design changes include:
+
+\begin{itemize}
+  \item adaptive stopping rather than fixed evidence horizons;
+  \item terminal decisions conditioned jointly on system risk and evidence quality;
+  \item explicit compensating-control semantics for CONDITIONAL GO;
+  \item correlated and partially redundant evidence;
+  \item non-unit test costs and project-specific evidence budgets;
+  \item sensitivity analyses over safety, delay, and commercial loss ratios;
+  \item realistic STRAT-Q release scenarios with governed evidence provenance.
+\end{itemize}
+
+The next protocol must separate exploratory development seeds from untouched confirmatory seeds and define a smaller primary endpoint family.
+
+\section*{8. Threats and limits}
+
+The conclusions remain synthetic and benchmark-specific. Latent state spaces are small; likelihoods are hand-specified; evidence channels are simplified; fixed horizons suppress adaptive stopping; and the same loss structure governs all scenarios. The post-hoc mechanism analysis is deterministic and reproducible but not confirmatory. Episode-level counts and aggregate-cell directions answer different questions and must not be conflated. Industrial calibration remains blocked by the governed data-readiness gate.
+
+\section*{9. Conclusion}
+
+Step 2 successfully performed its intended scientific function: it exposed the proposed advantages to a frozen, reproducible attempt at falsification. The broad decision-superiority claim did not survive. The broad evidence-quality claim also remains unpromoted, with one narrow calibration signal preserved. The most useful result is mechanistic: ED-POMDP often changes evidence acquisition and improves probability quality without crossing a terminal decision boundary. Future work must therefore redesign and preregister the coupling between evidence quality, acquisition, stopping, loss, and release action rather than merely enlarging the simulation.
+
+\vfill
+{\small\color{muted}Canonical artifacts: \texttt{benchmark/results/headline\_raw.csv}, \texttt{benchmark/results/headline\_contrasts.csv}, \texttt{benchmark/results/step27\_posthoc\_directionality.csv}, \texttt{benchmark/results/step28/}, and \texttt{docs/CLAIMS.md}.}
+
+\end{document}

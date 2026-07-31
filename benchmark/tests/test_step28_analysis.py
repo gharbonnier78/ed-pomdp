@@ -77,7 +77,8 @@ def test_step28_generation_is_complete_and_deterministic(tmp_path: Path) -> None
         encoding="utf-8"
     )
     assert "NOT SUPPORTED IN THE FROZEN STEP 2 BENCHMARK" in report
-    assert "descriptive, not inferential" in report.lower()
+    assert "mandatory descriptive safety evidence" in report.lower()
+    assert "was not tested for superiority" in report.lower()
     assert "zero discrepancies" not in report.lower()  # independent review is recorded elsewhere
 
     first_hashes = {

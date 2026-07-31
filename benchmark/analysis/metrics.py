@@ -9,12 +9,13 @@ from statistics import fmean, median, stdev
 from typing import Iterable, Mapping, Sequence
 
 
-PRIMARY_ENDPOINTS = (
+CONFIRMATORY_ENDPOINTS = (
     "decision_loss",
-    "unsafe_go_rate",
     "brier_score",
     "expected_calibration_error",
 )
+MANDATORY_SAFETY_ENDPOINTS = ("unsafe_go_rate",)
+SUMMARY_ENDPOINTS = CONFIRMATORY_ENDPOINTS + MANDATORY_SAFETY_ENDPOINTS
 
 
 def read_raw_csv(path: str | Path) -> list[dict[str, object]]:
@@ -43,6 +44,36 @@ def read_raw_csv(path: str | Path) -> list[dict[str, object]]:
     return records
 
 
+def _validate_bin_edges(bin_edges: Sequence[float]) -> None:
+    if len(bin_edges) < 2 or bin_edges[0] != 0.0 or bin_edges[-1] != 1.0:
+        raise ValueError("ECE bin edges must span [0, 1]")
+    if any(left >= right for left, right in zip(bin_edges, bin_edges[1:])):
+        raise ValueError("ECE bin edges must be strictly increasing")
+
+
+def _bin_index(probability: float, bin_edges: Sequence[float]) -> int:
+    for index, (lower, upper) in enumerate(zip(bin_edges, bin_edges[1:])):
+        if lower <= probability < upper:
+            return index
+        if index == len(bin_edges) - 2 and probability == upper:
+            return index
+    raise ValueError("probability is outside frozen calibration bins")
+
+
+def calibration_resolution(
+    probabilities: Sequence[float], bin_edges: Sequence[float]
+) -> dict[str, int]:
+    if not probabilities:
+        raise ValueError("calibration resolution requires predictions")
+    _validate_bin_edges(bin_edges)
+    populated = {_bin_index(float(probability), bin_edges) for probability in probabilities}
+    return {
+        "distinct_prediction_count": len(set(float(value) for value in probabilities)),
+        "populated_bin_count": len(populated),
+        "total_bin_count": len(bin_edges) - 1,
+    }
+
+
 def expected_calibration_error(
     probabilities: Sequence[float],
     outcomes: Sequence[bool],
@@ -50,23 +81,19 @@ def expected_calibration_error(
 ) -> float:
     if len(probabilities) != len(outcomes) or not probabilities:
         raise ValueError("ECE requires equally sized non-empty predictions and outcomes")
-    if len(bin_edges) < 2 or bin_edges[0] != 0.0 or bin_edges[-1] != 1.0:
-        raise ValueError("ECE bin edges must span [0, 1]")
-    if any(left >= right for left, right in zip(bin_edges, bin_edges[1:])):
-        raise ValueError("ECE bin edges must be strictly increasing")
+    _validate_bin_edges(bin_edges)
 
     total = len(probabilities)
     ece = 0.0
-    for index, (lower, upper) in enumerate(zip(bin_edges, bin_edges[1:])):
+    for index in range(len(bin_edges) - 1):
         members = [
             item
             for item, probability in enumerate(probabilities)
-            if lower <= probability < upper
-            or (index == len(bin_edges) - 2 and probability == upper)
+            if _bin_index(float(probability), bin_edges) == index
         ]
         if not members:
             continue
-        confidence = fmean(probabilities[item] for item in members)
+        confidence = fmean(float(probabilities[item]) for item in members)
         frequency = fmean(float(outcomes[item]) for item in members)
         ece += len(members) / total * abs(confidence - frequency)
     return ece
@@ -91,7 +118,7 @@ def endpoint_value(
             [bool(record["true_system_bad"]) for record in records],
             bin_edges,
         )
-    raise ValueError(f"unknown primary endpoint: {endpoint}")
+    raise ValueError(f"unknown headline endpoint: {endpoint}")
 
 
 def _stable_seed(base_seed: int, key: str) -> int:
@@ -108,15 +135,25 @@ def metric_summary(
     bootstrap_resamples: int,
     analysis_seed: int,
     summary_key: str,
-) -> dict[str, float | int]:
+) -> dict[str, float | int | None]:
+    """Return one consistently labelled bootstrap summary.
+
+    ``estimate`` is the statistic on the observed 30-seed cell. The median,
+    standard deviation and interval are always properties of the deterministic
+    bootstrap distribution, including for nonlinear ECE. Calibration-resolution
+    diagnostics are populated only for ECE rows.
+    """
     if not records:
         raise ValueError("metric summary requires records")
     if bootstrap_resamples <= 0:
         raise ValueError("bootstrap_resamples must be positive")
+    if not 0.0 < confidence_level < 1.0:
+        raise ValueError("confidence_level must be in (0, 1)")
+
     observed = endpoint_value(records, endpoint, bin_edges)
     rng = random.Random(_stable_seed(analysis_seed, summary_key))
     sample_count = len(records)
-    bootstrap = []
+    bootstrap: list[float] = []
     for _ in range(bootstrap_resamples):
         sample = [records[rng.randrange(sample_count)] for _ in range(sample_count)]
         bootstrap.append(endpoint_value(sample, endpoint, bin_edges))
@@ -127,26 +164,26 @@ def metric_summary(
         int((1.0 - tail) * bootstrap_resamples), bootstrap_resamples - 1
     )
 
+    resolution: dict[str, int | None] = {
+        "distinct_prediction_count": None,
+        "populated_bin_count": None,
+        "total_bin_count": None,
+    }
     if endpoint == "expected_calibration_error":
-        reported_median = median(bootstrap)
-        reported_sd = stdev(bootstrap) if len(bootstrap) > 1 else 0.0
-    else:
-        field = {
-            "decision_loss": "decision_loss",
-            "unsafe_go_rate": "unsafe_go",
-            "brier_score": "brier_score",
-        }[endpoint]
-        values = [float(record[field]) for record in records]
-        reported_median = median(values)
-        reported_sd = stdev(values) if len(values) > 1 else 0.0
+        resolution.update(
+            calibration_resolution(
+                [float(record["posterior_bad"]) for record in records], bin_edges
+            )
+        )
 
     return {
-        "value": observed,
-        "median": reported_median,
-        "standard_deviation": reported_sd,
+        "estimate": observed,
+        "bootstrap_median": median(bootstrap),
+        "bootstrap_standard_deviation": stdev(bootstrap) if len(bootstrap) > 1 else 0.0,
         "ci_lower": bootstrap[lower_index],
         "ci_upper": bootstrap[upper_index],
         "seed_count": sample_count,
+        **resolution,
     }
 
 
@@ -183,6 +220,8 @@ def paired_contrast(
     analysis_seed: int,
     contrast_key: str,
 ) -> dict[str, float]:
+    if endpoint not in CONFIRMATORY_ENDPOINTS:
+        raise ValueError(f"endpoint is not in the frozen confirmatory family: {endpoint}")
     if not pairs:
         raise ValueError("paired contrast requires at least one pair")
     if not 0.0 < confidence_level < 1.0:

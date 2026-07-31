@@ -131,7 +131,7 @@ The lock and final manifest identify exactly Python `3.12.13`. The headline runn
 1. generate and commit `benchmark/config/FROZEN_ARTIFACTS.json` after all accepted code/configuration is committed;
 2. generate and commit `benchmark/protocol/ANALYSIS_FREEZE.json` referencing the commit containing that lock.
 
-The lock hashes every model, policy, runtime, runner, metric implementation, metric contract, analysis, configuration and protocol artifact capable of changing results. The final manifest repeats:
+The lock hashes every model, policy, runtime, runner, metric implementation, metric contract, analysis, configuration and protocol artifact capable of changing results, including the held-out pre-freeze power review. The final manifest repeats:
 
 - frozen artifact commit;
 - lock hash;
@@ -140,10 +140,11 @@ The lock hashes every model, policy, runtime, runner, metric implementation, met
 - complete regimes, budgets, seeds and policies;
 - explicit `LossWeights`;
 - confirmatory metric and mandatory safety registries;
+- fixed ECE calibration bins;
 - RNG design;
-- multiplicity rule.
+- multiplicity method, alpha and expected family size.
 
-`run_headline.py` refuses execution unless the manifest is tracked, the Git tree has no unexpected dirty paths, the frozen commit is an ancestor, all hashes match, the exact runtime matches, configuration dimensions match, `LossWeights` match and no previous output exists.
+`run_headline.py` refuses execution unless the manifest is tracked, the Git tree has no unexpected dirty paths, the frozen commit is an ancestor, all hashes match, the exact runtime matches, configuration dimensions match, `LossWeights` match, endpoint registries match, ECE calibration matches, multiplicity semantics match and no previous output exists.
 
 ## Current branch state
 

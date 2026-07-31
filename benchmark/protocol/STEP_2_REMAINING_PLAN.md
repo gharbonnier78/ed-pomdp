@@ -49,12 +49,15 @@ Implemented on the Step 2.6 branch as a freeze candidate:
 - fixed-horizon exact-cost headline execution with early stopping prohibited;
 - explicit frozen `LossWeights` axis;
 - raw episode schema containing policy prediction, decision, realized loss, pairing keys, latent outcomes and acquisition trace;
-- fixed implementations for decision loss, unsafe GO, Brier score and ten-bin ECE;
-- deterministic paired bootstrap intervals, within-seed randomization p-values and complete-family Holm correction;
-- guarded runner that rejects missing/untracked manifests, dirty trees, non-descendant commits, hash drift, dimension drift and `LossWeights` drift;
+- three confirmatory endpoints: decision loss, Brier score and ten-bin ECE;
+- mandatory unsafe-GO safety reporting outside paired p-values and Holm correction;
+- ECE diagnostics for distinct posterior support and populated bins;
+- deterministic paired bootstrap intervals, within-seed randomization p-values and 240-hypothesis complete-family Holm correction;
+- held-out pre-freeze estimability review using seeds `100–129`, never headline seeds `0–29`;
+- guarded runner that rejects missing/untracked manifests, dirty trees, non-descendant commits, hash drift, dimension drift, endpoint-registry drift, multiplicity drift and `LossWeights` drift;
 - two-phase lock/manifest generator that guarantees the final manifest is committed before raw headline results exist.
 
-Deliberately not completed before review:
+Deliberately not completed before final review:
 
 - `benchmark/config/headline_matrix.json` remains `freeze_candidate_not_executable`;
 - `benchmark/config/FROZEN_ARTIFACTS.json` has not yet been generated;
@@ -73,7 +76,8 @@ After reviewer approval, finalization is mechanical:
 
 - execute exactly the `3,360` frozen episode rows;
 - preserve raw episode-level results and run metadata hashes;
-- generate policy summaries and `320` corrected confirmatory contrasts;
+- generate all-policy summaries, including mandatory unsafe-GO safety rates and ECE-resolution diagnostics;
+- generate `240` Holm-corrected confirmatory contrasts for decision loss, Brier score and ECE;
 - retain failed, null and adverse configurations;
 - label all non-frozen analyses exploratory.
 

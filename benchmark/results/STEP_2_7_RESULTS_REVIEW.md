@@ -19,6 +19,17 @@ Immutable result hashes:
 - `headline_summary.csv`: `8a2e6f4191862015b39b97c99d9358bb603859f7aaaead86c418b20bd7c34f5b`;
 - `headline_contrasts.csv`: `89bc40f8bc2b7f4be00bfadfc3cb3397b23c34ccd9b96b8e004c1151fad82478`.
 
+## Independent reviewer verification
+
+The reviewer independently cloned the branch and verified:
+
+- the raw and configuration SHA-256 values against `headline_run_metadata.json`;
+- the exact row counts: `3,360` raw episodes, `448` summaries, and `240` contrasts;
+- an independent reimplementation of Holm step-down from the raw `p_value` column, with `0` discrepancies across all `240` adjusted values;
+- exactly one Holm survivor, matching the committed effect and adjusted p-value.
+
+The reviewer also confirmed that the disagreement between the paired permutation rejection and the bootstrap interval crossing zero is not a computational contradiction. It is consistent with two different inferential procedures applied to a low-resolution, discrete-support ECE cell.
+
 ## Confirmatory family result
 
 Exactly **one of the 240 preregistered contrasts rejects after Holm correction**.
@@ -36,11 +47,58 @@ This result requires cautious interpretation for two preregistered reasons:
 
 The result is therefore a genuine confirmatory rejection under the frozen test, but it is **narrow, discrete-support-sensitive evidence**, not broad proof of superiority.
 
+## Post-hoc directional audit for Step 2.8
+
+Significance alone does not distinguish “no detectable effect” from “the observed effect points away from the claim.” At the reviewer’s request, the point-estimate directions were audited after the frozen analysis. This is a **post-hoc descriptive audit**, not a new confirmatory test and not a basis for claim promotion.
+
+The exact derived table is preserved in `step27_posthoc_directionality.csv`.
+
+Across all five confirmatory baselines (`80` comparisons per endpoint):
+
+| Endpoint | Favorable to ED | Adverse to ED | Equal | Mean ED − baseline |
+|---|---:|---:|---:|---:|
+| decision loss | 17/80 | 17/80 | 46/80 | -0.003333 |
+| Brier score | 63/80 | 13/80 | 4/80 | -0.021639 |
+| ECE | 53/80 | 23/80 | 4/80 | -0.029995 |
+
+This establishes a real dissociation:
+
+- probabilistic quality is descriptively favorable to ED in most cells;
+- terminal decision loss is favorable in only `21.25%` of cells and is exactly tied in `57.5%`;
+- when the classical baseline is included, favorable and adverse decision-loss directions are balanced `17` to `17`, so it would be inaccurate to say that ED has higher loss in a literal majority of all `80` cells;
+- nevertheless, the primary decision endpoint shows no broad directional superiority despite the much stronger calibration pattern.
+
+Decision-loss directions across all five baselines remain sparse at every budget:
+
+| Budget | Favorable | Adverse | Equal | Mean ED − baseline |
+|---:|---:|---:|---:|---:|
+| 2 | 5/20 | 5/20 | 10/20 | +0.027500 |
+| 4 | 4/20 | 6/20 | 10/20 | -0.005000 |
+| 8 | 4/20 | 5/20 | 11/20 | +0.004167 |
+| 12 | 4/20 | 1/20 | 15/20 | -0.040000 |
+
+In `evidence_degraded`, the regime expected to favor explicit evidence-quality reasoning, decision loss is favorable in only `2/20` comparisons, adverse in `5/20`, and equal in `13/20`.
+
+For the four acquisition baselines named directly by `CLM-VOI-001`—fixed, random, entropy, and risk-only—the directional signal is more clearly unfavorable:
+
+- favorable: `10/64`;
+- adverse: `16/64`;
+- equal: `38/64`;
+- mean ED-minus-baseline decision-loss difference: `+0.020833`, where positive is worse for ED;
+- among non-tied comparisons, adverse directions outnumber favorable directions `16` to `10`.
+
+The adverse pattern is strongest in the two most difficult regimes for those four acquisition baselines:
+
+- `evidence_degraded`: `0` favorable, `5` adverse, `11` equal, mean difference `+0.043750`;
+- `non_identifiable`: `0` favorable, `6` adverse, `10` equal, mean difference `+0.104167`.
+
+This is stronger and more informative than a generic statement that decision-loss results are “not significant.” The benchmark does not merely fail to confirm broad decision superiority; on the claim-relevant acquisition comparisons, the observed non-tied directions more often oppose it.
+
 ## CLM-VOI-001 review
 
 The claim under test was that decision-aware value of information reduces matched-budget decision loss relative to fixed, random, entropy, and risk-only acquisition policies.
 
-Across the four named acquisition baselines, four regimes, and four budgets:
+Across those four named acquisition baselines, four regimes, and four budgets:
 
 - decision loss: ED better in `10/64` cells, worse in `16/64`, equal in `38/64`;
 - mean ED-minus-baseline decision-loss difference: `+0.020833` — positive is worse for ED;
@@ -51,7 +109,7 @@ Descriptively, ED has lower Brier score in `49/64` cells and lower ECE in `43/64
 
 The risk-only policy has exactly the same decision loss as ED-POMDP in all `16` regime-budget cells, despite posterior and calibration differences. This is an important mechanistic result: under the current observation model, horizon, and terminal loss rule, the extra decision-aware acquisition objective often does not alter the terminal action enough to change realized decision loss.
 
-**Conclusion:** the current confirmatory experiment does not support the broad form of `CLM-VOI-001`. The claim must remain unpromoted. Step 2.8 should either refute it for this benchmark or narrow it to a more specific mechanism or regime before any new experiment.
+**Conclusion:** the current confirmatory experiment does not support the broad form of `CLM-VOI-001`. More strongly, the observed direction on the primary endpoint does not align with the claim across the four named acquisition baselines: adverse non-tied directions outnumber favorable ones. The claim must remain unpromoted. Step 2.8 should refute the broad benchmark claim or narrow it to a specific mechanism or regime before any new experiment.
 
 ## CLM-EQ-001 review
 
@@ -104,8 +162,11 @@ Higher acquisition budgets increase the number of distinct posterior values, but
 
 ## Claim-governance recommendation for Step 2.8
 
-1. Keep `CLM-VOI-001` and `CLM-EQ-001` at their current unpromoted status while the reviewer independently reproduces the result tables and hashes.
+1. Keep `CLM-VOI-001` and `CLM-EQ-001` unpromoted.
 2. Do not summarize Step 2.7 as “ED-POMDP wins.” The confirmatory family supports one narrow ECE contrast and rejects no decision-loss contrast.
-3. Treat the decision equivalence between ED-POMDP and risk-only as a primary mechanistic finding requiring explanation.
-4. Consider decomposing `CLM-EQ-001` into a narrow degraded-evidence calibration claim and separate unsupported misspecification and decision-loss claims.
-5. Preserve all null, adverse, and safety results in the publication package.
+3. State explicitly that the primary endpoint does not show the hoped-for direction: across the four acquisition baselines named in `CLM-VOI-001`, adverse non-tied directions outnumber favorable directions `16` to `10`.
+4. Treat the combination of better probabilistic calibration and absent or adverse terminal-decision improvement as a primary scientific tension, not as noise to omit.
+5. Treat the decision equivalence between ED-POMDP and risk-only as a primary mechanistic finding requiring explanation.
+6. Decompose `CLM-EQ-001` into a narrow degraded-evidence calibration claim and separate unsupported misspecification and decision-loss claims.
+7. Preserve all null, adverse, equal, and safety results in the publication package.
+8. Keep `step27_posthoc_directionality.csv` explicitly labelled post hoc and descriptive; do not add its counts to the frozen confirmatory family retroactively.

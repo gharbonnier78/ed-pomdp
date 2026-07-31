@@ -8,6 +8,9 @@ from pathlib import Path
 CSV_PATH = Path("docs/CLAIMS.csv")
 JSON_PATH = Path("docs/CLAIMS.json")
 MARKDOWN_PATH = Path("docs/CLAIMS.md")
+LEGACY_CSV_PATH = Path("claims/claim_registry.csv")
+LEGACY_JSON_PATH = Path("claims/claim_registry.json")
+LEGACY_README_PATH = Path("claims/README.md")
 SCALAR_FIELDS = (
     "id",
     "statement",
@@ -22,9 +25,13 @@ SCALAR_FIELDS = (
 )
 
 
+def _read_csv(path: Path) -> tuple[dict[str, str], ...]:
+    with path.open("r", encoding="utf-8", newline="") as handle:
+        return tuple(csv.DictReader(handle))
+
+
 def test_claim_registry_csv_json_and_markdown_are_synchronized() -> None:
-    with CSV_PATH.open("r", encoding="utf-8", newline="") as handle:
-        csv_rows = tuple(csv.DictReader(handle))
+    csv_rows = _read_csv(CSV_PATH)
     registry = json.loads(JSON_PATH.read_text(encoding="utf-8"))
     json_rows = tuple(registry["claims"])
     markdown = MARKDOWN_PATH.read_text(encoding="utf-8")
@@ -47,6 +54,20 @@ def test_claim_registry_csv_json_and_markdown_are_synchronized() -> None:
         ]
         assert f"| {claim_id} |" in markdown
         assert json_row["disposition"] in markdown
+
+
+def test_legacy_claim_registry_paths_are_controlled_mirrors() -> None:
+    canonical_csv = _read_csv(CSV_PATH)
+    legacy_csv = _read_csv(LEGACY_CSV_PATH)
+    canonical_json = json.loads(JSON_PATH.read_text(encoding="utf-8"))
+    legacy_json = json.loads(LEGACY_JSON_PATH.read_text(encoding="utf-8"))
+    legacy_readme = LEGACY_README_PATH.read_text(encoding="utf-8")
+
+    assert legacy_csv == canonical_csv
+    assert legacy_json == canonical_json
+    assert "authoritative epistemic claim registry" in legacy_readme
+    assert "docs/CLAIMS.md" in legacy_readme
+    assert "must not edit the legacy mirrors independently" in legacy_readme
 
 
 def test_step2_claim_dispositions_are_bounded_and_unpromoted() -> None:

@@ -1,70 +1,39 @@
-# Step 2 Benchmark
+# Step 2 Benchmark — Closed Frozen Increment
 
-This directory contains the quantitative validation increment for ED-POMDP.
+This directory contains the completed quantitative validation increment for ED-POMDP.
 
 ## Objective
 
 Evaluate whether decision-aware evidence acquisition and explicit evidence-quality modelling improve software-release decisions under strictly matched budgets.
 
-## Scope
+## Final status
 
-The benchmark controls:
+Step 2 is closed after:
 
-- latent system state `S`;
-- latent evidence-quality state `E`;
-- observation channels and evidence degradation;
-- likelihood misspecification and non-identifiability;
-- acquisition cost and exact budget;
-- terminal loss and posterior calibration;
-- random-stream pairing and analysis multiplicity;
-- exact analysis-runtime identity.
+- causal evidence-quality modelling;
+- completion of the seven-policy matrix;
+- fixed-horizon exact-cost harness construction;
+- cryptographic analysis freeze;
+- execution of 3,360 immutable headline episodes;
+- analysis of 240 Holm-corrected confirmatory contrasts;
+- independent hash, row-count and Holm verification;
+- audited post-hoc directionality analysis;
+- deterministic Step 2.8 mechanism diagnosis;
+- synchronized claim adjudication.
 
-## Current executable state
+The frozen runtime, config, raw results and confirmatory outputs are immutable. Step 2.8 reads them without modification.
 
-The repository now includes:
-
-- a causal evidence-production model in which latent `E` controls functional-channel reliability;
-- a shared joint posterior `P(S,E | history)` for explicit-`E` policies;
-- a collapsed classical posterior `P(S | history)` that permanently marginalizes `E`;
-- identifiable, evidence-degraded, likelihood-misspecified and deliberately non-identifiable regimes;
-- the complete seven-policy preregistered matrix;
-- a fixed-horizon exact-cost experiment harness;
-- common-random-number pairing across all policies for each `(regime, budget, seed)` cell;
-- a separate deterministic policy RNG stream and fresh policy instance per experimental unit;
-- explicit configured `LossWeights`;
-- raw episode-level evidence and metric schema;
-- three confirmatory endpoints plus mandatory non-inferential unsafe-GO reporting;
-- fixed-bin ECE with posterior-support and bin-occupancy diagnostics;
-- paired bootstrap, paired permutation and Holm implementations;
-- exact Python `3.12.13` runtime identity and pinned `pytest==9.1.1` test environment;
-- a hash/Git guard that prevents unfrozen headline execution;
-- a two-phase lock and dated-manifest generator.
-
-The Step 2.6 branch is still a **freeze candidate**. It deliberately contains no final lock, no final analysis-freeze manifest and no headline result. Those artifacts are generated only after review.
-
-See:
-
-- `runtime/STEP_2_4_SCOPE.md` for the causal model and numeric regression;
-- `runtime/STEP_2_5_SCOPE.md` for policy definitions and fairness invariants;
-- `experiment/STEP_2_6_SCOPE.md` for pairing, exact-cost execution, statistics and freeze mechanics;
-- `config/headline_matrix.json` for the executable freeze candidate;
-- `protocol/PRE_FREEZE_POWER_REVIEW.md` for the held-out seeds `100–129` estimability review;
-- `protocol/STEP_2_REMAINING_PLAN.md` for the remaining Step 2 sequence;
-- `protocol/PREREGISTRATION.md` for the confirmatory protocol.
-
-## Headline matrix candidate
+## Frozen design
 
 - 4 regimes
 - 4 budgets: 2, 4, 8, 12
 - 30 shared headline seeds: 0–29
 - 7 policies
 - 3,360 raw episode rows
-- 5 confirmatory ED-POMDP-versus-baseline contrasts
+- 5 confirmatory ED-POMDP-versus-baseline contrasts per regime and budget
 - 3 confirmatory endpoints
 - 1 mandatory safety endpoint outside inferential testing
 - 240 hypotheses in the complete Holm family
-
-The former `config/benchmark_matrix.yaml` is retained as a historical scaffold pointer. The canonical executable matrix is `config/headline_matrix.json`.
 
 ## Policies
 
@@ -84,16 +53,87 @@ The executable registry is `runtime/policy_matrix.py`.
 - Brier score
 - fixed ten-bin expected calibration error
 
-`unsafe_go_rate` is mandatory safety reporting for every cell but receives no p-value and does not enter Holm correction. Secondary and audit metrics include unnecessary NO-GO, posterior residual risk, evidence cost and acquisition count.
+`unsafe_go_rate` is mandatory safety reporting for every cell but receives no p-value and does not enter Holm correction.
 
-Every ECE row reports the number of distinct posterior values, populated bins and total frozen bins. Sparse support at small budgets is interpreted as low-resolution rather than hidden by post-hoc bin merging.
+## Confirmatory result
 
-## Frozen runtime
+Exactly one of 240 contrasts survives Holm correction:
 
-Headline generation and analysis require exactly Python `3.12.13`. They use only the Python standard library. CI tests use the same Python version and pin `pytest==9.1.1`; pytest is not a headline runtime dependency.
+- ED-POMDP versus classical POMDP;
+- degraded-evidence regime;
+- budget 2;
+- expected calibration error;
+- ED-minus-classical difference approximately `-0.042708`;
+- Holm-adjusted p-value approximately `0.004800`.
 
-## Execution boundary
+The paired bootstrap interval crosses zero and posterior support is sparse. No decision-loss contrast survives Holm correction.
 
-Headline generation is refused until `protocol/ANALYSIS_FREEZE.json` exists as a committed file and every frozen artifact hash, runtime version, dimension, endpoint registry, multiplicity setting and `LossWeights` value matches. Early-stopping runs are exploratory and cannot enter the confirmatory family.
+Across the four acquisition baselines directly associated with `CLM-VOI-001`, aggregate decision-loss directions are:
 
-No headline empirical claim is made by the current increment. Claim maturity changes only after Step 2.7 execution, independent statistical review and synchronized registry updates in Step 2.8.
+- favourable: 10/64;
+- adverse: 16/64;
+- equal: 38/64.
+
+## Step 2.8 mechanism diagnosis
+
+`analysis/analyze_step28_mechanisms.py` deterministically reads the immutable Step 2.7 outputs and creates:
+
+- `results/step28/step28_pairwise_diagnostics.csv` — 2,400 episode pairs;
+- `results/step28/step28_mechanism_summary.csv` — 125 aggregate mechanism rows;
+- `results/step28/step28_decision_transitions.csv` — terminal-action transition table;
+- `results/step28/step28_threshold_occupancy.csv` — posterior distance to frozen decision boundaries;
+- `results/step28/step28_acquisition_summary.csv` — channel use by position;
+- `results/step28/STEP_2_8_CLAIM_ADJUDICATION.md` — generated scientific adjudication;
+- `results/step28/step28_analysis_metadata.json` — input/output hashes and row counts.
+
+The diagnostic is `post_hoc_descriptive`. It produces no new p-values or confidence intervals.
+
+### Main mechanism finding
+
+ED-POMDP improves Brier score in 1,119 of 2,400 paired episodes. In 1,054 of those cases — 94.19% — the terminal action remains unchanged.
+
+Against `risk_only`, ED-POMDP selects exactly the same terminal action in all 480 paired episodes despite different acquisition traces in 275 episodes and a non-zero mean posterior difference.
+
+The benchmark therefore identifies a calibration-to-action coupling problem: better beliefs are frequently decision-inert under the frozen terminal thresholds and fixed horizons.
+
+## Mandatory safety evidence
+
+Unsafe GO counts for ED-POMDP are `0, 0, 0, 17` across identifiable, degraded, misspecified and non-identifiable regimes. Classical POMDP counts are `2, 2, 2, 18`.
+
+This pattern is retained as favourable descriptive evidence and is not promoted as an inferential superiority result.
+
+## Claim disposition
+
+- `CLM-VOI-001`: `NOT_SUPPORTED_STEP2`;
+- `CLM-EQ-001`: `BROAD_FORM_NOT_SUPPORTED_NARROW_ECE_SIGNAL`.
+
+The canonical status is in `../docs/CLAIMS.md`; CSV and JSON mirrors are checked by the test suite.
+
+## Canonical artifacts
+
+- `protocol/PREREGISTRATION.md`
+- `config/headline_matrix.json`
+- `config/FROZEN_ARTIFACTS.json`
+- `protocol/ANALYSIS_FREEZE.json`
+- `results/headline_raw.csv`
+- `results/headline_run_metadata.json`
+- `results/headline_summary.csv`
+- `results/headline_contrasts.csv`
+- `results/step27_execution_audit.json`
+- `results/STEP_2_7_RESULTS_REVIEW.md`
+- `results/step27_posthoc_directionality.csv`
+- `protocol/STEP_2_8_ANALYSIS_PLAN.md`
+- `results/step28/`
+
+## Reproduction
+
+```bash
+python -m pytest -q benchmark/tests
+python -m benchmark.analysis.analyze_step28_mechanisms --output-dir /tmp/step28
+```
+
+The analysis requires exactly Python `3.12.13` for repository parity and uses only the Python standard library. CI pins `pytest==9.1.1`.
+
+## Boundary for future work
+
+A future claim must not tune against headline seeds 0–29. Redesigned terminal rules, adaptive stopping, correlated evidence, non-unit costs or industrial scenarios require a new protocol, new development seeds and new untouched confirmatory seeds.

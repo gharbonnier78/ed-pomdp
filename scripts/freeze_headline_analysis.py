@@ -14,6 +14,10 @@ from pathlib import Path
 import subprocess
 import sys
 
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
 from benchmark.experiment.freeze_guard import sha256_path
 from benchmark.experiment.harness import load_headline_config
 
@@ -44,6 +48,7 @@ FROZEN_ARTIFACTS = (
 def _git(*arguments: str) -> str:
     return subprocess.run(
         ("git", *arguments),
+        cwd=REPO_ROOT,
         check=True,
         capture_output=True,
         text=True,
@@ -56,19 +61,21 @@ def _require_clean_tree() -> None:
 
 
 def _require_no_headline_results() -> None:
-    if RAW_RESULTS_PATH.exists():
+    if (REPO_ROOT / RAW_RESULTS_PATH).exists():
         raise RuntimeError("headline raw results already exist; freeze must precede execution")
 
 
 def create_lock() -> None:
     _require_clean_tree()
     _require_no_headline_results()
-    if LOCK_PATH.exists() or MANIFEST_PATH.exists():
+    lock_path = REPO_ROOT / LOCK_PATH
+    manifest_path = REPO_ROOT / MANIFEST_PATH
+    if lock_path.exists() or manifest_path.exists():
         raise RuntimeError("remove stale freeze artifacts before creating a new lock")
-    config = load_headline_config("benchmark/config/headline_matrix.json")
+    config = load_headline_config(REPO_ROOT / "benchmark/config/headline_matrix.json")
     if config.get("status") != "frozen":
         raise RuntimeError("headline config must be marked frozen before lock generation")
-    missing = [path for path in FROZEN_ARTIFACTS if not Path(path).is_file()]
+    missing = [path for path in FROZEN_ARTIFACTS if not (REPO_ROOT / path).is_file()]
     if missing:
         raise RuntimeError(f"frozen artifact inventory is incomplete: {missing!r}")
     source_commit = _git("rev-parse", "HEAD")
@@ -82,10 +89,10 @@ def create_lock() -> None:
             "test_only_dependencies": ["pytest"],
         },
         "artifacts": {
-            path: sha256_path(path) for path in sorted(FROZEN_ARTIFACTS)
+            path: sha256_path(REPO_ROOT / path) for path in sorted(FROZEN_ARTIFACTS)
         },
     }
-    LOCK_PATH.write_text(
+    lock_path.write_text(
         json.dumps(lock, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     print(f"wrote {LOCK_PATH}; commit it before creating the manifest")
@@ -94,22 +101,24 @@ def create_lock() -> None:
 def create_manifest() -> None:
     _require_clean_tree()
     _require_no_headline_results()
-    if not LOCK_PATH.is_file():
+    lock_path = REPO_ROOT / LOCK_PATH
+    manifest_path = REPO_ROOT / MANIFEST_PATH
+    if not lock_path.is_file():
         raise RuntimeError("frozen-artifact lock is absent")
-    if MANIFEST_PATH.exists():
+    if manifest_path.exists():
         raise RuntimeError("analysis-freeze manifest already exists")
     _git("ls-files", "--error-unmatch", str(LOCK_PATH))
 
-    lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
+    lock = json.loads(lock_path.read_text(encoding="utf-8"))
     artifacts = lock.get("artifacts")
     if not isinstance(artifacts, dict) or not artifacts:
         raise RuntimeError("invalid frozen-artifact lock")
     for path, expected_hash in artifacts.items():
-        if sha256_path(path) != expected_hash:
+        if sha256_path(REPO_ROOT / path) != expected_hash:
             raise RuntimeError(f"artifact changed after lock creation: {path}")
 
     config_path = Path("benchmark/config/headline_matrix.json")
-    config = load_headline_config(config_path)
+    config = load_headline_config(REPO_ROOT / config_path)
     if config.get("status") != "frozen":
         raise RuntimeError("headline config is not frozen")
     frozen_artifact_commit = _git("rev-parse", "HEAD")
@@ -119,17 +128,17 @@ def create_manifest() -> None:
         "created_date": "2026-07-31",
         "frozen_artifact_commit": frozen_artifact_commit,
         "lock_file": str(LOCK_PATH),
-        "lock_sha256": sha256_path(LOCK_PATH),
+        "lock_sha256": sha256_path(lock_path),
         "runner_entrypoint": {
             "path": "benchmark/experiment/run_headline.py",
-            "sha256": sha256_path("benchmark/experiment/run_headline.py"),
+            "sha256": sha256_path(REPO_ROOT / "benchmark/experiment/run_headline.py"),
         },
         "analysis_entrypoint": {
             "path": "benchmark/analysis/analyze_headline.py",
-            "sha256": sha256_path("benchmark/analysis/analyze_headline.py"),
+            "sha256": sha256_path(REPO_ROOT / "benchmark/analysis/analyze_headline.py"),
         },
         "headline_config": str(config_path),
-        "headline_config_sha256": sha256_path(config_path),
+        "headline_config_sha256": sha256_path(REPO_ROOT / config_path),
         "headline_dimensions": {
             "regimes": config["regimes"],
             "budgets": config["budgets"],
@@ -141,7 +150,7 @@ def create_manifest() -> None:
         "multiplicity": config["analysis"]["multiplicity"],
         "raw_results_absent_at_freeze": True,
     }
-    MANIFEST_PATH.write_text(
+    manifest_path.write_text(
         json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     print(f"wrote {MANIFEST_PATH}; commit it before headline execution")

@@ -18,6 +18,9 @@ on:
       - benchmark/tests/test_step28_analysis.py
       - benchmark/protocol/STEP_2_8_ANALYSIS_PLAN.md
 
+permissions:
+  contents: write
+
 jobs:
   analyze:
     runs-on: ubuntu-latest
@@ -41,7 +44,8 @@ jobs:
       - name: Generate Step 2.8 diagnostics
         run: >-
           python -m benchmark.analysis.analyze_step28_mechanisms
-          --output-dir step28_artifacts
+          --output-dir benchmark/results/step28
+          --overwrite
 
       - name: Verify generated package
         run: |
@@ -49,7 +53,7 @@ jobs:
           import csv, json
           from pathlib import Path
 
-          root = Path("step28_artifacts")
+          root = Path("benchmark/results/step28")
           expected = {
               "step28_pairwise_diagnostics.csv",
               "step28_mechanism_summary.csv",
@@ -75,8 +79,21 @@ jobs:
           print(json.dumps(metadata, indent=2, sort_keys=True))
           PY
 
+      - name: Commit exact outputs to the Step 2.8 branch
+        if: github.event_name == 'push'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add benchmark/results/step28
+          if git diff --cached --quiet; then
+            echo "No generated-output change to commit"
+          else
+            git commit -m "Step 2.8: record deterministic mechanism outputs"
+            git push origin HEAD:step-2.8-claim-adjudication
+          fi
+
       - uses: actions/upload-artifact@v4
         with:
           name: step2.8-mechanism-results
-          path: step28_artifacts
+          path: benchmark/results/step28
           retention-days: 90

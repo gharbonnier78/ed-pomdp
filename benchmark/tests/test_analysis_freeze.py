@@ -85,8 +85,14 @@ def test_metric_summary_uses_consistent_bootstrap_column_semantics() -> None:
 
 
 def test_paired_contrast_is_deterministic_for_same_analysis_seed() -> None:
-    ed = [_record(0, "ed_pomdp_voi", 0.1, 0.5), _record(1, "ed_pomdp_voi", 0.8, 1.0)]
-    baseline = [_record(0, "fixed_plan", 0.3, 1.0), _record(1, "fixed_plan", 0.6, 2.0)]
+    ed = [
+        _record(0, "ed_pomdp_voi", 0.1, 0.5),
+        _record(1, "ed_pomdp_voi", 0.8, 1.0),
+    ]
+    baseline = [
+        _record(0, "fixed_plan", 0.3, 1.0),
+        _record(1, "fixed_plan", 0.6, 2.0),
+    ]
     pairs = pair_policy_records(ed, baseline)
     first = paired_contrast(
         pairs,
@@ -113,8 +119,14 @@ def test_paired_contrast_is_deterministic_for_same_analysis_seed() -> None:
 
 
 def test_unsafe_go_cannot_enter_confirmatory_contrast_function() -> None:
-    ed = [_record(0, "ed_pomdp_voi", 0.1, 0.5), _record(1, "ed_pomdp_voi", 0.8, 1.0)]
-    baseline = [_record(0, "fixed_plan", 0.3, 1.0), _record(1, "fixed_plan", 0.6, 2.0)]
+    ed = [
+        _record(0, "ed_pomdp_voi", 0.1, 0.5),
+        _record(1, "ed_pomdp_voi", 0.8, 1.0),
+    ]
+    baseline = [
+        _record(0, "fixed_plan", 0.3, 1.0),
+        _record(1, "fixed_plan", 0.6, 2.0),
+    ]
     pairs = pair_policy_records(ed, baseline)
     try:
         paired_contrast(
@@ -196,14 +208,20 @@ def _write_guard_fixture(tmp_path: Path) -> tuple[dict[str, object], Path, Path]
         "alpha": 0.05,
         "expected_family_size": 3,
     }
+    calibration = {"bin_edges": [0.0, 0.5, 1.0]}
     config: dict[str, object] = {
         "status": "frozen",
         "regimes": ["identifiable"],
         "budgets": [2],
         "seeds": list(range(30)),
         "policies": ["ed_pomdp_voi"],
-        "confirmatory_metrics": ["decision_loss", "brier_score", "expected_calibration_error"],
+        "confirmatory_metrics": [
+            "decision_loss",
+            "brier_score",
+            "expected_calibration_error",
+        ],
         "mandatory_safety_metrics": ["unsafe_go_rate"],
+        "calibration": calibration,
         "analysis": {"multiplicity": multiplicity},
         "loss_weights": {
             "unsafe_go": 10.0,
@@ -236,6 +254,7 @@ def _write_guard_fixture(tmp_path: Path) -> tuple[dict[str, object], Path, Path]
         "loss_weights": config["loss_weights"],
         "confirmatory_metrics": config["confirmatory_metrics"],
         "mandatory_safety_metrics": config["mandatory_safety_metrics"],
+        "calibration": calibration,
         "multiplicity": multiplicity,
         "headline_dimensions": {
             "regimes": config["regimes"],
@@ -251,8 +270,21 @@ def _write_guard_fixture(tmp_path: Path) -> tuple[dict[str, object], Path, Path]
     return config, config_path, manifest_path
 
 
+def _rehash_config_and_lock(config_path: Path, manifest_path: Path) -> None:
+    lock_path = config_path.parent / "FROZEN_ARTIFACTS.json"
+    lock = json.loads(lock_path.read_text(encoding="utf-8"))
+    lock["artifacts"]["benchmark/config/headline_matrix.json"] = sha256_path(
+        config_path
+    )
+    lock_path.write_text(json.dumps(lock), encoding="utf-8")
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["lock_sha256"] = sha256_path(lock_path)
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+
 def test_freeze_guard_checks_artifacts_dimensions_and_loss_weights(tmp_path: Path) -> None:
-    config, config_path, manifest_path = _write_guard_fixture(tmp_path)
+    config, config_path, _ = _write_guard_fixture(tmp_path)
     assert verify_analysis_freeze(
         "benchmark/protocol/ANALYSIS_FREEZE.json",
         repo_root=tmp_path,
@@ -273,19 +305,13 @@ def test_freeze_guard_checks_artifacts_dimensions_and_loss_weights(tmp_path: Pat
         raise AssertionError("changed LossWeights/config must invalidate the freeze")
 
 
-def test_freeze_guard_checks_endpoint_registry_even_with_rehashed_config(tmp_path: Path) -> None:
+def test_freeze_guard_checks_endpoint_registry_even_with_rehashed_config(
+    tmp_path: Path,
+) -> None:
     config, config_path, manifest_path = _write_guard_fixture(tmp_path)
     config["confirmatory_metrics"] = ["decision_loss", "unsafe_go_rate"]
     config_path.write_text(json.dumps(config), encoding="utf-8")
-
-    lock_path = tmp_path / "benchmark/config/FROZEN_ARTIFACTS.json"
-    lock = json.loads(lock_path.read_text(encoding="utf-8"))
-    lock["artifacts"]["benchmark/config/headline_matrix.json"] = sha256_path(config_path)
-    lock_path.write_text(json.dumps(lock), encoding="utf-8")
-
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    manifest["lock_sha256"] = sha256_path(lock_path)
-    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    _rehash_config_and_lock(config_path, manifest_path)
 
     try:
         verify_analysis_freeze(
@@ -297,3 +323,23 @@ def test_freeze_guard_checks_endpoint_registry_even_with_rehashed_config(tmp_pat
         assert "confirmatory metrics differ" in str(error)
     else:
         raise AssertionError("manifest must reject endpoint-registry drift")
+
+
+def test_freeze_guard_checks_calibration_even_with_rehashed_config(
+    tmp_path: Path,
+) -> None:
+    config, config_path, manifest_path = _write_guard_fixture(tmp_path)
+    config["calibration"] = {"bin_edges": [0.0, 0.25, 0.5, 0.75, 1.0]}
+    config_path.write_text(json.dumps(config), encoding="utf-8")
+    _rehash_config_and_lock(config_path, manifest_path)
+
+    try:
+        verify_analysis_freeze(
+            "benchmark/protocol/ANALYSIS_FREEZE.json",
+            repo_root=tmp_path,
+            require_git=False,
+        )
+    except RuntimeError as error:
+        assert "calibration semantics differ" in str(error)
+    else:
+        raise AssertionError("manifest must reject ECE-bin drift")

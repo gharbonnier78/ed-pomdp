@@ -1,24 +1,17 @@
-"""Terminal decision semantics and preregistered loss endpoints.
+"""Posterior, terminal decision semantics and preregistered loss endpoints.
 
-The decision policy receives observations only. Ground-truth latent state is used
-strictly after termination to score the decision.
-
-The inference model is deliberately fixed to the identifiable functional-channel
-likelihoods (0.80/0.20). It is not made regime-aware. Future evaluation against
-non-identifiable or likelihood-misspecified environments therefore measures
-robustness to model misspecification rather than silently adapting the agent to
-the data-generating regime.
-
-Terminal decisions are Bayes-optimal under ``LossWeights``. This same rule is used
-by the episode runner and by decision-aware acquisition policies, preventing the
-look-ahead model from optimizing against a different terminal decision-maker.
+The runner and acquisition planner share the same joint posterior over system
+quality and latent evidence-production quality. Functional evidence is reliable
+only conditionally on evidence quality, while environment validation informs that
+reliability without exposing the true latent state or simulator regime.
 """
 from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from math import log
+from typing import Mapping, Sequence
 
+from .evidence_model import IDENTIFIABLE_AGENT_MODEL, State
 from .simulator import EpisodeOutcome, Observation
 
 
@@ -46,19 +39,62 @@ class DecisionScore:
     acquisition_cost: float
 
 
+def observation_likelihood(channel: str, failed: bool, state: State) -> float:
+    """Likelihood under the fixed, non-regime-aware agent evidence model."""
+    return IDENTIFIABLE_AGENT_MODEL.likelihood(channel, failed, state)
+
+
+def joint_posterior(
+    history: Sequence[Observation],
+    prior: Mapping[State, float] | None = None,
+) -> dict[State, float]:
+    """Return ``P(S,E | history)`` from observable evidence only."""
+    states: tuple[State, ...] = (
+        (False, False),
+        (False, True),
+        (True, False),
+        (True, True),
+    )
+    belief = {state: 0.25 for state in states} if prior is None else dict(prior)
+    if set(belief) != set(states) or any(value < 0.0 for value in belief.values()):
+        raise ValueError("prior must define non-negative mass for all four joint states")
+    total_prior = sum(belief.values())
+    if total_prior <= 0.0:
+        raise ValueError("prior mass must be positive")
+    belief = {state: value / total_prior for state, value in belief.items()}
+
+    for observation in history:
+        belief = {
+            state: probability
+            * observation_likelihood(observation.channel, observation.failed, state)
+            for state, probability in belief.items()
+        }
+        normalizer = sum(belief.values())
+        if normalizer <= 0.0:
+            raise ArithmeticError("observation history has zero probability under agent model")
+        belief = {state: value / normalizer for state, value in belief.items()}
+    return belief
+
+
+def marginal_system_bad(belief: Mapping[State, float]) -> float:
+    return sum(probability for (system_bad, _), probability in belief.items() if system_bad)
+
+
+def marginal_evidence_bad(belief: Mapping[State, float]) -> float:
+    return sum(probability for (_, evidence_bad), probability in belief.items() if evidence_bad)
+
+
 def posterior_system_bad(history: tuple[Observation, ...], prior: float = 0.5) -> float:
-    """Bayesian posterior under the fixed identifiable functional-channel model."""
+    """Marginal system-risk posterior from the shared joint belief model."""
     if not 0.0 < prior < 1.0:
         raise ValueError("prior must be between zero and one")
-    log_odds = log(prior / (1.0 - prior))
-    for obs in history:
-        if obs.channel != "functional":
-            continue
-        p_bad = 0.80 if obs.failed else 0.20
-        p_good = 0.20 if obs.failed else 0.80
-        log_odds += log(p_bad / p_good)
-    odds = pow(2.718281828459045, log_odds)
-    return odds / (1.0 + odds)
+    joint_prior = {
+        (False, False): (1.0 - prior) * 0.5,
+        (False, True): (1.0 - prior) * 0.5,
+        (True, False): prior * 0.5,
+        (True, True): prior * 0.5,
+    }
+    return marginal_system_bad(joint_posterior(history, prior=joint_prior))
 
 
 def expected_terminal_risk(
@@ -67,7 +103,7 @@ def expected_terminal_risk(
     *,
     weights: LossWeights = LossWeights(),
 ) -> float:
-    """Expected terminal loss for one decision at posterior risk ``probability_bad``."""
+    """Expected terminal loss for one decision at posterior risk."""
     if not 0.0 <= probability_bad <= 1.0:
         raise ValueError("probability_bad must be in [0, 1]")
     if decision is ReleaseDecision.GO:
@@ -85,10 +121,7 @@ def decide_from_posterior(
     *,
     weights: LossWeights = LossWeights(),
 ) -> ReleaseDecision:
-    """Return the Bayes-optimal terminal decision under ``weights``.
-
-    Ties are resolved deterministically in the order GO, CONDITIONAL_GO, NO_GO.
-    """
+    """Return the Bayes-optimal terminal decision under ``weights``."""
     ordered = (
         ReleaseDecision.GO,
         ReleaseDecision.CONDITIONAL_GO,
@@ -115,7 +148,11 @@ def score_decision(
     elif unnecessary_no_go:
         terminal_loss = weights.unnecessary_no_go
     elif decision is ReleaseDecision.CONDITIONAL_GO:
-        terminal_loss = weights.conditional_bad if outcome.true_system_bad else weights.conditional_good
+        terminal_loss = (
+            weights.conditional_bad
+            if outcome.true_system_bad
+            else weights.conditional_good
+        )
     else:
         terminal_loss = 0.0
     acquisition_cost = sum(obs.cost for obs in outcome.observations)

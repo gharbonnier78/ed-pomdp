@@ -17,6 +17,21 @@ The benchmark controls:
 - acquisition cost and total budget;
 - decision loss and hard constraints.
 
+## Current executable state
+
+The runtime now includes:
+
+- a causal evidence-production model in which latent `E` controls functional-channel reliability;
+- a shared joint posterior `P(S,E | history)` for the runner and ED-POMDP look-ahead;
+- identifiable, evidence-degraded, likelihood-misspecified and deliberately non-identifiable regimes;
+- a tested observable history in which environment validation has non-zero decision VoI.
+
+See:
+
+- `runtime/STEP_2_4_SCOPE.md` for the causal model and numeric regression;
+- `protocol/STEP_2_REMAINING_PLAN.md` for the remaining Step 2 sequence;
+- `protocol/PREREGISTRATION.md` for the frozen confirmatory protocol.
+
 ## Benchmark families
 
 1. Identifiable regimes
@@ -47,4 +62,4 @@ The benchmark controls:
 - evidence cost
 - hard-constraint violations
 
-No empirical claim is made by this scaffold. Claim maturity changes only after preregistered experiments and registry updates.
+No headline empirical claim is made by the current runtime increments. Claim maturity changes only after preregistered experiments, statistical review and synchronized registry updates.

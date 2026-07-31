@@ -1,19 +1,22 @@
-"""Executable synthetic environment for Step 2.1.
+"""Executable synthetic environment with latent evidence-quality degradation.
 
-This module exposes only observable data to policies. Latent system state and
-latent evidence quality remain internal to the environment and are used solely
-for scoring after an episode.
+Policies receive observations and channel names only. Latent system state, latent
+evidence quality and the true simulator regime remain internal and are used for
+observation generation and terminal scoring only.
 """
-
 from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
 import random
 
+from .evidence_model import IDENTIFIABLE_AGENT_MODEL, MISSPECIFIED_TRUE_MODEL
+
 
 class Regime(str, Enum):
     IDENTIFIABLE = "identifiable"
+    EVIDENCE_DEGRADED = "evidence_degraded"
+    LIKELIHOOD_MISSPECIFIED = "likelihood_misspecified"
     NON_IDENTIFIABLE = "non_identifiable"
 
 
@@ -40,7 +43,8 @@ class SyntheticReleaseEnvironment:
         self.regime = regime
         self._rng = random.Random(seed)
         self._system_bad = self._rng.random() < 0.5
-        self._evidence_bad = self._rng.random() < 0.5
+        evidence_bad_prior = 0.80 if regime is Regime.EVIDENCE_DEGRADED else 0.50
+        self._evidence_bad = self._rng.random() < evidence_bad_prior
         self._observations: list[Observation] = []
 
     @property
@@ -63,13 +67,13 @@ class SyntheticReleaseEnvironment:
         )
 
     def _failure_probability(self, channel: str) -> float:
+        state = (self._system_bad, self._evidence_bad)
         if self.regime is Regime.NON_IDENTIFIABLE:
-            # Deliberate aliasing: bad system/good evidence and good system/bad
-            # evidence induce the same marginal observation probability.
+            # Deliberate aliasing: latent causes cannot be separated from the
+            # observable distribution in this regime.
             if self._system_bad != self._evidence_bad:
                 return 0.80
             return 0.20
-
-        if channel == "functional":
-            return 0.80 if self._system_bad else 0.20
-        return 0.80 if self._evidence_bad else 0.20
+        if self.regime is Regime.LIKELIHOOD_MISSPECIFIED:
+            return MISSPECIFIED_TRUE_MODEL.failure_probability(channel, state)
+        return IDENTIFIABLE_AGENT_MODEL.failure_probability(channel, state)

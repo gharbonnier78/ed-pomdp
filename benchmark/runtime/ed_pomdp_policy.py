@@ -1,71 +1,73 @@
-"""Minimal decision-aware evidence acquisition for Step 2.3.
+"""Decision-aware acquisition with causal evidence-quality relevance.
 
-The policy maintains an observable-history posterior over joint latent hypotheses
-(system quality S, evidence-production quality E) under a fixed identifiable
-agent model. It never receives the simulator's true S, E or regime.
-
-This is a one-step look-ahead policy: for each available channel it computes the
-expected loss of the same Bayes-optimal terminal decision rule used by the episode
-runner, then adds evidence cost and selects the lowest-loss channel.
+The policy maintains the same observable-history joint posterior used by the
+runner. Because evidence quality controls functional-channel reliability,
+environment validation can change system-risk calibration after functional
+evidence without exposing true ``E`` or the simulator regime.
 """
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Mapping, Sequence
+from typing import Sequence
 
-from .decision import LossWeights, decide_from_posterior, expected_terminal_risk
+from .decision import (
+    LossWeights,
+    decide_from_posterior,
+    expected_terminal_risk,
+    joint_posterior,
+    marginal_evidence_bad,
+    marginal_system_bad,
+    observation_likelihood,
+)
 from .simulator import Observation
-
-State = tuple[bool, bool]  # (system_bad, evidence_bad)
-
-
-def _likelihood(channel: str, failed: bool, state: State) -> float:
-    system_bad, evidence_bad = state
-    if channel == "functional":
-        p_fail = 0.80 if system_bad else 0.20
-    elif channel == "environment_validation":
-        p_fail = 0.80 if evidence_bad else 0.20
-    else:
-        raise ValueError(f"unknown channel: {channel}")
-    return p_fail if failed else 1.0 - p_fail
-
-
-def joint_posterior(
-    history: Sequence[Observation],
-    prior: Mapping[State, float] | None = None,
-) -> dict[State, float]:
-    """Return P(S,E | observable history) under the fixed agent model."""
-    states: tuple[State, ...] = ((False, False), (False, True), (True, False), (True, True))
-    weights = {state: 0.25 for state in states} if prior is None else dict(prior)
-    if set(weights) != set(states) or any(value < 0.0 for value in weights.values()):
-        raise ValueError("prior must define non-negative mass for all four joint states")
-    total_prior = sum(weights.values())
-    if total_prior <= 0.0:
-        raise ValueError("prior mass must be positive")
-    weights = {state: value / total_prior for state, value in weights.items()}
-
-    for observation in history:
-        for state in states:
-            weights[state] *= _likelihood(observation.channel, observation.failed, state)
-        normalizer = sum(weights.values())
-        if normalizer <= 0.0:
-            raise ArithmeticError("observation history has zero probability under agent model")
-        weights = {state: value / normalizer for state, value in weights.items()}
-    return weights
-
-
-def marginal_system_bad(belief: Mapping[State, float]) -> float:
-    return sum(probability for (system_bad, _), probability in belief.items() if system_bad)
-
-
-def marginal_evidence_bad(belief: Mapping[State, float]) -> float:
-    return sum(probability for (_, evidence_bad), probability in belief.items() if evidence_bad)
 
 
 def terminal_policy_risk(probability_system_bad: float, weights: LossWeights) -> float:
-    """Risk of the exact terminal decision rule executed by the runner."""
+    """Risk of the exact Bayes-optimal terminal rule executed by the runner."""
     decision = decide_from_posterior(probability_system_bad, weights=weights)
     return expected_terminal_risk(probability_system_bad, decision, weights=weights)
+
+
+def expected_one_step_terminal_risk(
+    history: Sequence[Observation],
+    channel: str,
+    *,
+    weights: LossWeights = LossWeights(),
+) -> float:
+    """Expected terminal risk after one observable acquisition, excluding cost."""
+    belief = joint_posterior(history)
+    expected_risk = 0.0
+    for failed in (False, True):
+        predictive = sum(
+            probability * observation_likelihood(channel, failed, state)
+            for state, probability in belief.items()
+        )
+        if predictive <= 0.0:
+            continue
+        posterior = {
+            state: probability
+            * observation_likelihood(channel, failed, state)
+            / predictive
+            for state, probability in belief.items()
+        }
+        expected_risk += predictive * terminal_policy_risk(
+            marginal_system_bad(posterior), weights
+        )
+    return expected_risk
+
+
+def decision_value_of_information(
+    history: Sequence[Observation],
+    channel: str,
+    *,
+    weights: LossWeights = LossWeights(),
+) -> float:
+    """Gross expected terminal-risk reduction from one acquisition."""
+    current_belief = joint_posterior(history)
+    current_risk = terminal_policy_risk(marginal_system_bad(current_belief), weights)
+    return current_risk - expected_one_step_terminal_risk(
+        history, channel, weights=weights
+    )
 
 
 def expected_one_step_loss(
@@ -75,29 +77,15 @@ def expected_one_step_loss(
     weights: LossWeights = LossWeights(),
     observation_cost: float = 1.0,
 ) -> float:
-    """Expected realized-policy risk after one observation on ``channel``."""
-    belief = joint_posterior(history)
-    expected_risk = 0.0
-    for failed in (False, True):
-        predictive = sum(
-            probability * _likelihood(channel, failed, state)
-            for state, probability in belief.items()
-        )
-        if predictive <= 0.0:
-            continue
-        posterior = {
-            state: probability * _likelihood(channel, failed, state) / predictive
-            for state, probability in belief.items()
-        }
-        expected_risk += predictive * terminal_policy_risk(
-            marginal_system_bad(posterior), weights
-        )
-    return expected_risk + weights.evidence_cost * observation_cost
+    """Expected terminal risk plus preregistered evidence cost."""
+    return expected_one_step_terminal_risk(
+        history, channel, weights=weights
+    ) + weights.evidence_cost * observation_cost
 
 
 @dataclass(frozen=True)
 class EvidenceDrivenVoIPolicy:
-    """Choose the observable channel minimizing one-step expected decision loss."""
+    """Choose the channel minimizing expected realized decision loss."""
 
     weights: LossWeights = LossWeights()
     name: str = "ed_pomdp_one_step_voi"

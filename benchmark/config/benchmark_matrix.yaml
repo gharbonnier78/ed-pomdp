@@ -1,6 +1,6 @@
 schema_version: 0.1.0
 benchmark: ed-pomdp-step2
-status: scaffold
+status: policy_matrix_complete_pending_analysis_freeze
 claims_under_test:
   - CLM-VOI-001
   - CLM-EQ-001

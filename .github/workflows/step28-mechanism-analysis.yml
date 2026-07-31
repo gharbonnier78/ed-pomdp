@@ -1,0 +1,74 @@
+name: step-2.8-mechanism-analysis
+
+on:
+  push:
+    branches:
+      - step-2.8-claim-adjudication
+    paths:
+      - .github/workflows/step28-mechanism-analysis.yml
+      - benchmark/analysis/analyze_step28_mechanisms.py
+      - benchmark/tests/test_step28_analysis.py
+      - benchmark/protocol/STEP_2_8_ANALYSIS_PLAN.md
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: step-2.8-claim-adjudication
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.13"
+
+      - name: Install test dependency
+        run: python -m pip install pytest==9.1.1
+
+      - name: Run repository tests
+        run: python -m pytest -q benchmark/tests
+
+      - name: Generate Step 2.8 diagnostics
+        run: >-
+          python -m benchmark.analysis.analyze_step28_mechanisms
+          --output-dir step28_artifacts
+
+      - name: Verify generated package
+        run: |
+          python - <<'PY'
+          import csv, json
+          from pathlib import Path
+
+          root = Path("step28_artifacts")
+          expected = {
+              "step28_pairwise_diagnostics.csv",
+              "step28_mechanism_summary.csv",
+              "step28_decision_transitions.csv",
+              "step28_threshold_occupancy.csv",
+              "step28_acquisition_summary.csv",
+              "STEP_2_8_CLAIM_ADJUDICATION.md",
+              "step28_analysis_metadata.json",
+          }
+          actual = {path.name for path in root.iterdir() if path.is_file()}
+          assert actual == expected, (actual, expected)
+
+          with (root / "step28_pairwise_diagnostics.csv").open(newline="", encoding="utf-8") as handle:
+              assert sum(1 for _ in csv.DictReader(handle)) == 2400
+          with (root / "step28_mechanism_summary.csv").open(newline="", encoding="utf-8") as handle:
+              assert sum(1 for _ in csv.DictReader(handle)) == 125
+          with (root / "step28_threshold_occupancy.csv").open(newline="", encoding="utf-8") as handle:
+              assert sum(1 for _ in csv.DictReader(handle)) == 112
+
+          metadata = json.loads((root / "step28_analysis_metadata.json").read_text())
+          assert metadata["inferential_status"] == "descriptive_post_hoc_no_new_tests"
+          assert metadata["counts"]["pairwise_rows"] == 2400
+          print(json.dumps(metadata, indent=2, sort_keys=True))
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: step2.8-mechanism-results
+          path: step28_artifacts
+          retention-days: 90

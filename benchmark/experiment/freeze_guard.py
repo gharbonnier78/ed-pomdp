@@ -51,7 +51,7 @@ def verify_analysis_freeze(
     require_git: bool = True,
     allowed_dirty_paths: Sequence[str | Path] = (),
 ) -> dict[str, object]:
-    """Verify manifest, lock inventory, loss weights and controlled Git state.
+    """Verify manifest, lock inventory, frozen semantics and controlled Git state.
 
     Headline generation supplies no allowed dirty paths. Analysis may allow only
     the raw table and its metadata, whose hashes are checked independently by
@@ -112,6 +112,22 @@ def verify_analysis_freeze(
         raise RuntimeError("headline config status is not frozen")
     if config.get("loss_weights") != manifest.get("loss_weights"):
         raise RuntimeError("LossWeights differ between config and freeze manifest")
+    if config.get("confirmatory_metrics") != manifest.get("confirmatory_metrics"):
+        raise RuntimeError(
+            "confirmatory metrics differ between config and freeze manifest"
+        )
+    if config.get("mandatory_safety_metrics") != manifest.get(
+        "mandatory_safety_metrics"
+    ):
+        raise RuntimeError(
+            "mandatory safety metrics differ between config and freeze manifest"
+        )
+
+    config_analysis = config.get("analysis")
+    if not isinstance(config_analysis, Mapping):
+        raise RuntimeError("headline config has no analysis section")
+    if config_analysis.get("multiplicity") != manifest.get("multiplicity"):
+        raise RuntimeError("multiplicity semantics differ from freeze manifest")
 
     dimensions = manifest.get("headline_dimensions")
     if not isinstance(dimensions, Mapping):

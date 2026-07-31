@@ -84,6 +84,30 @@ def test_headline_config_rejects_early_stopping() -> None:
         raise AssertionError("headline config must reject early stopping")
 
 
+def test_confirmatory_family_excludes_mandatory_safety_endpoint() -> None:
+    config = load_headline_config(CONFIG_PATH)
+    assert config["confirmatory_metrics"] == [
+        "decision_loss",
+        "brier_score",
+        "expected_calibration_error",
+    ]
+    assert config["mandatory_safety_metrics"] == ["unsafe_go_rate"]
+    assert "unsafe_go_rate" not in config["confirmatory_metrics"]
+    assert config["analysis"]["multiplicity"]["expected_family_size"] == 240
+
+
+def test_headline_config_rejects_family_size_drift() -> None:
+    config = load_headline_config(CONFIG_PATH)
+    invalid = copy.deepcopy(config)
+    invalid["analysis"]["multiplicity"]["expected_family_size"] = 320
+    try:
+        validate_headline_config(invalid)
+    except ValueError as error:
+        assert "Holm family size" in str(error)
+    else:
+        raise AssertionError("headline config must reject multiplicity-family drift")
+
+
 def test_expected_headline_row_count_is_frozen() -> None:
     config = load_headline_config(CONFIG_PATH)
     assert config["expected_episode_rows"] == 3360

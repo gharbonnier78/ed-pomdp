@@ -14,6 +14,9 @@ on:
       - .github/workflows/step28-reproducible-pdf-fix.yml
       - paper/step2_closeout.tex
 
+permissions:
+  contents: write
+
 jobs:
   compile-twice:
     runs-on: ubuntu-latest
@@ -49,6 +52,18 @@ jobs:
         run: |
           cmp /tmp/step2_closeout.first.pdf paper/step2_closeout.pdf
           sha256sum /tmp/step2_closeout.first.pdf paper/step2_closeout.pdf
+
+      - name: Commit exact deterministic PDF
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add paper/step2_closeout.pdf
+          if git diff --cached --quiet; then
+            echo "Committed PDF already matches the deterministic build."
+          else
+            git commit -m "Commit reproducible Step 2 close-out PDF"
+            git push origin HEAD:step-2.8-claim-adjudication
+          fi
 
       - uses: actions/upload-artifact@v4
         with:

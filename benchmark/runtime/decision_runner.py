@@ -1,4 +1,4 @@
-"""Stopping-capable episode runner using the same loss model as VoI planning."""
+"""Stopping-capable episode runner with shared loss and policy-specific beliefs."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -8,7 +8,6 @@ from .decision import (
     LossWeights,
     ReleaseDecision,
     decide_from_posterior,
-    posterior_system_bad,
     score_decision,
 )
 from .policies import AcquisitionPolicy
@@ -53,13 +52,13 @@ def run_decision_episode(
         history.append(observation)
         spent += observation.cost
 
-        probability_bad = posterior_system_bad(tuple(history))
+        probability_bad = policy.posterior_bad(tuple(history))
         decision = decide_from_posterior(probability_bad, weights=weights)
         if len(history) >= minimum_acquisitions and decision is not ReleaseDecision.CONDITIONAL_GO:
             stopped_early = spent + 1.0 <= budget
             break
 
-    probability_bad = posterior_system_bad(tuple(history))
+    probability_bad = policy.posterior_bad(tuple(history))
     decision = decide_from_posterior(probability_bad, weights=weights)
     outcome = environment.finish()
     score = score_decision(outcome, decision, weights=weights)

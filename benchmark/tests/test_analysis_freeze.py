@@ -1,7 +1,10 @@
+import copy
+from dataclasses import asdict
 import json
 from pathlib import Path
 import platform
 
+from benchmark.analysis.analyze_headline import analyze_records
 from benchmark.analysis.metrics import (
     expected_calibration_error,
     holm_step_down,
@@ -9,6 +12,7 @@ from benchmark.analysis.metrics import (
     paired_contrast,
 )
 from benchmark.experiment.freeze_guard import sha256_path, verify_analysis_freeze
+from benchmark.experiment.harness import iter_headline_records, load_headline_config
 
 
 def _record(seed: int, policy: str, probability: float, loss: float) -> dict[str, object]:
@@ -68,6 +72,27 @@ def test_holm_step_down_controls_complete_family() -> None:
     assert corrected[1]["reject_holm"] is True
     assert corrected[2]["reject_holm"] is False
     assert corrected[0]["adjusted_p_value"] <= corrected[1]["adjusted_p_value"]
+
+
+def test_reduced_matrix_runs_end_to_end_through_holm() -> None:
+    config = copy.deepcopy(
+        load_headline_config("benchmark/config/headline_matrix.json")
+    )
+    config["regimes"] = ["identifiable"]
+    config["budgets"] = [2]
+    config["seeds"] = list(range(30))
+    config["expected_episode_rows"] = 30 * 7
+    config["analysis"]["bootstrap_resamples"] = 25
+    config["analysis"]["permutation_resamples"] = 25
+
+    records = [asdict(record) for record in iter_headline_records(config)]
+    summaries, contrasts = analyze_records(records, config)
+
+    assert len(records) == 210
+    assert len(summaries) == 7 * 4
+    assert len(contrasts) == 5 * 4
+    assert {row["seed_count"] for row in contrasts} == {30}
+    assert all(0.0 <= row["adjusted_p_value"] <= 1.0 for row in contrasts)
 
 
 def test_freeze_guard_rejects_missing_manifest(tmp_path: Path) -> None:

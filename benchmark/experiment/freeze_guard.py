@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+import platform
 import subprocess
 from typing import Mapping, Sequence
 
@@ -75,6 +76,20 @@ def verify_analysis_freeze(
     if sha256_path(lock_file) != manifest.get("lock_sha256"):
         raise RuntimeError("analysis-freeze lock hash mismatch")
     lock = _load_json(lock_file)
+
+    python_lock = lock.get("python")
+    if not isinstance(python_lock, Mapping):
+        raise RuntimeError("analysis-freeze lock does not identify Python runtime")
+    expected_python = python_lock.get("exact_version")
+    if not isinstance(expected_python, str):
+        raise RuntimeError("analysis-freeze lock lacks exact Python version")
+    if manifest.get("python_exact_version") != expected_python:
+        raise RuntimeError("Python version differs between lock and manifest")
+    if platform.python_version() != expected_python:
+        raise RuntimeError(
+            f"frozen Python runtime mismatch: expected {expected_python}, "
+            f"found {platform.python_version()}"
+        )
 
     artifacts = lock.get("artifacts")
     if not isinstance(artifacts, Mapping) or not artifacts:

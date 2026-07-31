@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+import platform
 import subprocess
 import sys
 
@@ -25,9 +26,11 @@ from benchmark.experiment.harness import load_headline_config
 LOCK_PATH = Path("benchmark/config/FROZEN_ARTIFACTS.json")
 MANIFEST_PATH = Path("benchmark/protocol/ANALYSIS_FREEZE.json")
 RAW_RESULTS_PATH = Path("benchmark/results/headline_raw.csv")
+EXPECTED_PYTHON_VERSION = "3.12.13"
 
 FROZEN_ARTIFACTS = (
     "benchmark/config/headline_matrix.json",
+    "benchmark/METRICS.md",
     "benchmark/protocol/PREREGISTRATION.md",
     "benchmark/runtime/evidence_model.py",
     "benchmark/runtime/simulator.py",
@@ -65,9 +68,18 @@ def _require_no_headline_results() -> None:
         raise RuntimeError("headline raw results already exist; freeze must precede execution")
 
 
+def _require_frozen_python() -> None:
+    actual = platform.python_version()
+    if actual != EXPECTED_PYTHON_VERSION:
+        raise RuntimeError(
+            f"freeze generation requires Python {EXPECTED_PYTHON_VERSION}; found {actual}"
+        )
+
+
 def create_lock() -> None:
     _require_clean_tree()
     _require_no_headline_results()
+    _require_frozen_python()
     lock_path = REPO_ROOT / LOCK_PATH
     manifest_path = REPO_ROOT / MANIFEST_PATH
     if lock_path.exists() or manifest_path.exists():
@@ -84,9 +96,9 @@ def create_lock() -> None:
         "status": "frozen_artifact_lock",
         "source_commit": source_commit,
         "python": {
-            "minimum_version": "3.11",
+            "exact_version": EXPECTED_PYTHON_VERSION,
             "analysis_runtime_dependencies": [],
-            "test_only_dependencies": ["pytest"],
+            "test_only_dependencies": ["pytest==9.1.1"],
         },
         "artifacts": {
             path: sha256_path(REPO_ROOT / path) for path in sorted(FROZEN_ARTIFACTS)
@@ -101,6 +113,7 @@ def create_lock() -> None:
 def create_manifest() -> None:
     _require_clean_tree()
     _require_no_headline_results()
+    _require_frozen_python()
     lock_path = REPO_ROOT / LOCK_PATH
     manifest_path = REPO_ROOT / MANIFEST_PATH
     if not lock_path.is_file():
@@ -113,6 +126,8 @@ def create_manifest() -> None:
     artifacts = lock.get("artifacts")
     if not isinstance(artifacts, dict) or not artifacts:
         raise RuntimeError("invalid frozen-artifact lock")
+    if lock.get("python", {}).get("exact_version") != EXPECTED_PYTHON_VERSION:
+        raise RuntimeError("frozen-artifact lock has the wrong Python version")
     for path, expected_hash in artifacts.items():
         if sha256_path(REPO_ROOT / path) != expected_hash:
             raise RuntimeError(f"artifact changed after lock creation: {path}")
@@ -129,6 +144,7 @@ def create_manifest() -> None:
         "frozen_artifact_commit": frozen_artifact_commit,
         "lock_file": str(LOCK_PATH),
         "lock_sha256": sha256_path(lock_path),
+        "python_exact_version": EXPECTED_PYTHON_VERSION,
         "runner_entrypoint": {
             "path": "benchmark/experiment/run_headline.py",
             "sha256": sha256_path(REPO_ROOT / "benchmark/experiment/run_headline.py"),

@@ -62,7 +62,7 @@ def test_paired_contrast_is_deterministic_for_same_analysis_seed() -> None:
 
 
 def test_holm_step_down_controls_complete_family() -> None:
-    corrected = holm_step_down([0.001, 0.02, 0.04], alpha=0.05)
+    corrected = holm_step_down([0.001, 0.02, 0.06], alpha=0.05)
     assert corrected[0]["reject_holm"] is True
     assert corrected[1]["reject_holm"] is True
     assert corrected[2]["reject_holm"] is False

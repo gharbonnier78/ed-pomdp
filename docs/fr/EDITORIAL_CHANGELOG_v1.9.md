@@ -1,28 +1,26 @@
-# ED-POMDP en clair - évolution éditoriale v1.9
+# ED-POMDP en clair - changelog éditorial v1.9
 
-## Décision éditoriale appliquée
+## Guide principal v1.9
 
-La version 1.8 a été scindée en deux documents afin de préserver le fil principal de Step 2 sans transformer le guide en cours universel.
+- ajout d'une page liminaire de mode d'emploi et de terminologie ;
+- mise à jour locale de la version et de l'avis éditorial sur la couverture ;
+- conservation des pages 2 à 30 de la v1.8 ;
+- retrait de l'ancienne Annexe G du guide principal.
 
-### Guide principal v1.9
+## Companion avancé v1.0
 
-- conserve le corps principal et les annexes A à F ;
-- ajoute une page liminaire de mode d'emploi et de glossaire de première lecture ;
-- explicite la progression en spirale : rôle des notions d'abord, mécanique ensuite ;
-- traduit les principaux termes statistiques et les anglicismes évitables dans le glossaire ;
-- remplace dans la table de protocole `seeds` et `endpoints` par des formulations françaises, avec le terme du dépôt conservé lorsque nécessaire ;
-- explicite `scalarisation` à sa première utilisation détaillée ;
-- retire l'ancienne Annexe G du guide principal.
-
-### Companion avancé v1.0
-
-- reprend l'ancienne Annexe G sans modifier son contenu scientifique ;
-- ajoute une couverture autonome ;
-- annonce explicitement le niveau avancé et les prérequis ;
-- ajoute un glossaire français pour MAP, HMM, filtres de Kalman et particulaires, inférence amortie, RO, bandits, RL avec/sans modèle, canary, rollback, override, evidence store et replay ;
-- conserve les noms de fichiers et identifiants techniques en anglais lorsqu'ils appartiennent au dépôt ou à la littérature.
+- ajout de deux pages liminaires présentant le niveau, les prérequis et la terminologie ;
+- reprise des pages 31 à 37 de la v1.8, correspondant à l'ancienne Annexe G.
 
 ## Volumétrie
 
-- Guide principal v1.9 : 31 pages, dont une page liminaire non numérotée et 30 pages de contenu A-F.
-- Companion avancé v1.0 : 9 pages, dont deux pages liminaires et les 7 pages de l'ancienne Annexe G.
+- guide principal : 31 pages ;
+- companion avancé : 9 pages.
+
+## Périmètre scientifique
+
+Ce changement est éditorial. Il ne modifie aucun résultat Step 2, aucune formule, aucun tableau, aucune figure, aucune disposition de claim ni aucun artefact scientifique.
+
+## Sources
+
+La composition est désormais décrite directement par les sources LaTeX dans `docs/fr/latex/`. Le document v1.8 hérité y sert de base afin d'éviter une reconstruction artificielle des pages qui ne changent pas.

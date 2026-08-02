@@ -1,0 +1,239 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{lmodern,microtype}
+\usepackage[a4paper,margin=2.2cm]{geometry}
+\usepackage{amsmath,amssymb,booktabs,tabularx,longtable,array}
+\usepackage{xcolor,hyperref,enumitem,fancyhdr,titlesec,tcolorbox}
+\hypersetup{colorlinks=true,linkcolor=blue!40!black,urlcolor=blue!40!black}
+\definecolor{deepblue}{HTML}{183B56}
+\definecolor{softblue}{HTML}{EAF2F8}
+\definecolor{softamber}{HTML}{FFF4D6}
+\definecolor{softred}{HTML}{FBE9E7}
+\definecolor{softgreen}{HTML}{E8F5E9}
+\pagestyle{fancy}\fancyhf{}\lhead{ED-POMDP / STRAT-Q}\rhead{Guide compagnon Milestone 2R}\cfoot{\thepage}
+\setlength{\parindent}{0pt}\setlength{\parskip}{0.6em}\setlength{\emergencystretch}{2em}
+\setlist{leftmargin=1.5em,itemsep=0.3em,topsep=0.3em}
+\titleformat{\section}{\large\bfseries\color{deepblue}}{\thesection}{0.65em}{}
+\titleformat{\subsection}{\normalsize\bfseries\color{deepblue}}{\thesubsection}{0.65em}{}
+\newcommand{\go}{\textsc{go}}
+\newcommand{\cgo}{\textsc{conditional go}}
+\newcommand{\nogo}{\textsc{no-go}}
+
+\title{\textbf{Guide compagnon français - Milestone 2R}\\
+\large Comment clore proprement Step 2 sans abandonner le programme ED-POMDP}
+\author{Guillaume Harbonnier\\Programme de recherche industriel indépendant / STRAT-Q}
+\date{2 août 2026}
+
+\begin{document}
+\maketitle
+
+\begin{tcolorbox}[colback=softblue,colframe=deepblue,boxrule=0.8pt,arc=2mm]
+\textbf{Réponse directe.} Non, on n'a pas « rien de sérieux ». Mais on n'a pas non plus le droit de continuer les milestones suivants comme si Step 2 avait validé l'architecture ED-POMDP initiale. Le résultat impose un arrêt de révision théorique, pas l'abandon du programme.
+\end{tcolorbox}
+
+\section{Pourquoi ce document existe}
+
+Step 2 devait soumettre deux intuitions attractives à un benchmark figé et falsifiable :
+\begin{itemize}
+  \item choisir la prochaine preuve selon sa valeur décisionnelle devrait améliorer la décision finale à budget égal ;
+  \item modéliser explicitement la qualité du dispositif de preuve devrait améliorer la calibration et, idéalement, la décision finale.
+\end{itemize}
+
+Le benchmark n'a pas confirmé ces affirmations générales. La bonne réponse scientifique n'est ni de cacher ce résultat, ni d'élargir immédiatement le simulateur, ni de lancer un pilote industriel pour « sauver » l'idée. Il faut transformer le résultat négatif en diagnostic de mécanisme, réviser les hypothèses, puis redéfinir les conditions d'une nouvelle falsification.
+
+\section{Ce que Step 2 a réellement produit de solide}
+
+Step 2 a éliminé deux affirmations trop larges :
+\begin{itemize}
+  \item la sélection des preuves par valeur décisionnelle n'a pas démontré une réduction générale de la perte de décision ;
+  \item la modélisation explicite de la qualité des preuves n'a pas démontré un bénéfice général sur la décision finale.
+\end{itemize}
+
+Ce n'est pas seulement une absence de significativité mal interprétée. Dans les comparaisons directement liées au pari VOI, les directions de perte terminale sont : 10 favorables, 16 défavorables et 38 égales. Aucun contraste de perte terminale n'a survécu à la correction de Holm. Les deux claims larges sont donc correctement classés comme non soutenus dans Step 2.
+
+Mais l'étude a établi quelque chose de plus précis :
+
+\begin{tcolorbox}[colback=softamber,colframe=orange!70!black,boxrule=0.8pt,arc=2mm]
+\textbf{Résultat mécanistique central.} Améliorer la croyance probabiliste ne suffit pas à améliorer la décision.
+\end{tcolorbox}
+
+La matrice brute contient :
+\[
+4\ \text{régimes}\times 4\ \text{budgets}\times 30\ \text{seeds}\times 7\ \text{politiques}=3\,360
+\]
+épisodes.
+
+L'analyse Step 2.8 compare ED-POMDP à cinq baselines confirmatoires pour chaque triplet régime--budget--seed :
+\[
+4\times 4\times 30\times 5=2\,400
+\]
+paires diagnostiques.
+
+Parmi ces paires, ED-POMDP améliore le Brier score dans 1 119 cas. Dans 1 054 de ces cas, l'action terminale reste identique :
+\[
+\frac{1\,054}{1\,119}=94{,}19\,\%.
+\]
+
+ED-POMDP modifie donc souvent la sélection des preuves et les probabilités, mais ces différences restent absorbées par les mêmes régions \go{}, \cgo{} et \nogo{}. La chaîne de valeur se casse ici :
+\[
+\text{meilleure preuve}\rightarrow\text{meilleure croyance}\not\Rightarrow\text{meilleure décision}.
+\]
+
+\section{Ce qui reste valide}
+
+\subsection{Le problème de départ reste valide}
+
+La distinction entre risque réel du système et qualité réelle du dispositif de preuve n'a pas été invalidée. Une campagne de tests rassurante peut rester trompeuse si les données, les environnements, les oracles, l'instrumentation, la fraîcheur ou la provenance sont faibles.
+
+\subsection{L'architecture proposée n'est pas validée}
+
+La manière précise dont Step 2 a relié acquisition de preuves, mise à jour de croyance, horizon fixe, coûts unitaires, seuils terminaux, fonction de perte et décision n'a pas produit la supériorité générale attendue.
+
+\subsection{Certains signaux restent exploratoires}
+
+ED-POMDP a produit zéro \texttt{unsafe GO} dans les trois régimes où cette erreur était structurellement évitable, contre deux pour le POMDP classique dans chacun de ces régimes. Ce signal peut être important pour une Test Authority, mais il était hors famille confirmatoire. Il ne peut donc pas être promu rétroactivement comme preuve de supériorité.
+
+\section{Pourquoi le passage à SYNTHETIC est correct}
+
+Avant Step 2, les claims avaient un niveau de preuve \texttt{NONE} : aucune étude empirique ou synthétique gelée ne les avait encore adjudiqués. Après Step 2, conserver \texttt{NONE} serait faux, car un benchmark synthétique figé existe désormais.
+
+Le niveau de preuve doit être séparé de la polarité et de la disposition :
+\begin{itemize}
+  \item \textbf{niveau de preuve} : origine de l'évidence, par exemple NONE, FORMAL, SYNTHETIC, INDUSTRIAL ou OPERATIONAL ;
+  \item \textbf{polarité} : supportive, mixed, adverse ou untested ;
+  \item \textbf{disposition} : active, narrowed, unsupported, blocked ou deferred.
+\end{itemize}
+
+Ainsi, \texttt{SYNTHETIC} ne signifie pas « claim soutenu ». Pour \texttt{CLM-VOI-001}, la combinaison correcte est : preuve de type synthétique, polarité défavorable/mixte, disposition \texttt{NOT\_SUPPORTED\_STEP2}. Cette séparation évite précisément la dérive documentaire.
+
+\section{Faut-il reprendre depuis les hypothèses de départ ?}
+
+Oui. Pas depuis zéro, mais depuis la structure des paris. Il faut distinguer ce qui est non soutenu, ce qui reste conceptuellement valide, ce qui a été découvert et ce qui doit faire l'objet d'une nouvelle falsification.
+
+\begin{longtable}{p{0.10\textwidth}p{0.39\textwidth}p{0.23\textwidth}p{0.20\textwidth}}
+\toprule
+ID & Pari & Statut après Step 2 & Décision \\
+\midrule
+P0 & Le risque système et la qualité des preuves doivent être distingués. & Non invalidé, sans preuve de gain opérationnel. & Conserver comme hypothèse de modélisation. \\
+P1 & Une politique VOI donne généralement de meilleures décisions à budget égal. & Non soutenu. & Abandonner la forme large. \\
+P2 & Modéliser la qualité des preuves améliore généralement calibration et décision. & Forme large non soutenue. & Décomposer en claims plus étroits. \\
+P3 & Une meilleure calibration se convertit naturellement en meilleure action. & Contredit par le mécanisme observé. & Abandonner comme hypothèse implicite. \\
+P4 & Le bénéfice dépend du couplage croyance--seuils--pertes--arrêt--contrôle--action. & Nouvelle hypothèse issue de Step 2. & Tester explicitement. \\
+P5 & La qualité de preuve peut réduire les décisions dangereuses. & Signal descriptif seulement. & Préenregistrer un test sécurité dédié. \\
+\bottomrule
+\end{longtable}
+
+Le nouveau programme ne doit plus chercher à démontrer « ED-POMDP est meilleur en général ». Il doit répondre à la question suivante :
+
+\begin{quote}
+Sous quelles conditions une information supplémentaire ou mieux qualifiée change-t-elle effectivement une décision gouvernée, et cette décision modifiée réduit-elle une perte significative à coût total comparable ?
+\end{quote}
+
+\section{Pourquoi ce pivot n'est pas une rationalisation post-hoc}
+
+Un jury pourra demander si le passage d'un claim de supériorité à une recherche de frontières conditionnelles est un progrès scientifique ou un déplacement des objectifs après échec. La réponse repose sur quatre éléments.
+
+\begin{enumerate}
+  \item La falsification était prévue dès le départ : Step 2 n'était pas une démonstration construite pour réussir.
+  \item Les claims d'origine restent visibles, identifiés et non promus dans le registre canonique.
+  \item Les nouvelles hypothèses sont plus étroites, mécanistiques et falsifiables ; elles ne renomment pas l'ancien claim.
+  \item Les anciennes seeds restent gelées ; toute nouvelle confirmation utilise des seeds nouvelles et intactes.
+\end{enumerate}
+
+Le pivot est donc une conséquence gouvernée du protocole initial. Il ne transforme pas un résultat négatif en résultat positif.
+
+\section{Milestone 2R - Theory and Claim Reset}
+
+Ce milestone devient obligatoire avant tout Step 3 confirmatoire ou industriel.
+
+\subsection{2R.1 Revenir à la chaîne causale}
+
+Il faut formaliser séparément :
+\[
+\text{action d'acquisition}\rightarrow\text{observation}\rightarrow\text{mise à jour}
+\rightarrow\text{frontière ou arrêt}\rightarrow\text{action terminale}\rightarrow\text{perte réalisée}.
+\]
+
+Pour chaque lien, il faut définir les conditions nécessaires pour produire de la valeur, les modes d'échec et les diagnostics observables.
+
+\subsection{2R.2 Auditer les hypothèses structurelles}
+
+L'audit doit couvrir au minimum :
+\begin{itemize}
+  \item la justification des seuils terminaux ;
+  \item la sensibilité aux ratios de pertes de sécurité, délai et coût commercial ;
+  \item la qualité de preuve dans la règle terminale ;
+  \item l'horizon fixe par rapport à l'arrêt adaptatif ;
+  \item le budget égal par rapport au coût total comparé ;
+  \item les coûts unitaires par rapport aux coûts hétérogènes ;
+  \item les régions où un posterior peut effectivement franchir une frontière ;
+  \item les situations où plusieurs politiques sont pratiquement indiscernables ;
+  \item la corrélation et la redondance des preuves ;
+  \item la sémantique réelle des contrôles compensatoires pour \cgo{}.
+\end{itemize}
+
+\subsection{2R.3 Reformuler des claims conditionnels}
+
+\textbf{H3-A - Décision conjointe.} Une règle terminale utilisant conjointement $P(S=\mathrm{bad})$ et la croyance sur la qualité de preuve réduit la perte pondérée sous preuve dégradée, par rapport à une règle fondée uniquement sur le risque système.
+
+\textbf{H3-B - Arrêt adaptatif.} Une politique adaptative réduit le coût moyen d'acquisition sans augmenter la perte terminale ni le taux d'unsafe GO.
+
+\textbf{H3-C - CONDITIONAL GO gouverné.} Un \cgo{} associé à des contrôles compensatoires explicites et vérifiables réduit la perte par rapport à une simple zone intermédiaire.
+
+\textbf{H3-D - VOI conditionnelle.} La VOI n'apporte un avantage que lorsque les preuves sont hétérogènes, discriminantes, peu redondantes et capables de franchir une frontière décisionnelle pertinente.
+
+\textbf{H3-E - Sécurité.} Une règle tenant compte de la qualité des preuves réduit le taux d'unsafe GO sous dégradation contrôlée, à coût de preuve comparable.
+
+Ces hypothèses sont des candidates. Elles ne deviennent confirmatoires qu'après définition des estimands, seuils d'effet, multiplicité, critères de réfutation et protocole gelé.
+
+\subsection{2R.4 Gate de falsifiabilité de H3-D}
+
+H3-D ne peut pas entrer en phase confirmatoire tant que ses quatre qualificatifs ne sont pas calculés selon une règle gelée. L'hétérogénéité provient d'une taxonomie de familles de preuves et d'un graphe de dépendance préenregistrés. Le pouvoir discriminant utilise la divergence de Jensen--Shannon avec logarithmes naturels : la valeur brute est conservée en nats et normalisée par $\ln 2$, donnant $D\in[0,1]$. La non-redondance utilise $I(S;O_a\mid O_H)$ en nats, normalisée par l'entropie résiduelle lorsque celle-ci dépasse un $\epsilon_H$ gelé, donnant $U\in[0,1]$. La portée décisionnelle est la probabilité prédictive $B\in[0,1]$ que l'acquisition modifie l'action terminale admissible ou la décision continuer/arrêter.
+
+Une cellule n'est éligible que si la règle de provenance est satisfaite et si $D\geq\delta_D$, $U\geq\delta_U$ et $B\geq\delta_B$. Les seuils sont calibrés uniquement sur les nouvelles seeds de développement 3A puis gelés avant toute ouverture des seeds confirmatoires 3B. L'estimand principal est une interaction éligibilité--politique. Des nombres minimaux numériques sont requis de façon symétrique pour les groupes éligible et inéligible ; l'insuffisance de l'un des deux conduit à \texttt{NOT\_TESTABLE\_IN\_BENCHMARK}, jamais à une reclassification a posteriori. Le gate complet est enregistré dans \texttt{benchmark/protocol/H3D\_OPERATIONALISATION\_GATE.md}.
+
+\section{Roadmap recommandée}
+
+\begin{longtable}{p{0.16\textwidth}p{0.73\textwidth}}
+\toprule
+Milestone & Objet et gate \\
+\midrule
+2R & Reset théorique : claims, architecture, hypothèses, seuils, pertes, arrêt, contrôles et critères de passage. \\
+3A & Benchmark exploratoire de mécanismes avec de nouvelles seeds de développement ; aucun claim confirmatoire. \\
+3B & Nouveau benchmark préenregistré avec seeds confirmatoires intactes et famille primaire réduite : perte terminale pondérée, unsafe GO, coût total de preuve. \\
+4 & Scénarios STRAT-Q réalistes : coûts hétérogènes, tests et signaux OTEL corrélés, contrôles compensatoires, provenance, calendrier et pertes projet. \\
+5 & Replay rétrospectif puis shadow mode, seulement après passage des gates de données et de validation bornée. \\
+\bottomrule
+\end{longtable}
+
+Brier et ECE restent utiles pour comprendre les mécanismes. Ils ne remplacent pas la valeur décisionnelle.
+
+\section{Règles anti-fuite et anti-sauvetage}
+
+\begin{itemize}
+  \item Les seeds headline de Step 2 restent des preuves historiques immuables et ne deviennent jamais un jeu de tuning.
+  \item Le redesign exploratoire utilise de nouvelles seeds de développement.
+  \item Les nouvelles seeds confirmatoires restent intactes jusqu'au gel du protocole et du code d'analyse.
+  \item Le pilote industriel ne doit pas servir à sauver une théorie encore instable.
+  \item Une baseline simple et gouvernée reste un comparateur de premier rang.
+  \item Un nouveau résultat négatif reste une sortie scientifique valide.
+\end{itemize}
+
+\section{Conclusion}
+
+Step 2 n'a pas détruit ED-POMDP. Il a détruit une version trop simple de sa promesse :
+\begin{quote}
+Mieux choisir et mieux qualifier les preuves conduira naturellement à de meilleures décisions.
+\end{quote}
+
+La nouvelle hypothèse centrale devient :
+
+\begin{tcolorbox}[colback=softgreen,colframe=green!45!black,boxrule=0.8pt,arc=2mm]
+\textbf{La valeur ne vient pas de la qualité de la croyance seule, mais de l'architecture complète qui transforme cette croyance en arrêt, contrôle compensatoire ou décision terminale, sous pertes asymétriques, coûts hétérogènes et contraintes dures.}
+\end{tcolorbox}
+
+C'est assez sérieux pour continuer, mais seulement après un milestone explicite de refondation des hypothèses et des claims. Continuer l'ancien plan sans ce reset ferait perdre la principale valeur scientifique de Step 2.
+
+\end{document}

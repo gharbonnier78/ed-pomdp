@@ -1,47 +1,61 @@
-\documentclass[11pt]{article}
+\documentclass[11pt,a4paper]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{lmodern}
-\usepackage{microtype}
-\usepackage{geometry}
-\geometry{margin=1in}
-\usepackage{amsmath,amssymb,booktabs,array,longtable,tabularx,multirow}
-\usepackage{graphicx}
-\usepackage{xcolor}
-\usepackage{hyperref}
-\usepackage{enumitem}
-\usepackage{fancyhdr}
-\usepackage{titlesec}
-\usepackage{listings}
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit}
-\hypersetup{colorlinks=true,linkcolor=blue!45!black,citecolor=blue!45!black,urlcolor=blue!45!black}
-\setlist{nosep,leftmargin=*}
-\pagestyle{fancy}\fancyhf{}\lhead{ED-POMDP Research Edition v1.0}\rhead{Scientific Foundations}\cfoot{\thepage}
-\newcommand{\edp}{ED-POMDP}
-\newcommand{\stratq}{STRAT-Q}
-\newcommand{\risk}{\mathcal{R}}
-\newcommand{\evidence}{\mathcal{E}}
+\usepackage[english]{babel}
+\usepackage{lmodern,microtype}
+\usepackage[a4paper,margin=2.25cm]{geometry}
+\usepackage{booktabs,tabularx,longtable,array}
+\usepackage{xcolor,hyperref,tcolorbox,fancyhdr}
+\definecolor{deepblue}{HTML}{183B56}
+\definecolor{softblue}{HTML}{EAF2F8}
+\pagestyle{fancy}\fancyhf{}\lhead{ED-POMDP Research Edition v1.4}\rhead{Post-Step-2 Reviewer Companion}\cfoot{\thepage}
+\setlength{\parindent}{0pt}\setlength{\parskip}{0.55em}\setlength{\emergencystretch}{2em}
+\title{\textbf{Post-Step-2 Reviewer Companion}\\Response, adjudication, and Milestone 2R commitments}
+\author{ED-POMDP Research Edition v1.4}
+\date{2 August 2026}
 
-\title{Reviewer Companion: Response and Revision Commitments}
-\author{ED-POMDP Research Edition v1.0}
-\date{July 2026}
-\begin{document}\maketitle
-\section*{Purpose}
-This companion converts the initial reviewer assessment into explicit changes, experiments, and residual limitations.
-\begin{longtable}{p{0.20\textwidth}p{0.31\textwidth}p{0.36\textwidth}}
-\toprule Concern & Step-1 response & Step-2 verification\\\midrule
-Shared abstraction proves code reuse, not scientific necessity & Software release is primary; cross-domain claims downgraded. The paper states the expected scientific utility of the formalism. & Ablate the shared constructs and compare simpler domain-specific models.\\
-Hand-picked likelihoods & Abstract and non-claims explicitly state that parameters are not estimated. & Separate $Z_{true}$ from $\widehat Z$; estimate from finite samples; test calibration.\\
-Identifiability unsupported & Reframed as RQ7 and an open programme risk. & Identifiability analysis, posterior geometry, conservative bounds, elicitation study.\\
-No matched budgets & H1 rewritten for fixed budgets and paired intervals. & Budget-loss curves, target-loss cost curves, Pareto fronts.\\
-Dependence and shift absent & Central threats and WP3. & Common-cause generators, shift regimes, robust models.\\
-Unused hard constraints $\mathcal K$ & Formal admissibility defined and mandatory scenarios specified. & Constraint explorer and zero-violation tests.\\
-Which domain first? & Software release is the only primary validation domain. & Retrospective STRAT-Q-style replay before biometrics/UAV.\\
-UAV degenerate stopping & Retained as evidence of model-specification failure, not hidden. & Continuous-state UAV benchmark deferred to external validation.\\
-Thin related work & Dedicated survey and comparison matrix added. & Systematic-review protocol and expanded bibliography.\\
-Hypotheses not falsifiable & Every hypothesis includes a refutation criterion. & Machine-readable preregistration and locked analysis.\\\bottomrule
+\begin{document}
+\maketitle
+
+\begin{tcolorbox}[colback=softblue,colframe=deepblue,boxrule=0.8pt,arc=2mm]
+\textbf{Reviewer boundary.} Step 2 did not validate general ED-POMDP superiority. Milestone 2R is a theory-and-claim reset, not a new positive result.
+\end{tcolorbox}
+
+\section*{Resolved reviewer questions}
+
+\begin{longtable}{p{0.24\textwidth}p{0.34\textwidth}p{0.34\textwidth}}
+\toprule
+Question & Verified answer & Repository consequence \\
+\midrule
+Are the announced deliverables present in the PR? & They must appear in the actual diff. References in README are not sufficient. & The English paper, French guide, bet register, roadmap, programme, reviewer companion, and CI changes are included in this PR. \\
+How is the count 2,400 derived? & $4$ regimes $\times 4$ budgets $\times 30$ seeds $\times 5$ ED-versus-baseline comparisons. & The derivation appears in the main paper, Milestone 2R paper, French guide, and bet register. \\
+Why does evidence level change from NONE to SYNTHETIC? & Evidence level records the source class, not positive support. A frozen synthetic benchmark now exists. & Polarity and disposition remain separate; unsupported claims may correctly have SYNTHETIC evidence. \\
+Is the pivot a post-hoc displacement of objectives? & No positive claim is rescued. The original claims remain visible and unsupported; the new hypotheses are narrower and require new seeds and a new preregistration. & A dedicated section explains the stage-gate logic and anti-leakage boundary. \\
+Is the safety pattern confirmatory? & No. Unsafe-GO results remain descriptive and outside the original multiplicity family. & H3-E requires a new preregistered safety endpoint. \\
+Is H3-D currently confirmatory and fully falsifiable? & Not yet as a confirmatory hypothesis. Its qualitative conditions now have measurable definitions, but numerical thresholds and symmetric group minima must be calibrated on 3A development seeds and frozen before 3B. & H3-D operationalisation is documented in the protocol gate; approval of 2R does not authorize confirmatory testing. \\
+\bottomrule
 \end{longtable}
-\section*{Residual limitations}
-Step 1 remains a scientific foundation. It contains no operational performance claim, no real-data calibration, and no proof that the framework is preferable to simpler decision rules. These are intentionally delegated to subsequent milestones with explicit stop conditions.
+
+\section*{Scientific reading of Step 2}
+
+The principal mechanism finding is that probabilistic improvement was usually decision-inert. Of 1,119 ED-POMDP-versus-baseline pairs with improved Brier score, 1,054 retained the same terminal action. The risk-only comparison produced the same terminal action in all 480 pairs despite different evidence traces and posterior values in many cases.
+
+The conclusion is therefore stronger than a generic null result: the frozen terminal architecture often failed to convert belief improvement into changed action and reduced loss.
+
+\section*{Milestone 2R commitments}
+
+\begin{enumerate}
+  \item Audit threshold derivation, loss asymmetry, stopping, cost, dependence, redundancy, and boundary reachability.
+  \item Replace broad claims with conditional hypotheses H3-A to H3-E.
+  \item Keep Step 2 headline seeds out of all tuning.
+  \item Use new development seeds for exploration and untouched seeds for confirmation.
+  \item Keep Brier and ECE secondary to terminal loss, unsafe GO, and total evidence cost.
+  \item Block industrial progression until both theory and data gates pass.
+  \item Require H3-D units, normalization, numerical thresholds, symmetric eligible/ineligible minimum counts, interaction estimand, analysis code, and non-testable disposition to be frozen before Milestone 3B.
+\end{enumerate}
+
+\section*{Approval condition}
+
+Approval of Milestone 2R means approval of the bounded reset and its progression gates. It does not mean approval of ED-POMDP operational superiority, industrial readiness, or the candidate hypotheses. In particular, H3-D remains a candidate only: Milestone 3B is blocked until its numerical thresholds, symmetric minimum counts for both eligibility groups, interaction estimand, multiplicity rule, effect criteria, code, and untouched seed boundary are frozen.
+
 \end{document}

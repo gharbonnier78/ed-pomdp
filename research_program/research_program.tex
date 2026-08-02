@@ -1,150 +1,163 @@
-\documentclass[11pt]{report}
+\documentclass[11pt,a4paper]{report}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{lmodern}
-\usepackage{microtype}
-\usepackage{geometry}
-\geometry{margin=1in}
-\usepackage{amsmath,amssymb,booktabs,array,longtable,tabularx,multirow}
-\usepackage{graphicx}
-\usepackage{xcolor}
-\usepackage{hyperref}
-\usepackage{enumitem}
-\usepackage{fancyhdr}
-\usepackage{titlesec}
-\usepackage{listings}
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit}
-\hypersetup{colorlinks=true,linkcolor=blue!45!black,citecolor=blue!45!black,urlcolor=blue!45!black}
-\setlist{nosep,leftmargin=*}
-\pagestyle{fancy}\fancyhf{}\lhead{ED-POMDP Research Edition v1.0}\rhead{Scientific Foundations}\cfoot{\thepage}
-\newcommand{\edp}{ED-POMDP}
-\newcommand{\stratq}{STRAT-Q}
-\newcommand{\risk}{\mathcal{R}}
-\newcommand{\evidence}{\mathcal{E}}
+\usepackage[english]{babel}
+\usepackage{lmodern,microtype}
+\usepackage[a4paper,margin=2.25cm]{geometry}
+\usepackage{amsmath,amssymb,booktabs,tabularx,longtable,array}
+\usepackage{xcolor,hyperref,enumitem,fancyhdr,titlesec,tcolorbox}
+\hypersetup{colorlinks=true,linkcolor=blue!40!black,urlcolor=blue!40!black}
+\definecolor{deepblue}{HTML}{183B56}
+\definecolor{softblue}{HTML}{EAF2F8}
+\pagestyle{fancy}\fancyhf{}\lhead{ED-POMDP Research Edition v1.4}\rhead{Research Programme 2026--2030}\cfoot{\thepage}
+\setlength{\parindent}{0pt}\setlength{\parskip}{0.55em}\setlength{\emergencystretch}{2em}
+\setlist{leftmargin=1.5em,itemsep=0.25em,topsep=0.25em}
+\titleformat{\chapter}{\Huge\bfseries\color{deepblue}}{\thechapter}{0.8em}{}
+\titleformat{\section}{\large\bfseries\color{deepblue}}{\thesection}{0.65em}{}
 
-\title{ED-POMDP Research Programme 2026--2030\\Scientific, Experimental and Industrial Validation Roadmap}
+\title{\textbf{ED-POMDP Research Programme 2026--2030}\\
+\large Revised gated roadmap after the Step 2 benchmark}
 \author{Guillaume Harbonnier -- STRAT-Q Research Programme}
-\date{July 2026}
-\begin{document}\maketitle\tableofcontents
-\chapter{Programme vision}
-The programme investigates whether governed engineering evidence can support auditable sequential decisions under partial observability. Software release assurance is the first validation domain. The programme deliberately separates conceptual plausibility, synthetic falsification, retrospective empirical validation, shadow operation, and authorised deployment.
+\date{2 August 2026}
 
-\chapter{Scientific objectives}
+\begin{document}
+\maketitle
+\tableofcontents
+
+\chapter{Programme status}
+
+Steps 1 and 1.1 are shipped. Step 2 is closed after frozen execution, independent review, mechanism diagnosis, and claim adjudication. Step 2 did not validate broad ED-POMDP superiority.
+
+\begin{tcolorbox}[colback=softblue,colframe=deepblue,boxrule=0.8pt,arc=2mm]
+\textbf{Programme gate.} The former direct path from synthetic benchmark to industrial calibration is suspended. Milestone 2R---Theory and Claim Reset---is mandatory before any new confirmatory benchmark or industrial milestone.
+\end{tcolorbox}
+
+The benchmark contained 3,360 raw policy episodes:
+\[
+4\ \mathrm{regimes}\times 4\ \mathrm{budgets}\times 30\ \mathrm{seeds}\times 7\ \mathrm{policies}=3{,}360.
+\]
+The mechanism analysis contained 2,400 ED-POMDP-versus-baseline pairs:
+\[
+4\times4\times30\times5=2{,}400.
+\]
+Of 1,119 Brier-improving pairs, 1,054 retained the same terminal action.
+
+\chapter{Scientific posture}
+
+The programme preserves the distinction between latent system risk and latent evidence-production quality. It withdraws the assumption that improved evidence selection or calibration naturally creates better decisions under an unchanged terminal architecture.
+
+The revised central question is:
+\begin{quote}
+Under which conditions does additional or better-qualified evidence change a governed engineering decision, and does that changed decision reduce materially important loss at comparable total cost?
+\end{quote}
+
+\chapter{Milestone 2R -- Theory and Claim Reset}
+
+\section{Objectives}
+
 \begin{enumerate}
-\item Formalise system risk, evidence quality, decision context, and model uncertainty without reducing quality to one score.
-\item Establish matched-budget performance and failure regimes of Decision-VoI.
-\item Develop calibration methods for sparse, biased, dependent industrial evidence.
-\item Integrate hard legal, contractual, safety, and governance constraints.
-\item Produce replayable decision traces and human-accountable recommendations.
-\item Assess generalisability only after software validation.
+  \item Reconstruct the complete causal chain from evidence acquisition to realised loss.
+  \item Audit thresholds, loss ratios, stopping, evidence costs, dependence, redundancy, and decision admissibility.
+  \item Replace broad superiority claims with conditional hypotheses H3-A to H3-E.
+  \item Define new progression gates and seed-separation rules.
 \end{enumerate}
 
-\chapter{Programme principles}
-Claims mature through five evidence levels: L0 conceptual coherence; L1 synthetic falsification; L2 retrospective replay; L3 prospective shadow mode; L4 governed operational use. No result is promoted to a higher level by narrative alone. Every experiment is versioned, reproducible, and accompanied by failure criteria.
+\section{Exit criteria}
 
-\chapter{Work packages}
-\section{WP0 -- Scientific positioning and preregistration}
-\textbf{Objective:} define scope, terminology, novelty boundaries, and non-claims.\\
-\textbf{Inputs:} POMDP, Bayesian decision theory, software reliability, assurance cases, adaptive testing, runtime evidence.\\
-\textbf{Methods:} systematic search protocol, comparison matrix, reviewer panels.\\
-\textbf{Deliverables:} main paper, survey, reviewer companion, ontology.\\
-\textbf{Exit:} all hypotheses have measurable outcomes and refutation criteria.
+Milestone 2R exits only when:
+\begin{itemize}
+  \item the P0--P5 bet register is approved;
+  \item structural assumptions and boundary reachability are audited;
+  \item candidate hypotheses have explicit estimands and refutation criteria;
+  \item Step 2 headline seeds are cryptographically and procedurally excluded from tuning;
+  \item a Step 3A exploratory protocol is independently reviewable.
+\end{itemize}
 
-\section{WP1 -- Synthetic benchmark and matched-budget evaluation}
-\textbf{Objective:} test mathematical and algorithmic claims under controlled conditions.\\
-\textbf{Experiments:} budget curves, Pareto fronts, misspecified priors/likelihoods, correlation, shift, stale evidence, hard gates, ablations, computational scaling.\\
-\textbf{Baselines:} fixed order, random, entropy gain, risk-ranked, myopic DVoI, finite-horizon solver.\\
-\textbf{Exit:} results reproducible across seeds; negative regimes documented.
+Milestone 2R produces no new confirmatory performance claim.
 
-\section{WP2 -- Industrial data model and calibration}
-\textbf{Objective:} determine which parameters are estimable from release data.\\
-\textbf{Data:} requirements, risk registers, changes, tests, defects, environments, OTEL signals, incidents, decisions, waivers.\\
-\textbf{Methods:} hierarchical Bayesian models, conservative bounds, missingness models, elicitation, calibration curves.\\
-\textbf{Risk:} labels reflect historical decisions rather than true latent quality.\\
-\textbf{Exit:} data dictionary, governance approval, identifiability report, calibrated candidate model.
+\chapter{Post-reset work packages}
 
-\section{WP3 -- Dependence, model uncertainty and drift}
-\textbf{Objective:} prevent double-counting and brittle posterior confidence.\\
-\textbf{Methods:} latent common-cause models, Bayesian networks, copulas where justified, robust Bayes, ensembles, online change detection.\\
-\textbf{Exit:} calibrated uncertainty under preregistered shifts and evidence correlations.
+\section{WP3A -- Exploratory mechanism benchmark}
 
-\section{WP4 -- Constraints and human governance}
-\textbf{Objective:} represent mandatory evidence and accountable human authority.\\
-\textbf{Methods:} constrained POMDP, shielded policies, abstention, human review reliability, reason codes.\\
-\textbf{Exit:} zero simulated hard-gate violations and approved governance model.
+\textbf{Purpose:} determine when belief changes cross decision boundaries, alter stopping, trigger compensating controls, or reduce loss.
 
-\section{WP5 -- Retrospective replay}
-\textbf{Objective:} compare ED-POMDP recommendations with historical release pathways on held-out releases.\\
-\textbf{Design:} time-respecting splits; blinded model fitting; counterfactual limitations documented.\\
-\textbf{Outcomes:} decision loss proxies, evidence cost, time to decision, calibration, action agreement, reviewer utility.\\
-\textbf{Exit:} independent review and predeclared go/no-go for shadow mode.
+\textbf{Design:} new development seeds; adaptive stopping; heterogeneous costs; correlated and redundant evidence; joint risk/evidence-quality terminal rules; explicit CONDITIONAL GO controls.
 
-\section{WP6 -- Shadow deployment}
-\textbf{Objective:} generate recommendations without influencing formal release authority.\\
-\textbf{Controls:} immutable evidence snapshots, policy versioning, human override, no automated deployment.\\
-\textbf{Exit:} stable calibration, acceptable false-escalation burden, complete audit replay.
+\textbf{Constraint:} no confirmatory claim.
 
-\section{WP7 -- Prospective governed evaluation}
-\textbf{Objective:} assess decision support with limited authority and monitored outcomes.\\
-\textbf{Design:} stepped-wedge or phased introduction where organisationally feasible.\\
-\textbf{Exit:} evidence of benefit without unacceptable safety, fairness, legal, or workload impact.
+\section{WP3B -- New preregistered benchmark}
 
-\section{WP8 -- External-validity studies}
-Biometrics: adaptive multimodal evidence acquisition with PAD, quality, ageing and human review. UAV: continuous-state active perception with GNSS/INS/EO/IR and terrain. These studies test transfer of principles, not proof of universal equivalence.
+\textbf{Primary endpoints:}
+\begin{enumerate}
+  \item weighted terminal decision loss;
+  \item unsafe-GO rate;
+  \item total evidence cost.
+\end{enumerate}
 
-\chapter{Milestones}
-\begin{longtable}{p{0.1\textwidth}p{0.22\textwidth}p{0.43\textwidth}p{0.15\textwidth}}
-\toprule ID & Target & Acceptance evidence & Earliest period\\\midrule
-M1 & Scientific foundation & Reviewer-ready documents, ontology, preregistration & 2026 Q3\\
-M2 & Benchmark v1 & Matched-budget experiments and CI reproducibility & 2026 Q4\\
-M3 & Calibration study & Identifiability and data-governance report & 2027 H1\\
-M4 & Replay study & Held-out retrospective evaluation & 2027 H2\\
-M5 & Shadow mode & Prospective evidence traces without decision authority & 2028\\
-M6 & Governed pilot & Limited operational decision support & 2029\\
-M7 & External validation & Biometrics and UAV studies & 2029--2030\\\bottomrule
+Brier score and ECE are secondary mechanism diagnostics. Confirmatory seeds remain untouched until protocol and analysis freeze.
+
+\section{WP4 -- Realistic STRAT-Q scenarios}
+
+The realistic benchmark adds heterogeneous evidence costs, correlated tests and OTEL signals, representative environments, governed provenance, schedule constraints, compensating controls, and project-specific loss models.
+
+\section{WP5 -- Industrial replay and shadow evaluation}
+
+This work requires a passed data-readiness gate and prior bounded validation. The industrial pilot evaluates an architecture that has already survived synthetic testing; it must not be used to rescue an unstable theory.
+
+\chapter{Candidate hypotheses}
+
+\begin{longtable}{p{0.13\textwidth}p{0.75\textwidth}}
+\toprule
+ID & Candidate hypothesis \\
+\midrule
+H3-A & A terminal rule using both system-risk and evidence-quality belief reduces weighted loss under evidence degradation relative to a risk-only rule. \\
+H3-B & Adaptive stopping reduces mean evidence cost without increasing terminal loss or unsafe-GO rate. \\
+H3-C & CONDITIONAL GO linked to explicit, verifiable compensating controls reduces loss relative to an unstructured intermediate decision region. \\
+H3-D & VOI provides benefit only when evidence is heterogeneous, discriminating, non-redundant, and boundary-capable. \\
+H3-E & Evidence-quality-aware terminal rules reduce unsafe-GO rate under controlled degradation at comparable total cost. \\
+\bottomrule
 \end{longtable}
 
-\chapter{Data and evidence plan}
-The data model uses immutable release snapshots. Direct identifiers are excluded from the research layer. Every feature has a source, owner, extraction rule, timestamp, validity window, missingness semantics, and allowed use. Labels are separated into observed outcomes, expert assessments, and latent variables. Production incidents cannot be naively treated as complete defect truth because detection and reporting are selective.
+\chapter{Epistemic governance}
 
-\chapter{Evaluation plan}
-Primary comparison uses equal budgets. Secondary comparison uses minimum evidence cost to reach a target expected loss. Policies are evaluated on Pareto fronts, calibration, constraint violations, abstention, computational cost, and audit reproducibility. Sensitivity analyses vary all loss ratios and model assumptions. Statistical plans use paired simulations, bootstrap intervals, correction for multiple hypotheses where applicable, and effect sizes rather than p-values alone.
+Evidence level records source class, not support. Step 2 changes the adjudicating evidence level from \texttt{NONE} to \texttt{SYNTHETIC} because a frozen synthetic benchmark now exists. Polarity and disposition remain separate. A claim can therefore have synthetic evidence and remain unsupported.
 
-\chapter{Governance, ethics and safety}
-ED-POMDP is decision support, not autonomous release authority. Mandatory evidence remains mandatory. Human decision makers receive reasons, uncertainty, missing-evidence warnings, and counterfactuals. The programme assesses automation bias, disparate effects, workload transfer, confidentiality, and strategic gaming. Biometrics and UAV work require separate ethical and legal review before real data or field trials.
+The canonical combinations are:
+\begin{itemize}
+  \item \texttt{CLM-VOI-001}: synthetic evidence, adverse/mixed polarity, \texttt{NOT\_SUPPORTED\_STEP2};
+  \item \texttt{CLM-EQ-001}: synthetic evidence, mixed narrow-positive polarity, \texttt{BROAD\_FORM\_NOT\_SUPPORTED\_NARROW\_ECE\_SIGNAL}.
+\end{itemize}
 
-\chapter{Reproducibility and open science}
-Each release includes source, environment lock file, container recipe, seeds, configuration manifests, raw synthetic outputs, analysis notebooks, figure scripts, and a machine-readable claim-to-experiment map. Industrial data are not published; instead, schemas, synthetic surrogates, and controlled replication protocols are provided.
+\chapter{Anti-leakage and reproducibility}
 
-\chapter{Publication strategy}
-\begin{enumerate}
-\item Position/methods paper: software release assurance under partial observability.
-\item Benchmark paper: matched-budget ED-POMDP evaluation and failure regimes.
-\item Calibration paper: dependence and uncertainty in engineering evidence.
-\item Industrial empirical study: retrospective and shadow validation.
-\item Biometrics study.
-\item UAV active-perception study.
-\item General theory only after domain evidence supports it.
-\end{enumerate}
+\begin{itemize}
+  \item Step 2 headline seeds remain immutable historical evidence.
+  \item Step 3A uses new development seeds.
+  \item Step 3B uses untouched confirmatory seeds.
+  \item Protocol, code, endpoints, multiplicity, and stopping criteria freeze before confirmation.
+  \item Simple governed baselines remain first-class comparators.
+  \item A new negative result is a valid programme outcome.
+\end{itemize}
 
-\chapter{Risk register}
-Major risks are non-identifiability, poor outcome labels, policy instability, computational burden, organisational resistance, and false precision. Mitigations include conservative bounds, abstention, simple baselines, human governance, and explicit termination criteria. A negative result---for example, fixed policies outperforming DVoI under realistic costs---is a valid programme outcome.
+\chapter{Milestones}
 
-\chapter{Decision gates}
-At each milestone, continuation requires evidence. Failure to outperform simple baselines under matched budgets blocks claims of optimisation advantage. Failure to calibrate blocks shadow mode. Any hard-gate violation blocks operational use. Lack of independent replay blocks auditability claims.
+\begin{longtable}{p{0.13\textwidth}p{0.25\textwidth}p{0.49\textwidth}}
+\toprule
+ID & Milestone & Acceptance evidence \\
+\midrule
+M1 & Scientific foundations & Shipped. \\
+M1.1 & Identifiability foundations & Shipped. \\
+M2 & Frozen matched-budget benchmark & Closed; broad superiority claims not supported. \\
+M2R & Theory and claim reset & Audited assumptions, P0--P5 register, H3-A--H3-E candidates, progression gates. \\
+M3A & Exploratory mechanism benchmark & New development seeds; no confirmatory claim. \\
+M3B & Preregistered confirmatory benchmark & Untouched seeds; primary loss, safety, and cost family. \\
+M4 & Realistic STRAT-Q scenario & Governed heterogeneous evidence and project-specific loss. \\
+M5 & Industrial replay and shadow mode & Passed data gate and prior bounded validation. \\
+\bottomrule
+\end{longtable}
 
-\begin{thebibliography}{99}
-\bibitem{kaelbling1998planning} Kaelbling, L. P., Littman, M. L., and Cassandra, A. R. Planning and acting in partially observable stochastic domains. \emph{Artificial Intelligence}, 101(1--2), 99--134, 1998.
-\bibitem{lauri2023robotics} Lauri, M., Hsu, D., and Pajarinen, J. Partially observable Markov decision processes in robotics: A survey. \emph{IEEE Transactions on Robotics}, 39(1), 21--40, 2023.
-\bibitem{silver2010pomcp} Silver, D. and Veness, J. Monte-Carlo planning in large POMDPs. \emph{NeurIPS}, 2010.
-\bibitem{sarraute2013hackers} Sarraute, C., Buffet, O., and Hoffmann, J. POMDPs make better hackers: Accounting for uncertainty in penetration testing. arXiv:1307.7809, 2013.
-\bibitem{wu2020active} Wu, B. et al. Constrained active classification using partially observable Markov decision processes. arXiv:2008.04768, 2020.
-\bibitem{arora2019multimodal} Arora, A., Fitch, R., and Sukkarieh, S. Multi-modal active perception for information gathering in science missions. \emph{Autonomous Robots}, 2019.
-\bibitem{rahbar2025active} Rahbar, A., Aronsson, L., and Chehreghani, M. H. A survey on active feature acquisition strategies. arXiv:2502.11067, 2025.
-\bibitem{wong2024revisiting} Wong, W. E. et al. Revisiting software reliability modeling and testing. \emph{IEEE Transactions on Reliability}, 2024.
-\bibitem{ieee1633} IEEE. \emph{IEEE Recommended Practice on Software Reliability}, IEEE Std 1633-2016, 2017.
-\bibitem{fenton2012risk} Fenton, N. and Neil, M. \emph{Risk Assessment and Decision Analysis with Bayesian Networks}. CRC Press, 2012.
-\bibitem{howard1966information} Howard, R. A. Information value theory. \emph{IEEE Transactions on Systems Science and Cybernetics}, 2(1), 22--26, 1966.
-\end{thebibliography}
+\chapter{Conclusion}
+
+Step 2 performed its scientific function by exposing the proposed advantages to a frozen attempt at falsification. The programme continues, but not on the former assumptions. Milestone 2R makes the negative result operationally useful by redesigning the complete belief-to-action architecture before any new claim or deployment path.
+
 \end{document}

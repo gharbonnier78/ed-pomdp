@@ -1,35 +1,66 @@
-# Research Tracks
+# Research Tracks — Post-Step-2 Gated Roadmap
 
-## Committed Core — 12 to 18 months
+## Closed foundation
 
-Executable by the principal investigator without privileged industrial data:
+- Step 1 — Scientific foundations: shipped.
+- Step 1.1 — Epistemic foundations and identifiability: shipped.
+- Step 2 — Frozen matched-budget synthetic benchmark: closed.
 
-1. Step 1.1 epistemic foundations and identifiability note.
-2. Step 2 synthetic identifiability and matched-budget benchmark.
-3. Software-release demonstrator using governed synthetic scenarios.
-4. Reproducibility package and first methods/results publication.
+Step 2 did not validate broad ED-POMDP superiority. It produced a falsification result and a mechanism finding: improved probabilistic belief often did not change the terminal action.
 
-## Conditional Industrial Track
+## Mandatory Milestone 2R — Theory and Claim Reset
 
-Requires approved access, governance and possibly collaborators:
+Milestone 2R is required before any new confirmatory or industrial milestone. It:
 
-- data-readiness assessment;
-- industrial calibration;
-- retrospective release replay;
+1. reconstructs `acquisition → observation → belief → boundary/stopping → action → loss`;
+2. audits thresholds, loss ratios, fixed horizons, equal budgets, unit costs, boundary reachability, policy indistinguishability, evidence dependence, and compensating-control semantics;
+3. withdraws broad superiority claims and defines conditional hypotheses H3-A to H3-E;
+4. freezes progression gates and anti-leakage rules.
+
+Milestone 2R creates no new confirmatory evidence.
+
+## Milestone 3A — Exploratory mechanism benchmark
+
+- New development seeds only.
+- Adaptive stopping, heterogeneous costs, joint risk/evidence-quality terminal rules, and explicit CONDITIONAL GO controls.
+- Diagnostics of boundary reachability and policy distinguishability.
+- Calibration of H3-D eligibility thresholds using normalized discrimination, normalized conditional information gain, provenance heterogeneity, and boundary-reachability metrics.
+- No confirmatory claim.
+
+## Milestone 3B — New preregistered benchmark
+
+**Mandatory entry gate:** H3-D metrics, units, normalization rules, numerical thresholds, symmetric minimum counts for eligible and ineligible cells, the eligibility-by-policy interaction estimand, effect criteria, multiplicity rules, analysis code and untouched confirmatory seeds must all be frozen before confirmatory access. Failure of either group to meet its minimum count yields `NOT_TESTABLE_IN_BENCHMARK`, not retrospective relabelling.
+
+Primary endpoint family:
+
+1. weighted terminal decision loss;
+2. unsafe-GO rate;
+3. total evidence cost.
+
+Brier score and ECE are secondary mechanism diagnostics. New confirmatory seeds remain untouched until the protocol and analysis code are frozen.
+
+## Milestone 4 — Realistic STRAT-Q scenarios
+
+Only after bounded synthetic validation:
+
+- heterogeneous evidence costs;
+- correlated tests, reviews, simulations, and OTEL signals;
+- environment representativity and provenance;
+- compensating controls;
+- schedule and resource constraints;
+- project-specific loss models.
+
+## Milestone 5 — Conditional industrial track
+
+Requires both a passed data-readiness gate and prior bounded validation:
+
+- governed retrospective replay;
 - shadow decision-support evaluation;
-- human-review studies.
+- calibrated human review;
+- no autonomous release authority.
 
-These activities begin only after the relevant gates pass.
+The industrial pilot must not be used to rescue an unstable theory.
 
-## North-Star Track
+## North-Star track
 
-Long-term scientific direction, not a personal delivery commitment:
-
-- biometrics external validation;
-- UAV active-perception validation;
-- cross-domain benchmark community;
-- general ED-POMDP theory and operational deployments.
-
-## Numbering
-
-The repository uses one sequence everywhere: Step 1, Step 1.1, Step 2, Step 3 and Step 4. Step 1.1 is a distinct de-risking increment and is not implied by completion of Step 1.
+Biometrics and UAV active perception remain external-validity studies. They are deferred until the software-release claims survive the preceding gates.

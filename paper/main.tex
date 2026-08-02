@@ -1,163 +1,168 @@
-\documentclass[11pt]{article}
+\documentclass[11pt,a4paper]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{lmodern}
-\usepackage{microtype}
-\usepackage{geometry}
-\geometry{margin=1in}
-\usepackage{amsmath,amssymb,booktabs,array,longtable,tabularx,multirow}
-\usepackage{graphicx}
-\usepackage{xcolor}
-\usepackage{hyperref}
-\usepackage{enumitem}
-\usepackage{fancyhdr}
-\usepackage{titlesec}
-\usepackage{listings}
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit}
-\hypersetup{colorlinks=true,linkcolor=blue!45!black,citecolor=blue!45!black,urlcolor=blue!45!black}
-\setlist{nosep,leftmargin=*}
-\pagestyle{fancy}\fancyhf{}\lhead{ED-POMDP Research Edition v1.0}\rhead{Scientific Foundations}\cfoot{\thepage}
-\newcommand{\edp}{ED-POMDP}
-\newcommand{\stratq}{STRAT-Q}
-\newcommand{\risk}{\mathcal{R}}
-\newcommand{\evidence}{\mathcal{E}}
+\usepackage[english]{babel}
+\usepackage{lmodern,microtype}
+\usepackage[a4paper,margin=2.25cm]{geometry}
+\usepackage{amsmath,amssymb,booktabs,tabularx,longtable,array}
+\usepackage{xcolor,hyperref,enumitem,fancyhdr,titlesec,tcolorbox}
+\hypersetup{colorlinks=true,linkcolor=blue!40!black,citecolor=blue!40!black,urlcolor=blue!40!black}
+\definecolor{deepblue}{HTML}{183B56}
+\definecolor{softblue}{HTML}{EAF2F8}
+\definecolor{softamber}{HTML}{FFF4D6}
+\definecolor{softgreen}{HTML}{E8F5E9}
+\pagestyle{fancy}\fancyhf{}\lhead{ED-POMDP Research Edition v1.4}\rhead{Current Scientific Overview}\cfoot{\thepage}
+\setlength{\parindent}{0pt}\setlength{\parskip}{0.55em}\setlength{\emergencystretch}{2em}
+\setlist{leftmargin=1.5em,itemsep=0.25em,topsep=0.25em}
+\titleformat{\section}{\large\bfseries\color{deepblue}}{\thesection}{0.65em}{}
+\titleformat{\subsection}{\normalsize\bfseries\color{deepblue}}{\thesubsection}{0.65em}{}
+\newcommand{\go}{\textsc{go}}
+\newcommand{\cgo}{\textsc{conditional go}}
+\newcommand{\nogo}{\textsc{no-go}}
 
-\title{Decision-Relevant Evidence Acquisition for Software Release Assurance under Partial Observability\\\large ED-POMDP Research Edition v1.0 -- Scientific Foundations}
+\title{\textbf{Decision-Relevant Evidence Acquisition for Software Release Assurance under Partial Observability}\\
+\large ED-POMDP Research Edition v1.4 - Current scientific overview after Step 2}
 \author{Guillaume Harbonnier\\Independent industrial research programme / STRAT-Q}
-\date{July 2026}
-\begin{document}\maketitle
+\date{2 August 2026}
+
+\begin{document}
+\maketitle
+
 \begin{abstract}
-Software release decisions are made under persistent partial observability: latent defects, uncertain residual risks, incomplete tests, non-representative environments, and imperfect runtime evidence. Existing release governance often aggregates pass rates and coverage indicators without explicitly modelling how evidence quality, dependence, cost, admissibility, and freshness affect the decision. This paper introduces an Evidence-Driven Partially Observable Markov Decision Process (ED-POMDP) as a research framework for sequentially acquiring decision-relevant evidence and selecting release actions under hard constraints. The paper deliberately presents a preregistered methods and research programme rather than a validated operational model. It defines falsifiable hypotheses, matched-budget evaluation, misspecification and dependence experiments, constraint semantics, and an industrial validation path centred on software release assurance. Biometrics and unmanned aerial perception are retained only as future external-validity domains. The principal open question is whether observation and evidence-quality models can be identified and calibrated from realistic assurance data with sufficient robustness for decision support.
+Software release decisions remain partially observable: latent defects, uncertain residual risk, incomplete tests, non-representative environments, and imperfect runtime evidence prevent direct observation of release fitness. ED-POMDP represents latent system risk and latent evidence-production quality separately and formulates evidence acquisition, stopping, and release action as a governed sequential decision problem. The Step 2 frozen synthetic benchmark did not support the original broad claim that decision-aware evidence acquisition generally reduces terminal decision loss at matched budget, nor the broad claim that explicit evidence-quality modelling generally improves final release decisions. Its principal mechanism result is more precise: 1,054 of 1,119 paired episodes with improved Brier score retained the same terminal action. Better probabilistic belief was usually absorbed by unchanged decision regions. This overview preserves the underlying problem and formalism while replacing the broad superiority narrative with a mandatory Milestone 2R theory-and-claim reset. The revised programme asks under which conditions evidence actually changes a governed decision and reduces materially important loss at comparable total cost.
 \end{abstract}
 
-\section{Problem and motivation}
-Release status is not directly observable. A release may pass every executed test and still contain a critical defect; conversely, failed tests may reflect an invalid environment or oracle rather than product risk. Requirements, architecture reviews, tests, traces, incidents, and expert judgements are observations generated through evidence-producing processes of unequal quality. Release governance therefore combines two forms of uncertainty: uncertainty about the system and uncertainty about the evidence system.
+\begin{tcolorbox}[colback=softblue,colframe=deepblue,boxrule=0.8pt,arc=2mm]
+\textbf{Current empirical status.} Step 2 is closed. \texttt{CLM-VOI-001} is \texttt{NOT\_SUPPORTED\_STEP2}. \texttt{CLM-EQ-001} is \texttt{BROAD\_FORM\_NOT\_SUPPORTED\_NARROW\_ECE\_SIGNAL}. The programme continues only through Milestone 2R before any new confirmatory or industrial milestone.
+\end{tcolorbox}
 
-The proposed research asks whether release assurance can be formulated as a constrained sequential decision problem in which each evidence-acquisition action is evaluated by its expected reduction in decision loss rather than by coverage or entropy alone. The work does not claim that POMDPs are new, nor that a synthetic demonstrator establishes operational effectiveness. Its intended novelty lies in making governed engineering evidence a first-class decision-theoretic object.
+\section{Problem and formal framework}
 
-\subsection{Contributions}
-This Step-1 package contributes: (1) a software-centred ED-POMDP formalisation; (2) an explicit separation between latent system state and latent evidence-quality state; (3) preregistered matched-budget hypotheses and refutation criteria; (4) hard constraint semantics; (5) a research programme from synthetic falsification to retrospective replay and shadow deployment; and (6) an auditable evidence ontology linked to STRAT-Q.
+Release status is not directly observable. A passing campaign may coexist with critical latent risk; a failing test may reflect an invalid environment or unreliable oracle rather than product failure. Release governance therefore combines uncertainty about the system and uncertainty about the process producing evidence.
 
-\section{Research questions}
-\begin{description}
-\item[RQ1] Can software release assurance be represented as a constrained sequential decision problem under partial observability without collapsing quality into a single score?
-\item[RQ2] Can latent evidence quality be estimated separately from latent system risk?
-\item[RQ3] Does decision-aware value of information outperform fixed and entropy-based acquisition under matched budgets?
-\item[RQ4] How sensitive are decisions to prior error, likelihood misspecification, dependence, and distribution shift?
-\item[RQ5] Which hard constraints must remain non-compensatory, and how should violations be represented?
-\item[RQ6] Can human review be calibrated as a context-dependent evidence source without treating people as infallible sensors?
-\item[RQ7] Which parts of the model are identifiable from industrial data, and which require elicitation or conservative bounds?
-\item[RQ8] Can recommendations be made auditable enough for engineering and executive governance?
-\end{description}
-
-\section{Related work and gap}
-POMDPs provide a standard framework for planning under uncertain state and observations \cite{kaelbling1998planning,lauri2023robotics}. Active classification and active feature acquisition explicitly trade information against acquisition costs \cite{wu2020active,rahbar2025active}. Penetration testing has been modelled as information-gathering planning under incomplete network knowledge \cite{sarraute2013hackers}. Software reliability models estimate residual failure behaviour and release timing \cite{wong2024revisiting,ieee1633}, while Bayesian networks support causal and evidential reasoning \cite{fenton2012risk}. These lines remain fragmented with respect to provenance, admissibility, environment representativity, correlation, auditability, and release gates.
-
-\begin{table}[ht]
-\centering\small
-\caption{Positioning of the proposed framework. ``Partial'' indicates that a topic appears but is not a central modelled object.}
-\begin{tabularx}{\textwidth}{l*{7}{>{\centering\arraybackslash}X}}
-\toprule
-Approach & Latent risk & Sequential action & Evidence cost & Evidence quality & Dependence & Hard gates & Audit trail\\\midrule
-SRGM & Yes & Partial & Partial & No & Partial & No & No\\
-Bayesian assurance network & Yes & Partial & Partial & Partial & Yes & Partial & Partial\\
-Adaptive test selection & Partial & Yes & Yes & No & Partial & No & Partial\\
-Classical POMDP active sensing & Yes & Yes & Yes & Sensor model & Yes & Partial & No\\
-Assurance cases & Partial & No & No & Argument-level & Yes & Yes & Yes\\
-Proposed ED-POMDP & Yes & Yes & Yes & Latent + governed & Explicit & Explicit & Explicit\\\bottomrule
-\end{tabularx}
-\end{table}
-
-The common formalism must buy more than software reuse. It provides a disciplined separation of state uncertainty, evidence-process uncertainty, decision loss, and non-compensatory constraints; exposes when a test cannot influence the decision; supports counterfactual analysis; and produces a replayable decision trace. These are the scientific utilities to be tested, not assumed.
-
-\section{Conceptual model}
 At time $t$, the partially observable state is factorised as
 \[
 X_t=(S_t,E_t,C_t,\Theta_t),
 \]
-where $S_t$ is latent system risk, $E_t$ is latent evidence-production quality, $C_t$ is the observable decision context, and $\Theta_t$ contains uncertain model parameters. The belief is
+where $S_t$ is latent system risk, $E_t$ is latent evidence-production quality, $C_t$ is observable decision context, and $\Theta_t$ contains uncertain model parameters. The belief is
 \[
-b_t(x)=P(S_t,E_t,\Theta_t\mid h_t,C_t),
+b_t(x)=P(S_t,E_t,\Theta_t\mid h_t,C_t).
 \]
-with history $h_t=(a_0,o_1,\ldots,a_{t-1},o_t)$.
+An evidence-acquisition action $a_t$ produces an observation $o_{t+1}$ through $Z(o\mid S,E,a,\Theta)$, followed by Bayesian update:
+\[
+b_{t+1}(x')=\eta Z(o_{t+1}\mid x',a_t)\sum_xT(x'\mid x,a_t)b_t(x).
+\]
+For a terminal decision $d$, Bayes risk is $\rho(d,b)=\mathbb{E}_{x\sim b}[L(d,x)]$. The action space includes acquisition, stopping, remediation, escalation, abstention, staged release, \go{}, \cgo{}, and \nogo{}. Hard constraints remain non-compensatory.
 
-An evidence item is not identical to an observation. An evidence action $a$ invokes a process with provenance, environment, oracle, data, and instrumentation. It produces an observation $o$ through $Z(o\mid S,E,a,\Theta)$. Consequently, a passing test in a stale or non-representative environment may provide little support for a production claim.
+\section{Step 2 design and adjudication}
 
-\section{Formal ED-POMDP}
-We define
+The frozen benchmark evaluated seven policies under four regimes, four budgets, and thirty untouched headline seeds:
 \[
-\mathcal{M}=\langle\mathcal{X},\mathcal{A},\mathcal{O},T,Z,L,\gamma,\mathcal{K},\Pi\rangle.
+4\times4\times30\times7=3{,}360
 \]
-$\mathcal{A}$ includes evidence acquisition, remediation, escalation, staged deployment, GO, CONDITIONAL GO, NO-GO, and abstention. $L$ is a vector of decision, delay, acquisition, and operational losses. $\mathcal{K}$ is a set of hard constraints; $\Pi$ is an evidence provenance and audit model.
+executed episode rows.
 
-The Bayesian update is
-\[
-b_{t+1}(x')=\eta\,Z(o_{t+1}\mid x',a_t)\sum_x T(x'\mid x,a_t)b_t(x).
-\]
-For a terminal decision $d$, Bayes risk is
-\[
-\rho(d,b)=\mathbb{E}_{x\sim b}[L(d,x)].
-\]
-A one-step decision-relevant value of information is
-\[
-\operatorname{DVoI}(a;b)=\rho^*(b)-c(a)-\mathbb{E}_{o\sim P(o\mid b,a)}[\rho^*(\tau(b,a,o))],
-\]
-where $\rho^*(b)=\min_{d\in D_{\mathcal K}(b)}\rho(d,b)$ and $D_{\mathcal K}(b)$ excludes inadmissible decisions.
+The confirmatory family contained 240 Holm-corrected contrasts over terminal decision loss, Brier score, and expected calibration error. No terminal-decision-loss contrast survived Holm correction. Across the four acquisition baselines directly relevant to the VOI claim, aggregate terminal-loss directions were 10 favourable, 16 adverse, and 38 equal. One degraded-evidence, budget-two ECE contrast survived Holm correction, but its bootstrap interval crossed zero and posterior support was sparse.
 
-\subsection{Hard constraints}
-Hard constraints are not large scalar penalties. Examples include mandatory security evidence, regulatory artefacts, segregation of duties, or prohibition of GO above a critical-risk probability bound. A decision is feasible only if
-\[
-g_j(b,h,\Pi)\leq 0,\quad j=1,\dots,m.
-\]
-The demonstrator in Step 2 must instantiate at least: mandatory evidence before GO, an abstention rule under model uncertainty, and a conditional-go compensating-control requirement.
+A descriptive safety signal remains bounded: ED-POMDP produced zero unsafe \go{} decisions in the three structurally avoidable regimes, compared with two per regime for the classical POMDP. This endpoint was outside the confirmatory p-value family and is not promoted retrospectively.
 
-\section{Evidence ontology}
-Each evidence item is represented by
-\[
-e=(id,type,claim,source,t,env,data,oracle,coverage,q,dep,adm,cost,hash).
-\]
-The quality vector $q$ includes validity, reliability, representativity, freshness, completeness, and reproducibility. Dependence $dep$ links shared generators, datasets, components, environments, and human reviewers. Admissibility $adm$ captures policy and regulatory use. Hashes and lineage support replay.
+\section{Mechanism diagnosis and count reconciliation}
 
-\section{Preregistered hypotheses and refutation}
-\begin{longtable}{p{0.07\textwidth}p{0.48\textwidth}p{0.37\textwidth}}
-\toprule ID & Hypothesis and protocol & Refutation criterion\\\midrule
-H1 & Under each fixed evidence budget $B$, Decision-VoI yields lower terminal decision loss than fixed-order and entropy policies. & Refuted for a regime if the 95\% paired bootstrap interval for loss difference includes zero or favours a baseline.\\
-H2 & Explicit latent evidence-quality modelling improves calibration and expected loss under environment defects. & Refuted if ECE/Brier score and decision loss do not improve over a state-only model.\\
-H3 & Dependence-aware models avoid overconfidence when evidence shares causes. & Refuted if dependence modelling does not reduce overconfidence or increases loss across preregistered correlation regimes.\\
-H4 & Hard constraints prevent inadmissible GO decisions without unacceptable growth in abstention/delay. & Refuted if violations occur or if the preregistered feasibility threshold is exceeded.\\
-H5 & Retrospective ED-POMDP recommendations identify decision-changing evidence earlier than historical fixed plans. & Refuted if replay shows no reduction in time/cost to decision under blinded evaluation.\\
-H6 & Audit traces allow independent reviewers to reproduce the selected action from evidence and policy versions. & Refuted if deterministic replay agreement is below 100\% for frozen artefacts.\\\bottomrule
+Step 2.8 compared ED-POMDP with five frozen confirmatory baselines for every regime--budget--seed cell:
+\[
+4\times4\times30\times5=2{,}400
+\]
+paired diagnostics.
+
+The 3,360 count therefore describes all executed policy episodes; the 2,400 count describes ED-POMDP-versus-baseline mechanism pairs. ED-POMDP improved Brier score in 1,119 pairs, but 1,054 of those retained the same terminal action:
+\[
+\frac{1{,}054}{1{,}119}=94.19\%.
+\]
+The risk-only comparison selected the same terminal action in all 480 paired episodes despite frequently different acquisition traces and posterior values.
+
+The observed value chain therefore breaks at the conversion from belief to action:
+\[
+\text{better evidence}\rightarrow\text{better belief}\not\Rightarrow\text{better decision}.
+\]
+A useful evidence action must not only improve a probability. It must produce a credible observation, move belief materially, cross a relevant boundary or alter stopping, enable a different admissible action or compensating control, and reduce loss after cost and delay.
+
+\section{What remains valid}
+
+\subsection{The problem statement remains valid}
+Step 2 did not refute the distinction between latent system risk and latent evidence-production quality.
+
+\subsection{The frozen architecture is not validated}
+The specific coupling among acquisition, belief update, fixed horizon, unit cost, terminal thresholds, loss ratios, and three-way release action did not produce the expected general advantage.
+
+\subsection{Safety remains exploratory}
+The unsafe-GO pattern warrants a dedicated future hypothesis, not retrospective claim promotion.
+
+\section{Why Milestone 2R is not post-hoc goal displacement}
+
+The programme is not replacing a failed superiority claim with a positive narrative. Four safeguards make the reset principled:
+\begin{enumerate}
+  \item falsification and stop conditions were part of the original programme;
+  \item the original claim IDs and adverse dispositions remain visible in the canonical registry;
+  \item the new hypotheses are narrower, conditional, and mechanism-specific;
+  \item any new confirmation requires new development seeds, a new preregistration, and untouched confirmatory seeds.
+\end{enumerate}
+
+The revised objective is not to prove ED-POMDP superior by another route. It is to determine the conditions under which evidence changes a governed action and reduces material loss.
+
+\section{Epistemic taxonomy: why NONE becomes SYNTHETIC}
+
+Evidence level records the source class of adjudicating evidence, not support. Before Step 2, \texttt{NONE} was correct because no frozen empirical or synthetic benchmark had adjudicated the claims. After Step 2, retaining \texttt{NONE} would be inaccurate.
+
+The repository separates:
+\begin{itemize}
+  \item \textbf{evidence level}: NONE, FORMAL, SYNTHETIC, INDUSTRIAL, or OPERATIONAL;
+  \item \textbf{evidence polarity}: supportive, mixed, adverse, or untested;
+  \item \textbf{disposition}: active, narrowed, unsupported, blocked, or deferred.
+\end{itemize}
+
+Thus \texttt{SYNTHETIC} does not imply support. For \texttt{CLM-VOI-001}, the correct combination is synthetic evidence, adverse/mixed polarity, and \texttt{NOT\_SUPPORTED\_STEP2}.
+
+\section{Milestone 2R}
+
+Milestone 2R is the mandatory theoretical revision gate. It:
+\begin{enumerate}
+  \item reconstructs acquisition $\rightarrow$ observation $\rightarrow$ belief $\rightarrow$ boundary/stopping $\rightarrow$ action $\rightarrow$ loss;
+  \item audits thresholds, loss ratios, fixed horizons, equal budgets, unit costs, boundary reachability, policy indistinguishability, dependence, redundancy, and compensating-control semantics;
+  \item replaces broad claims with conditional hypotheses H3-A to H3-E;
+  \item freezes progression and anti-leakage rules.
+\end{enumerate}
+
+\section{Revised roadmap}
+
+\begin{longtable}{p{0.16\textwidth}p{0.73\textwidth}}
+\toprule
+Milestone & Purpose and gate \\
+\midrule
+2R & Theory and claim reset; no new performance claim. \\
+3A & Exploratory mechanism benchmark on new development seeds; no confirmatory claim. \\
+3B & New preregistered benchmark with untouched seeds and primary endpoints centred on weighted terminal loss, unsafe GO, and total evidence cost. \\
+4 & Realistic STRAT-Q scenarios with heterogeneous costs, correlated tests and OTEL evidence, compensating controls, governed provenance, and project-specific loss. \\
+5 & Governed industrial replay and shadow evaluation, gated by data readiness and prior bounded validation. \\
+\bottomrule
 \end{longtable}
 
-\section{Experimental protocol}
-Step 2 will use a factorial benchmark varying budget, prior error, likelihood sample size, observation correlation, distribution shift, evidence freshness, and constraint regimes. Policies are compared at matched budgets and matched target risk. Primary outcomes are terminal decision loss and constraint violations; secondary outcomes are evidence cost, time to decision, calibration, abstention, posterior entropy, and computational cost. Confidence intervals, multiple seeds, preregistered analysis scripts, and ablations are mandatory.
-
-The generative likelihood $Z_{true}$ and inference likelihood $\widehat Z$ must differ in misspecification experiments. No headline result may be based solely on an oracle model. Correlation is generated through common hidden causes. Sensitivity analyses vary loss ratios and the cost conversion coefficient instead of fixing a favourable scalarisation.
-
-\section{Industrial validation path}
-The software-release domain is primary. Phase 1 curates historical release evidence with anonymised identifiers. Phase 2 estimates conservative observation models on training releases. Phase 3 performs blinded retrospective replay on held-out releases. Phase 4 runs shadow recommendations without authority to change release decisions. Phase 5 evaluates prospective decision support under human governance. Biometrics and UAV are external-validity studies only after the software claims survive these phases.
-
-\section{Threats to validity}
-Construct validity is threatened by treating ``risk'' as a small categorical variable. Internal validity is threatened by hand-set likelihoods and shared assumptions between simulator and inference. Statistical validity is threatened by policy tuning on evaluation scenarios. External validity is limited until real releases are replayed. Operational validity is threatened by missing evidence, policy changes, and strategic behaviour. Ethical and governance risks include automation bias, opaque loss elicitation, and misuse of confidence estimates as guarantees. The programme addresses these through conservative intervals, blinded splits, immutable provenance, human sign-off, abstention, and explicit non-claims.
-
-\section{Non-claims}
-This paper does not establish that likelihoods are identifiable in practice, that ED-POMDP is operationally superior, that one common kernel is optimal across domains, or that a posterior probability constitutes a certification. It proposes a falsifiable framework and a validation programme.
+Brier score and ECE remain mechanism diagnostics, not substitutes for decision value.
 
 \section{Conclusion}
-ED-POMDP reframes release assurance as governed sequential evidence acquisition under partial observability. The Step-1 contribution is a precise, reviewable scientific foundation. The next milestone is not wider rhetoric but controlled experiments designed to disconfirm the proposed advantages.
+
+Step 2 did not destroy ED-POMDP. It invalidated an overly simple promise: that selecting and qualifying evidence more intelligently would naturally produce better decisions.
+
+\begin{tcolorbox}[colback=softgreen,colframe=green!45!black,boxrule=0.8pt,arc=2mm]
+\textbf{Revised central hypothesis.} Decision value does not arise from belief quality alone. It arises from the complete governed architecture that converts belief into stopping, compensating control, and terminal action under asymmetric loss, heterogeneous evidence cost, and hard constraints.
+\end{tcolorbox}
+
+The full theory reset is documented in \texttt{paper/milestone2r\_theory\_claim\_reset.tex}; the complete French explanation is in \texttt{reviewer/guide\_fr\_milestone2r.tex}.
 
 \begin{thebibliography}{99}
 \bibitem{kaelbling1998planning} Kaelbling, L. P., Littman, M. L., and Cassandra, A. R. Planning and acting in partially observable stochastic domains. \emph{Artificial Intelligence}, 101(1--2), 99--134, 1998.
-\bibitem{lauri2023robotics} Lauri, M., Hsu, D., and Pajarinen, J. Partially observable Markov decision processes in robotics: A survey. \emph{IEEE Transactions on Robotics}, 39(1), 21--40, 2023.
-\bibitem{silver2010pomcp} Silver, D. and Veness, J. Monte-Carlo planning in large POMDPs. \emph{NeurIPS}, 2010.
-\bibitem{sarraute2013hackers} Sarraute, C., Buffet, O., and Hoffmann, J. POMDPs make better hackers: Accounting for uncertainty in penetration testing. arXiv:1307.7809, 2013.
-\bibitem{wu2020active} Wu, B. et al. Constrained active classification using partially observable Markov decision processes. arXiv:2008.04768, 2020.
-\bibitem{arora2019multimodal} Arora, A., Fitch, R., and Sukkarieh, S. Multi-modal active perception for information gathering in science missions. \emph{Autonomous Robots}, 2019.
-\bibitem{rahbar2025active} Rahbar, A., Aronsson, L., and Chehreghani, M. H. A survey on active feature acquisition strategies. arXiv:2502.11067, 2025.
-\bibitem{wong2024revisiting} Wong, W. E. et al. Revisiting software reliability modeling and testing. \emph{IEEE Transactions on Reliability}, 2024.
-\bibitem{ieee1633} IEEE. \emph{IEEE Recommended Practice on Software Reliability}, IEEE Std 1633-2016, 2017.
-\bibitem{fenton2012risk} Fenton, N. and Neil, M. \emph{Risk Assessment and Decision Analysis with Bayesian Networks}. CRC Press, 2012.
 \bibitem{howard1966information} Howard, R. A. Information value theory. \emph{IEEE Transactions on Systems Science and Cybernetics}, 2(1), 22--26, 1966.
+\bibitem{fenton2012risk} Fenton, N. and Neil, M. \emph{Risk Assessment and Decision Analysis with Bayesian Networks}. CRC Press, 2012.
+\bibitem{lauri2023robotics} Lauri, M., Hsu, D., and Pajarinen, J. Partially observable Markov decision processes in robotics: A survey. \emph{IEEE Transactions on Robotics}, 39(1), 21--40, 2023.
 \end{thebibliography}
+
 \end{document}

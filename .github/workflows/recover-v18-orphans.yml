@@ -1,0 +1,70 @@
+name: recover-v18-orphans
+on:
+  pull_request:
+    branches: [main]
+    paths: ['.github/workflows/recover-v18-orphans.yml']
+permissions:
+  contents: read
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect and reconstruct staged blobs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          python - <<'PY'
+          import base64, hashlib, itertools, json, lzma, os, urllib.request
+          shas = [
+            'adaba70e083036bf118cb88b5aeed3699fbf6699',
+            '41bd036787da06c7a5624d7e1fdc04ac13c2b73a',
+            '98370b5795b70b223593c4055b11abcf80cd68de',
+            '8c45437d3c154281bcf1207f79be179dff14a34a',
+            '6c11ca5591462764f99b5d1cb042fca57707d644',
+            'd8d926ef27921206bfad9ec1aeea9d67a726c574',
+            'ac6424a254ddfb4b35e375e8bff82b46a53cc3d1',
+          ]
+          token=os.environ['GH_TOKEN']; repo=os.environ['REPO']
+          blobs={}
+          for sha in shas:
+            req=urllib.request.Request(f'https://api.github.com/repos/{repo}/git/blobs/{sha}',headers={'Authorization':f'Bearer {token}','Accept':'application/vnd.github+json'})
+            with urllib.request.urlopen(req) as r: obj=json.load(r)
+            text=base64.b64decode(obj['content']).decode('ascii')
+            blobs[sha]=text
+            print(sha, len(text), text[:20], text[-20:])
+          # Drop blobs wholly contained in another blob.
+          candidates=[]
+          for sha,text in blobs.items():
+            if any(sha!=s2 and text in t2 for s2,t2 in blobs.items()):
+              print('contained',sha)
+            else:
+              candidates.append((sha,text))
+          print('candidates',[(s,len(t)) for s,t in candidates])
+          def overlap(a,b):
+            limit=min(len(a),len(b))
+            for n in range(limit,0,-1):
+              if a[-n:]==b[:n]: return n
+            return 0
+          expected_len=679272
+          expected_sha='11bb7899d1100e5cd158476bf75bae118806ec3b3388094723899d6b39551ca3'
+          for perm in itertools.permutations(candidates):
+            merged=perm[0][1]
+            for _,part in perm[1:]:
+              if part in merged: continue
+              ov=overlap(merged,part)
+              merged += part[ov:]
+            if not merged.startswith('/Td6WFoAAA') or len(merged)<expected_len: continue
+            for start in range(0, min(1000,len(merged)-expected_len+1)):
+              chunk=merged[start:start+expected_len]
+              try:
+                pdf=lzma.decompress(base64.b64decode(chunk,validate=True))
+              except Exception:
+                continue
+              digest=hashlib.sha256(pdf).hexdigest()
+              print('DECODED', [s for s,_ in perm], 'merged',len(merged),'start',start,'pdf',len(pdf),'sha',digest)
+              if digest==expected_sha:
+                print('SUCCESS_SEQUENCE', [s for s,_ in perm])
+                raise SystemExit(0)
+          raise SystemExit('No exact reconstruction found')
+          PY

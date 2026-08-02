@@ -1,22 +1,29 @@
-# French-only ED-POMDP review package
+# Documents pédagogiques ED-POMDP en français
 
-Status: **draft — reviewer hand-off not started**.
+Deux documents sont proposés dans cette PR :
 
-GitHub is the sole source of truth for this publication package. The editable sources, build instructions, generated PDFs, integrity manifests and review evidence must all remain versioned in this repository and in this pull request. No external workspace or document platform is part of the publication chain.
+- [`ED_POMDP_En_Clair_FR_v1.9.pdf`](./ED_POMDP_En_Clair_FR_v1.9.pdf) - guide principal, annexes A à F ;
+- [`ED_POMDP_Belief_to_Action_Companion_FR_v1.0.pdf`](./ED_POMDP_Belief_to_Action_Companion_FR_v1.0.pdf) - companion avancé reprenant l'ancienne Annexe G.
 
-This directory is reserved for two French-only pedagogical review artifacts:
+Les deux documents sont disponibles **uniquement en français**.
 
-- `ED_POMDP_En_Clair_FR_v1.9.pdf`;
-- `ED_POMDP_Belief_to_Action_Companion_FR_v1.0.pdf`.
+## Sources LaTeX
 
-The root README contains two quick-link buttons explicitly labelled `FR only` and targeting these paths.
+Les sources sont dans [`latex/`](./latex/) :
 
-Before requesting review:
+- `main-guide.tex` ;
+- `companion.tex` ;
+- `common.tex` ;
+- `Makefile` ;
+- `base/ED_POMDP_En_Clair_FR_v1.8.pdf`, publication héritée utilisée pour conserver les pages existantes.
 
-1. commit the authoritative source package and both generated PDFs;
-2. run the documented GitHub build and verification workflow;
-3. validate `SHA256SUMS`;
-4. inspect the rendered pages;
-5. keep the pull request in draft until the editorial review gate in `REVIEW_GUIDE_v1.9.md` is satisfied.
+Compilation :
 
-The documents are pedagogical companions. They do not modify the frozen Step 2 benchmark, statistical outputs, claim dispositions or scientific hashes.
+```bash
+cd docs/fr/latex
+make
+```
+
+Le split est volontairement conservateur : le guide reprend les pages 2 à 30 de la v1.8 et le companion reprend les pages 31 à 37. Seules les pages liminaires et l'avis éditorial de couverture sont nouveaux.
+
+Voir [`EDITORIAL_CHANGELOG_v1.9.md`](./EDITORIAL_CHANGELOG_v1.9.md) pour le détail destiné au reviewer.

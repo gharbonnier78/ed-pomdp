@@ -2,6 +2,8 @@
 
 Status: **draft — reviewer hand-off not started**.
 
+GitHub is the sole source of truth for this publication package. The editable sources, build instructions, generated PDFs, integrity manifests and review evidence must all remain versioned in this repository and in this pull request. No external workspace or document platform is part of the publication chain.
+
 This directory is reserved for two French-only pedagogical review artifacts:
 
 - `ED_POMDP_En_Clair_FR_v1.9.pdf`;
@@ -11,9 +13,10 @@ The root README contains two quick-link buttons explicitly labelled `FR only` an
 
 Before requesting review:
 
-1. commit both authoritative PDFs;
-2. run `cd docs/fr && sha256sum -c SHA256SUMS`;
-3. inspect the rendered pages;
-4. keep the pull request in draft until the editorial review gate in `REVIEW_GUIDE_v1.9.md` is satisfied.
+1. commit the authoritative source package and both generated PDFs;
+2. run the documented GitHub build and verification workflow;
+3. validate `SHA256SUMS`;
+4. inspect the rendered pages;
+5. keep the pull request in draft until the editorial review gate in `REVIEW_GUIDE_v1.9.md` is satisfied.
 
 The documents are pedagogical companions. They do not modify the frozen Step 2 benchmark, statistical outputs, claim dispositions or scientific hashes.

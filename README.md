@@ -6,9 +6,13 @@ Evidence-Driven Partially Observable Markov Decision Processes for governed soft
 
 Steps 1 and 1.1 are shipped. **Step 2 is closed** after frozen execution, independent statistical review, deterministic mechanism diagnosis, and claim adjudication.
 
-The Step 2 benchmark evaluated seven policies over 3,360 paired episodes, four regimes, four fixed evidence budgets, and thirty untouched headline seeds. Its confirmatory family contained 240 Holm-corrected contrasts over terminal decision loss, Brier score, and expected calibration error.
+The Step 2 benchmark produced **3,360 policy-episode rows**:
 
-The broad claims are now bounded as follows:
+`4 regimes × 4 budgets × 30 untouched headline seeds × 7 policies = 3,360`.
+
+Its confirmatory family contained 240 Holm-corrected contrasts over terminal decision loss, Brier score, and expected calibration error.
+
+The broad claims are bounded as follows:
 
 - `CLM-VOI-001`: `NOT_SUPPORTED_STEP2`;
 - `CLM-EQ-001`: `BROAD_FORM_NOT_SUPPORTED_NARROW_ECE_SIGNAL`.
@@ -17,7 +21,11 @@ No terminal-decision-loss contrast survived Holm correction. Across the four acq
 
 ## Principal mechanism result
 
-ED-POMDP improved Brier score in 1,119 paired episodes. In 1,054 of those cases — **94.19%** — the terminal action remained unchanged.
+The deterministic Step 2.8 diagnosis produced **2,400 ED-POMDP-versus-baseline paired records**:
+
+`4 regimes × 4 budgets × 30 seeds × 5 confirmatory baselines = 2,400`.
+
+ED-POMDP improved Brier score in 1,119 pairs. In 1,054 of those cases — **94.19%** — the terminal action remained unchanged.
 
 > Better evidence selection can improve probabilistic belief without crossing a decision boundary, changing a stopping decision, enabling a different governed action, or reducing realised loss.
 
@@ -25,35 +33,53 @@ The risk-only comparison selected the same terminal action in all 480 paired epi
 
 A favourable unsafe-GO pattern remains descriptive: ED-POMDP produced zero unsafe GO decisions in the three structurally avoidable regimes, versus two per regime for the classical POMDP. This endpoint was outside the confirmatory p-value family and is not promoted retrospectively.
 
+## Evidence level does not mean support
+
+The move from `NONE` to `SYNTHETIC` records that a frozen synthetic benchmark now exists. It does **not** promote either claim.
+
+The repository keeps three fields separate:
+
+- evidence level: source class of adjudicating evidence;
+- evidence polarity: supportive, mixed, adverse, or untested;
+- disposition: active, narrowed, unsupported, blocked, or deferred.
+
+For `CLM-VOI-001`, the correct combination is synthetic evidence, adverse/mixed polarity, and `NOT_SUPPORTED_STEP2`.
+
 ## Mandatory Milestone 2R
 
 The programme does not continue as if the initial architecture had been validated. **Milestone 2R — Theory and Claim Reset** is mandatory before any new confirmatory or industrial milestone.
 
 It:
 
-1. reconstructs the causal chain `acquisition → observation → belief → boundary → action → loss`;
+1. reconstructs `acquisition → observation → belief → boundary/stopping → action → loss`;
 2. audits thresholds, loss ratios, fixed horizons, equal budgets, unit costs, boundary reachability, policy indistinguishability, evidence dependence, and CONDITIONAL GO semantics;
 3. retires broad superiority claims and defines conditional hypotheses H3-A to H3-E;
 4. freezes progression gates and seed-separation rules.
+
+This is not a post-hoc replacement of a failed claim with a positive narrative. The original claims remain visible and unsupported; the new hypotheses are narrower and require a new preregistration, new development seeds, and untouched confirmatory seeds.
 
 The revised central question is:
 
 > Under which conditions does additional or better-qualified evidence change a governed engineering decision, and does that changed decision reduce a materially important loss at comparable total cost?
 
-## Documents
+## Documents in this PR
 
-### Current closure package
-
-- [`paper/step2_closeout.pdf`](paper/step2_closeout.pdf) — frozen Step 2 results, mechanism diagnosis, and claim adjudication.
 - [`paper/milestone2r_theory_claim_reset.tex`](paper/milestone2r_theory_claim_reset.tex) — English research-level Milestone 2R paper.
 - [`reviewer/guide_fr_milestone2r.tex`](reviewer/guide_fr_milestone2r.tex) — complete French explanatory companion.
 - [`paper/main.tex`](paper/main.tex) — current scientific overview after Step 2.
 - [`research_program/research_program.tex`](research_program/research_program.tex) — revised 2026–2030 programme.
+- [`reviewer/reviewer_companion.tex`](reviewer/reviewer_companion.tex) — post-Step-2 reviewer response and approval boundary.
 - [`docs/POST_STEP2_BET_REGISTER.md`](docs/POST_STEP2_BET_REGISTER.md) — revised bets P0–P5 and candidate hypotheses H3-A–H3-E.
 - [`roadmap/RESEARCH_TRACKS.md`](roadmap/RESEARCH_TRACKS.md) — gated post-Step-2 roadmap.
-- [`docs/CLAIMS.md`](docs/CLAIMS.md) — canonical epistemic claim registry.
+- [`scripts/check_current_status.py`](scripts/check_current_status.py) — anti-drift status guard.
+- [`paper/step2_closeout.pdf`](paper/step2_closeout.pdf) — committed frozen Step 2 close-out, governed by SHA-256.
 
-The GitHub Actions workflow compiles the English paper, French guide, current overview, revised programme, and foundation documents, then publishes them in the **`ed-pomdp-v1.4-documents` workflow artifact**. Generated PDFs that would otherwise become stale are not treated as authoritative unless reproduced by CI. The committed deterministic `step2_closeout.pdf` remains governed by its SHA-256 manifest.
+The two new PDFs are generated by GitHub Actions from the LaTeX sources and published in the **`ed-pomdp-v1.4-documents` workflow artifact**:
+
+- `paper/milestone2r_theory_claim_reset.pdf`;
+- `reviewer/guide_fr_milestone2r.pdf`.
+
+Generated PDFs are not described as committed repository files unless they are actually committed. The deterministic `step2_closeout.pdf` remains the only PDF governed by its committed SHA-256 manifest.
 
 `benchmark/results/STEP_2_7_EXECUTIVE_STATUS_NOTE.tex` is retained as a historical Step 2.7 snapshot. Final claim status is governed by the Step 2 close-out and canonical registry.
 

@@ -1,28 +1,33 @@
 name: build-documents
 on: [push, pull_request]
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Apply one-shot H3-D documentation finalization
-        if: ${{ hashFiles('.github/workflows/finalize-milestone2r-h3d.yml') != '' }}
+        if: ${{ github.event_name == 'push' && hashFiles('.github/workflows/finalize-milestone2r-h3d.yml') != '' }}
         shell: bash
         run: |
           set -euo pipefail
           python3 - <<'PY'
           from pathlib import Path
-          import re
-          import textwrap
 
           workflow = Path('.github/workflows/finalize-milestone2r-h3d.yml')
-          text = workflow.read_text(encoding='utf-8')
-          match = re.search(r"python3 - <<'PY'\n(.*?)\n          PY", text, flags=re.S)
-          if not match:
-              raise SystemExit('Could not extract embedded finalization script')
-          script = textwrap.dedent(match.group(1))
+          lines = workflow.read_text(encoding='utf-8').splitlines()
+          start = lines.index("          python3 - <<'PY'") + 1
+          end = next(i for i in range(start, len(lines)) if lines[i] == "          PY")
+          script_lines = []
+          for line in lines[start:end]:
+              script_lines.append(line[10:] if line.startswith('          ') else line)
+          script = '\n'.join(script_lines) + '\n'
           exec(compile(script, str(workflow), 'exec'))
           PY
           rm -f .github/workflows/finalize-milestone2r-h3d.yml

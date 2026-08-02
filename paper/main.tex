@@ -10,47 +10,35 @@
 \definecolor{deepblue}{HTML}{183B56}
 \definecolor{softblue}{HTML}{EAF2F8}
 \definecolor{softamber}{HTML}{FFF4D6}
-\definecolor{softred}{HTML}{FBE9E7}
 \definecolor{softgreen}{HTML}{E8F5E9}
 \pagestyle{fancy}\fancyhf{}\lhead{ED-POMDP Research Edition v1.4}\rhead{Current Scientific Overview}\cfoot{\thepage}
 \setlength{\parindent}{0pt}\setlength{\parskip}{0.55em}\setlength{\emergencystretch}{2em}
 \setlist{leftmargin=1.5em,itemsep=0.25em,topsep=0.25em}
 \titleformat{\section}{\large\bfseries\color{deepblue}}{\thesection}{0.65em}{}
 \titleformat{\subsection}{\normalsize\bfseries\color{deepblue}}{\thesubsection}{0.65em}{}
-\newcommand{\edp}{ED-POMDP}
 \newcommand{\go}{\textsc{go}}
 \newcommand{\cgo}{\textsc{conditional go}}
 \newcommand{\nogo}{\textsc{no-go}}
 
 \title{\textbf{Decision-Relevant Evidence Acquisition for Software Release Assurance under Partial Observability}\\
-\large ED-POMDP Research Edition v1.4 - Current scientific overview after the Step 2 benchmark}
+\large ED-POMDP Research Edition v1.4 - Current scientific overview after Step 2}
 \author{Guillaume Harbonnier\\Independent industrial research programme / STRAT-Q}
 \date{2 August 2026}
 
-\begin{document}\maketitle
+\begin{document}
+\maketitle
 
 \begin{abstract}
-Software release decisions are made under persistent partial observability: latent defects, uncertain residual risk, incomplete tests, non-representative environments, and imperfect runtime evidence. ED-POMDP treats latent system risk and latent evidence-production quality as separate objects and formulates evidence acquisition, stopping, and release action as a governed sequential decision problem. The Step 2 frozen synthetic benchmark did not support the original broad claim that decision-aware evidence acquisition generally reduces terminal decision loss at matched budget, nor the broad claim that explicit evidence-quality modelling generally improves final release decisions. Its principal mechanism result is more precise: 1,054 of 1,119 paired episodes with improved Brier score retained the same terminal action. Better probabilistic belief was therefore usually absorbed by unchanged decision regions. This overview preserves the original problem and formalism while replacing the broad superiority narrative with a mandatory Milestone 2R theory-and-claim reset. The revised programme asks under which conditions evidence actually changes a governed decision and reduces a materially important loss at comparable total cost.
+Software release decisions remain partially observable: latent defects, uncertain residual risk, incomplete tests, non-representative environments, and imperfect runtime evidence prevent direct observation of release fitness. ED-POMDP represents latent system risk and latent evidence-production quality separately and formulates evidence acquisition, stopping, and release action as a governed sequential decision problem. The Step 2 frozen synthetic benchmark did not support the original broad claim that decision-aware evidence acquisition generally reduces terminal decision loss at matched budget, nor the broad claim that explicit evidence-quality modelling generally improves final release decisions. Its principal mechanism result is more precise: 1,054 of 1,119 paired episodes with improved Brier score retained the same terminal action. Better probabilistic belief was usually absorbed by unchanged decision regions. This overview preserves the underlying problem and formalism while replacing the broad superiority narrative with a mandatory Milestone 2R theory-and-claim reset. The revised programme asks under which conditions evidence actually changes a governed decision and reduces materially important loss at comparable total cost.
 \end{abstract}
 
 \begin{tcolorbox}[colback=softblue,colframe=deepblue,boxrule=0.8pt,arc=2mm]
-\textbf{Current empirical status.} Step 2 is closed. The broad decision-superiority claim is \texttt{NOT\_SUPPORTED\_STEP2}. The broad evidence-quality claim is \texttt{BROAD\_FORM\_NOT\_SUPPORTED\_NARROW\_ECE\_SIGNAL}. The programme continues only through Milestone 2R, which revises the theory, claims, terminal architecture, and progression gates before any new confirmatory or industrial milestone.
+\textbf{Current empirical status.} Step 2 is closed. \texttt{CLM-VOI-001} is \texttt{NOT\_SUPPORTED\_STEP2}. \texttt{CLM-EQ-001} is \texttt{BROAD\_FORM\_NOT\_SUPPORTED\_NARROW\_ECE\_SIGNAL}. The programme continues only through Milestone 2R before any new confirmatory or industrial milestone.
 \end{tcolorbox}
 
-\section{Problem and motivation}
+\section{Problem and formal framework}
 
-Release status is not directly observable. A release may pass every executed test and still contain a critical defect; conversely, failed tests may reflect an invalid environment, unreliable oracle, or incomplete instrumentation rather than product risk. Requirements, architecture reviews, tests, traces, incidents, and expert judgements are observations generated through evidence-producing processes of unequal validity, representativity, freshness, dependence, and admissibility.
-
-The engineering problem is therefore twofold:
-
-\begin{itemize}
-  \item uncertainty about the real system state;
-  \item uncertainty about the mechanism that produced the available evidence.
-\end{itemize}
-
-Step 2 did not invalidate this distinction. It invalidated the assumption that improving evidence selection and probabilistic calibration would naturally improve the terminal decision under the frozen architecture.
-
-\section{Formal framework}
+Release status is not directly observable. A passing campaign may coexist with critical latent risk; a failing test may reflect an invalid environment or unreliable oracle rather than product failure. Release governance therefore combines uncertainty about the system and uncertainty about the process producing evidence.
 
 At time $t$, the partially observable state is factorised as
 \[
@@ -60,106 +48,115 @@ where $S_t$ is latent system risk, $E_t$ is latent evidence-production quality, 
 \[
 b_t(x)=P(S_t,E_t,\Theta_t\mid h_t,C_t).
 \]
-
-An acquisition action $a$ invokes an evidence-producing process and yields an observation $o$ through $Z(o\mid S,E,a,\Theta)$. The Bayesian update is
+An evidence-acquisition action $a_t$ produces an observation $o_{t+1}$ through $Z(o\mid S,E,a,\Theta)$, followed by Bayesian update:
 \[
-b_{t+1}(x')=\eta Z(o_{t+1}\mid x',a_t)\sum_x T(x'\mid x,a_t)b_t(x).
+b_{t+1}(x')=\eta Z(o_{t+1}\mid x',a_t)\sum_xT(x'\mid x,a_t)b_t(x).
 \]
+For a terminal decision $d$, Bayes risk is $\rho(d,b)=\mathbb{E}_{x\sim b}[L(d,x)]$. The action space includes acquisition, stopping, remediation, escalation, abstention, staged release, \go{}, \cgo{}, and \nogo{}. Hard constraints remain non-compensatory.
 
-For a terminal decision $d$, Bayes risk is
+\section{Step 2 design and adjudication}
+
+The frozen benchmark evaluated seven policies under four regimes, four budgets, and thirty untouched headline seeds:
 \[
-\rho(d,b)=\mathbb{E}_{x\sim b}[L(d,x)].
+4\times4\times30\times7=3{,}360
 \]
-The action space includes evidence acquisition, stopping, remediation, escalation, abstention, staged release, \go{}, \cgo{}, and \nogo{}. Hard constraints remain non-compensatory: absent mandatory evidence, unresolved critical risk, or invalid segregation of duties cannot be offset by a favourable scalar score.
+executed episode rows.
 
-\section{Original claims and Step 2 adjudication}
+The confirmatory family contained 240 Holm-corrected contrasts over terminal decision loss, Brier score, and expected calibration error. No terminal-decision-loss contrast survived Holm correction. Across the four acquisition baselines directly relevant to the VOI claim, aggregate terminal-loss directions were 10 favourable, 16 adverse, and 38 equal. One degraded-evidence, budget-two ECE contrast survived Holm correction, but its bootstrap interval crossed zero and posterior support was sparse.
 
-The frozen benchmark evaluated seven policies over 3,360 paired episodes, four regimes, four fixed budgets, and thirty untouched headline seeds. The confirmatory family contained 240 Holm-corrected contrasts over terminal decision loss, Brier score, and expected calibration error.
+A descriptive safety signal remains bounded: ED-POMDP produced zero unsafe \go{} decisions in the three structurally avoidable regimes, compared with two per regime for the classical POMDP. This endpoint was outside the confirmatory p-value family and is not promoted retrospectively.
 
-\begin{center}
-\begin{tabularx}{\textwidth}{>{\bfseries\raggedright\arraybackslash}p{0.25\textwidth} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}p{0.21\textwidth}}
-\toprule
-Claim & Step 2 result & Disposition \\
-\midrule
-Decision-aware VOI generally reduces matched-budget terminal loss. & No decision-loss contrast survived Holm correction; claim-relevant aggregate directions were 10 favourable, 16 adverse, and 38 equal. & Not supported in Step 2. \\
-Explicit evidence-quality modelling generally improves calibration and final decisions. & One degraded-evidence, budget-two ECE contrast survived Holm; its bootstrap interval crossed zero, support was sparse, and no general decision-loss gain appeared. & Broad form not supported; narrow ECE signal retained. \\
-\bottomrule
-\end{tabularx}
-\end{center}
+\section{Mechanism diagnosis and count reconciliation}
 
-Canonical dispositions are \texttt{NOT\_SUPPORTED\_STEP2} and \texttt{BROAD\_FORM\_NOT\_SUPPORTED\_NARROW\_ECE\_SIGNAL}.
-
-A descriptive safety signal remains bounded: ED-POMDP produced zero unsafe \go{} decisions in the three structurally avoidable regimes, compared with two per regime for the classical POMDP. This endpoint was outside the confirmatory p-value family.
-
-\section{Mechanism finding}
-
-The deterministic Step 2.8 diagnosis produced 2,400 paired episode diagnostics. ED-POMDP improved Brier score in 1,119 pairs, but the terminal action remained unchanged in 1,054 of them:
+Step 2.8 compared ED-POMDP with five frozen confirmatory baselines for every regime--budget--seed cell:
 \[
-1054/1119=94.19\%.
+4\times4\times30\times5=2{,}400
 \]
+paired diagnostics.
 
-The risk-only comparison selected the same terminal action in all 480 paired episodes even though acquisition traces and posterior values frequently differed. The observed value chain therefore breaks at the conversion from belief to action:
+The 3,360 count therefore describes all executed policy episodes; the 2,400 count describes ED-POMDP-versus-baseline mechanism pairs. ED-POMDP improved Brier score in 1,119 pairs, but 1,054 of those retained the same terminal action:
+\[
+\frac{1{,}054}{1{,}119}=94.19\%.
+\]
+The risk-only comparison selected the same terminal action in all 480 paired episodes despite frequently different acquisition traces and posterior values.
+
+The observed value chain therefore breaks at the conversion from belief to action:
 \[
 \text{better evidence}\rightarrow\text{better belief}\not\Rightarrow\text{better decision}.
 \]
+A useful evidence action must not only improve a probability. It must produce a credible observation, move belief materially, cross a relevant boundary or alter stopping, enable a different admissible action or compensating control, and reduce loss after cost and delay.
 
-A decision-relevant acquisition action must satisfy more than information gain. It must produce a credible observation, move the belief materially, reach a decision boundary or alter stopping, enable a different governed action, and reduce loss after cost and delay.
+\section{What remains valid}
+
+\subsection{The problem statement remains valid}
+Step 2 did not refute the distinction between latent system risk and latent evidence-production quality.
+
+\subsection{The frozen architecture is not validated}
+The specific coupling among acquisition, belief update, fixed horizon, unit cost, terminal thresholds, loss ratios, and three-way release action did not produce the expected general advantage.
+
+\subsection{Safety remains exploratory}
+The unsafe-GO pattern warrants a dedicated future hypothesis, not retrospective claim promotion.
+
+\section{Why Milestone 2R is not post-hoc goal displacement}
+
+The programme is not replacing a failed superiority claim with a positive narrative. Four safeguards make the reset principled:
+\begin{enumerate}
+  \item falsification and stop conditions were part of the original programme;
+  \item the original claim IDs and adverse dispositions remain visible in the canonical registry;
+  \item the new hypotheses are narrower, conditional, and mechanism-specific;
+  \item any new confirmation requires new development seeds, a new preregistration, and untouched confirmatory seeds.
+\end{enumerate}
+
+The revised objective is not to prove ED-POMDP superior by another route. It is to determine the conditions under which evidence changes a governed action and reduces material loss.
+
+\section{Epistemic taxonomy: why NONE becomes SYNTHETIC}
+
+Evidence level records the source class of adjudicating evidence, not support. Before Step 2, \texttt{NONE} was correct because no frozen empirical or synthetic benchmark had adjudicated the claims. After Step 2, retaining \texttt{NONE} would be inaccurate.
+
+The repository separates:
+\begin{itemize}
+  \item \textbf{evidence level}: NONE, FORMAL, SYNTHETIC, INDUSTRIAL, or OPERATIONAL;
+  \item \textbf{evidence polarity}: supportive, mixed, adverse, or untested;
+  \item \textbf{disposition}: active, narrowed, unsupported, blocked, or deferred.
+\end{itemize}
+
+Thus \texttt{SYNTHETIC} does not imply support. For \texttt{CLM-VOI-001}, the correct combination is synthetic evidence, adverse/mixed polarity, and \texttt{NOT\_SUPPORTED\_STEP2}.
 
 \section{Milestone 2R}
 
-Milestone 2R is the mandatory theoretical revision gate. It performs four tasks.
-
-\subsection{Reconstruct the causal chain}
-
-\[
-\text{acquisition}\rightarrow\text{observation}\rightarrow\text{belief}\rightarrow\text{boundary}\rightarrow\text{action}\rightarrow\text{loss}.
-\]
-
-Each link receives necessary conditions, failure modes, diagnostics, and counterexamples.
-
-\subsection{Audit structural assumptions}
-
-The reset examines threshold derivation, loss ratios, fixed horizons, equal budgets, unit costs, posterior boundary reachability, policy indistinguishability, dependence, redundancy, and the absence of explicit compensating-control semantics for \cgo{}.
-
-\subsection{Replace broad claims with conditional hypotheses}
-
-The candidate hypotheses concern joint risk/evidence-quality terminal decisions, adaptive stopping, explicit compensating controls, conditional VOI under heterogeneous and boundary-capable evidence, and a preregistered unsafe-\go{} safety endpoint.
-
-\subsection{Define progression gates}
-
-New development uses new development seeds. New confirmatory seeds remain untouched until protocol and code are frozen. Step 2 headline seeds remain immutable historical evidence and may not become a tuning set.
+Milestone 2R is the mandatory theoretical revision gate. It:
+\begin{enumerate}
+  \item reconstructs acquisition $\rightarrow$ observation $\rightarrow$ belief $\rightarrow$ boundary/stopping $\rightarrow$ action $\rightarrow$ loss;
+  \item audits thresholds, loss ratios, fixed horizons, equal budgets, unit costs, boundary reachability, policy indistinguishability, dependence, redundancy, and compensating-control semantics;
+  \item replaces broad claims with conditional hypotheses H3-A to H3-E;
+  \item freezes progression and anti-leakage rules.
+\end{enumerate}
 
 \section{Revised roadmap}
 
-\begin{longtable}{p{0.17\textwidth}p{0.72\textwidth}}
+\begin{longtable}{p{0.16\textwidth}p{0.73\textwidth}}
 \toprule
 Milestone & Purpose and gate \\
 \midrule
-2R & Theory and claim reset; mandatory before Step 3. \\
+2R & Theory and claim reset; no new performance claim. \\
 3A & Exploratory mechanism benchmark on new development seeds; no confirmatory claim. \\
-3B & New preregistered benchmark with a small primary family centred on weighted terminal loss, unsafe GO, and total evidence cost. \\
-4 & Realistic STRAT-Q scenario with heterogeneous costs, correlated tests and OTEL evidence, compensating controls, provenance, and project-specific loss. \\
-5 & Governed industrial replay and shadow pilot, gated by data readiness and prior bounded validation. \\
+3B & New preregistered benchmark with untouched seeds and primary endpoints centred on weighted terminal loss, unsafe GO, and total evidence cost. \\
+4 & Realistic STRAT-Q scenarios with heterogeneous costs, correlated tests and OTEL evidence, compensating controls, governed provenance, and project-specific loss. \\
+5 & Governed industrial replay and shadow evaluation, gated by data readiness and prior bounded validation. \\
 \bottomrule
 \end{longtable}
 
-Brier score and ECE remain valuable diagnostics. They are not substitutes for decision value.
-
-\section{Governance and non-claims}
-
-ED-POMDP remains decision support, not autonomous release authority. Human decision makers require reasons, uncertainty, missing-evidence warnings, compensating controls, and replayable provenance. The programme makes no claim of general superiority, operational readiness, industrial calibratability, or cross-domain transfer.
-
-A negative result is a valid programme outcome. If the revised architecture does not outperform simple governed rules under matched cost, the optimisation claim remains blocked.
+Brier score and ECE remain mechanism diagnostics, not substitutes for decision value.
 
 \section{Conclusion}
 
-Step 2 did not destroy the ED-POMDP research programme. It destroyed an overly simple promise: that selecting and qualifying evidence more intelligently would naturally produce better decisions. The still-valid problem is how to govern release decisions when both system state and evidence quality are uncertain.
+Step 2 did not destroy ED-POMDP. It invalidated an overly simple promise: that selecting and qualifying evidence more intelligently would naturally produce better decisions.
 
 \begin{tcolorbox}[colback=softgreen,colframe=green!45!black,boxrule=0.8pt,arc=2mm]
-\textbf{Revised central hypothesis.} The value of evidence does not arise from belief quality alone. It arises from the complete governed architecture that converts belief into stopping, compensating control, and terminal action under asymmetric loss and hard constraints.
+\textbf{Revised central hypothesis.} Decision value does not arise from belief quality alone. It arises from the complete governed architecture that converts belief into stopping, compensating control, and terminal action under asymmetric loss, heterogeneous evidence cost, and hard constraints.
 \end{tcolorbox}
 
-The detailed Step 2 result is preserved in \texttt{paper/step2\_closeout.tex}. The full theory-and-claim reset is defined in \texttt{paper/milestone2r\_theory\_claim\_reset.tex}, with a complete French companion in \texttt{reviewer/guide\_fr\_milestone2r.tex}.
+The full theory reset is documented in \texttt{paper/milestone2r\_theory\_claim\_reset.tex}; the complete French explanation is in \texttt{reviewer/guide\_fr\_milestone2r.tex}.
 
 \begin{thebibliography}{99}
 \bibitem{kaelbling1998planning} Kaelbling, L. P., Littman, M. L., and Cassandra, A. R. Planning and acting in partially observable stochastic domains. \emph{Artificial Intelligence}, 101(1--2), 99--134, 1998.
@@ -167,4 +164,5 @@ The detailed Step 2 result is preserved in \texttt{paper/step2\_closeout.tex}. T
 \bibitem{fenton2012risk} Fenton, N. and Neil, M. \emph{Risk Assessment and Decision Analysis with Bayesian Networks}. CRC Press, 2012.
 \bibitem{lauri2023robotics} Lauri, M., Hsu, D., and Pajarinen, J. Partially observable Markov decision processes in robotics: A survey. \emph{IEEE Transactions on Robotics}, 39(1), 21--40, 2023.
 \end{thebibliography}
+
 \end{document}

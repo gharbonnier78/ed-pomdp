@@ -178,6 +178,12 @@ The reset must examine:
 
 These are candidate hypotheses, not promoted claims. Their exact estimands, multiplicity family, effect thresholds, and refutation criteria must be frozen before confirmation.
 
+\subsection{2R.4 H3-D falsifiability gate}
+
+H3-D is not confirmatory until its four qualifiers are operationalised under a frozen protocol. Provenance heterogeneity is computed from a preregistered evidence-family taxonomy and dependency graph. Discriminative power uses Jensen--Shannon divergence with natural logarithms: the raw value is retained in nats and normalized by $\ln 2$ to $D\in[0,1]$. Conditional non-redundancy uses $I(S;O_a\mid O_H)$ in nats, normalized by residual state entropy when that entropy exceeds a frozen $\epsilon_H$, giving $U\in[0,1]$. Boundary reachability is the predictive probability $B\in[0,1]$ that acquisition changes the admissible terminal action or the continue/stop decision.
+
+A cell is eligible only if the provenance rule holds and $D\geq\delta_D$, $U\geq\delta_U$, and $B\geq\delta_B$. The thresholds may be calibrated only on new Milestone 3A development seeds and must be frozen before any Milestone 3B confirmatory seed is opened. The primary estimand is an eligibility-by-policy interaction. Numerical minimum counts are required for both eligible and ineligible groups; failure of either minimum yields \texttt{NOT\_TESTABLE\_IN\_BENCHMARK}, not retrospective reclassification. The complete gate is recorded in \texttt{benchmark/protocol/H3D\_OPERATIONALISATION\_GATE.md}.
+
 \section{Epistemic taxonomy: NONE to SYNTHETIC}
 
 The transition from evidence level \texttt{NONE} to \texttt{SYNTHETIC} records the \emph{kind of adjudicating evidence}, not positive support. Three fields must remain independent:

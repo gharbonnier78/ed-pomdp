@@ -40,6 +40,19 @@ A CONDITIONAL GO action linked to explicit, verifiable compensating controls red
 
 VOI provides benefit only when available evidence is heterogeneous, sufficiently discriminating, non-redundant, and capable of crossing a relevant decision boundary.
 
+#### H3-D falsifiability and operationalisation gate
+
+H3-D is not eligible for confirmatory testing until all four qualifiers are computed under a frozen rule:
+
+- provenance heterogeneity from a preregistered evidence-family taxonomy and dependency graph;
+- normalized Jensen-Shannon discrimination `D = JS / ln(2)` in `[0,1]`, with the raw value retained in nats;
+- normalized conditional information gain `U = I(S;O_a|O_H) / H(S|O_H)` in `[0,1]`, with the raw value retained in nats and low-residual-entropy cells marked `UNINFORMATIVE_BY_CONSTRUCTION`;
+- decision-boundary reachability `B`, the predictive probability that acquisition changes the admissible terminal action or continue/stop decision.
+
+A cell is eligible only when `H_prov=1`, `D>=delta_D`, `U>=delta_U`, and `B>=delta_B`. Thresholds may be calibrated only on new Milestone 3A development seeds and must be frozen before any Milestone 3B confirmatory seed is opened. Retuning or relabelling after confirmatory access is prohibited.
+
+The primary estimand is the eligibility-by-policy interaction, not an eligible-only subgroup effect. The preregistration must freeze numerical minimum counts for **both** eligible and ineligible cells. If either group is undersized, H3-D is `NOT_TESTABLE_IN_BENCHMARK`, not supported or refuted. Full definitions are governed by [`benchmark/protocol/H3D_OPERATIONALISATION_GATE.md`](../benchmark/protocol/H3D_OPERATIONALISATION_GATE.md).
+
 ### H3-E — Safety
 
 Evidence-quality-aware terminal rules reduce unsafe-GO rate under controlled evidence degradation at comparable total evidence cost.

@@ -29,6 +29,7 @@ required = [
     "docs/CLAIMS.csv",
     "docs/CLAIMS.json",
     "docs/POST_STEP2_BET_REGISTER.md",
+    "benchmark/protocol/H3D_OPERATIONALISATION_GATE.md",
     "roadmap/RESEARCH_TRACKS.md",
     "claims/README.md",
     "claims/claim_registry.csv",

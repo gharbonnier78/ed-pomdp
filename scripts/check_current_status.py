@@ -9,6 +9,7 @@ REQUIRED_FILES = [
     "paper/milestone2r_theory_claim_reset.tex",
     "reviewer/guide_fr_milestone2r.tex",
     "docs/POST_STEP2_BET_REGISTER.md",
+    "benchmark/protocol/H3D_OPERATIONALISATION_GATE.md",
     "roadmap/RESEARCH_TRACKS.md",
     "research_program/research_program.tex",
 ]
@@ -29,11 +30,27 @@ REQUIRED_TEXT = {
         "4\\times 4\\times 30\\times 5=2{,}400",
         "Why Milestone 2R is not goal displacement",
         "Epistemic taxonomy: NONE to SYNTHETIC",
+        "2R.4 H3-D falsifiability gate",
     ],
     "reviewer/guide_fr_milestone2r.tex": [
         "4\\times 4\\times 30\\times 5=2\\,400",
         "Pourquoi le passage à SYNTHETIC est correct",
         "Pourquoi ce pivot n'est pas une rationalisation post-hoc",
+        "2R.4 Gate de falsifiabilité de H3-D",
+    ],
+    "docs/POST_STEP2_BET_REGISTER.md": [
+        "H3-D falsifiability and operationalisation gate",
+        "NOT_TESTABLE_IN_BENCHMARK",
+    ],
+    "benchmark/protocol/H3D_OPERATIONALISATION_GATE.md": [
+        "Symmetric minimum-support rule",
+        "Delta_interaction",
+        "D_raw",
+        "U_raw",
+    ],
+    "roadmap/RESEARCH_TRACKS.md": [
+        "Mandatory entry gate",
+        "symmetric minimum counts",
     ],
 }
 

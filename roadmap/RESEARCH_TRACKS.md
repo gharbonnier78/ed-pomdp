@@ -24,9 +24,12 @@ Milestone 2R creates no new confirmatory evidence.
 - New development seeds only.
 - Adaptive stopping, heterogeneous costs, joint risk/evidence-quality terminal rules, and explicit CONDITIONAL GO controls.
 - Diagnostics of boundary reachability and policy distinguishability.
+- Calibration of H3-D eligibility thresholds using normalized discrimination, normalized conditional information gain, provenance heterogeneity, and boundary-reachability metrics.
 - No confirmatory claim.
 
 ## Milestone 3B — New preregistered benchmark
+
+**Mandatory entry gate:** H3-D metrics, units, normalization rules, numerical thresholds, symmetric minimum counts for eligible and ineligible cells, the eligibility-by-policy interaction estimand, effect criteria, multiplicity rules, analysis code and untouched confirmatory seeds must all be frozen before confirmatory access. Failure of either group to meet its minimum count yields `NOT_TESTABLE_IN_BENCHMARK`, not retrospective relabelling.
 
 Primary endpoint family:
 

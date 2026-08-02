@@ -188,6 +188,12 @@ L'audit doit couvrir au minimum :
 
 Ces hypothèses sont des candidates. Elles ne deviennent confirmatoires qu'après définition des estimands, seuils d'effet, multiplicité, critères de réfutation et protocole gelé.
 
+\subsection{2R.4 Gate de falsifiabilité de H3-D}
+
+H3-D ne peut pas entrer en phase confirmatoire tant que ses quatre qualificatifs ne sont pas calculés selon une règle gelée. L'hétérogénéité provient d'une taxonomie de familles de preuves et d'un graphe de dépendance préenregistrés. Le pouvoir discriminant utilise la divergence de Jensen--Shannon avec logarithmes naturels : la valeur brute est conservée en nats et normalisée par $\ln 2$, donnant $D\in[0,1]$. La non-redondance utilise $I(S;O_a\mid O_H)$ en nats, normalisée par l'entropie résiduelle lorsque celle-ci dépasse un $\epsilon_H$ gelé, donnant $U\in[0,1]$. La portée décisionnelle est la probabilité prédictive $B\in[0,1]$ que l'acquisition modifie l'action terminale admissible ou la décision continuer/arrêter.
+
+Une cellule n'est éligible que si la règle de provenance est satisfaite et si $D\geq\delta_D$, $U\geq\delta_U$ et $B\geq\delta_B$. Les seuils sont calibrés uniquement sur les nouvelles seeds de développement 3A puis gelés avant toute ouverture des seeds confirmatoires 3B. L'estimand principal est une interaction éligibilité--politique. Des nombres minimaux numériques sont requis de façon symétrique pour les groupes éligible et inéligible ; l'insuffisance de l'un des deux conduit à \texttt{NOT\_TESTABLE\_IN\_BENCHMARK}, jamais à une reclassification a posteriori. Le gate complet est enregistré dans \texttt{benchmark/protocol/H3D\_OPERATIONALISATION\_GATE.md}.
+
 \section{Roadmap recommandée}
 
 \begin{longtable}{p{0.16\textwidth}p{0.73\textwidth}}

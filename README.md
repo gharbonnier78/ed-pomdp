@@ -88,6 +88,7 @@ The revised central question is:
 - [`research_program/research_program.tex`](research_program/research_program.tex) — revised 2026–2030 programme.
 - [`reviewer/reviewer_companion.tex`](reviewer/reviewer_companion.tex) — post-Step-2 reviewer response and approval boundary.
 - [`docs/POST_STEP2_BET_REGISTER.md`](docs/POST_STEP2_BET_REGISTER.md) — revised bets P0–P5 and candidate hypotheses H3-A–H3-E.
+- [`benchmark/protocol/H3D_OPERATIONALISATION_GATE.md`](benchmark/protocol/H3D_OPERATIONALISATION_GATE.md) — measurable H3-D eligibility, normalization, symmetric support, interaction estimand, and 3B entry gate.
 - [`roadmap/RESEARCH_TRACKS.md`](roadmap/RESEARCH_TRACKS.md) — gated post-Step-2 roadmap.
 - [`scripts/check_current_status.py`](scripts/check_current_status.py) — anti-drift status guard.
 - [`paper/step2_closeout.pdf`](paper/step2_closeout.pdf) — committed frozen Step 2 close-out, governed by SHA-256.

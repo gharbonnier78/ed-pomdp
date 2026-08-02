@@ -1,10 +1,10 @@
 cff-version: 1.2.0
-title: "ED-POMDP Research Edition v1.3 — Step 2 Benchmark Close-Out"
-message: "Please cite this research package and its bounded claim adjudication."
+title: "ED-POMDP Research Edition v1.4 — Milestone 2R Theory and Claim Reset"
+message: "Please cite the frozen Step 2 close-out and the bounded post-benchmark theory-and-claim reset."
 type: software
 authors:
   - family-names: Harbonnier
     given-names: Guillaume
-version: 1.3.0-step2-closeout
-date-released: 2026-07-31
+version: 1.4.0-milestone2r
+date-released: 2026-08-02
 license: CC-BY-4.0

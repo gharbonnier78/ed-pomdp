@@ -1,0 +1,237 @@
+name: finalize-milestone2r-h3d
+
+on:
+  push:
+    branches:
+      - milestone-2r-theory-claim-reset
+    paths:
+      - '.github/workflows/finalize-milestone2r-h3d.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Milestone 2R branch
+        uses: actions/checkout@v4
+        with:
+          ref: milestone-2r-theory-claim-reset
+          fetch-depth: 0
+
+      - name: Apply final reviewer-driven H3-D operationalisation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_one(path: str, old: str, new: str) -> None:
+              p = Path(path)
+              text = p.read_text(encoding="utf-8")
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{path}: expected exactly one replacement target, found {count}")
+              p.write_text(text.replace(old, new), encoding="utf-8")
+
+          protocol = r'''# H3-D Operationalisation and Confirmatory Entry Gate
+
+## Status and scope
+
+H3-D remains a **candidate conditional hypothesis**, not a confirmatory claim. Milestone 2R may close because the falsifiability framework is now explicit. Milestone 3B may not start until the numerical thresholds, minimum group sizes, estimand, code and confirmatory seed boundary described below are frozen.
+
+The claim under study is that decision-aware value of information provides benefit only when available evidence is heterogeneous, sufficiently discriminating, non-redundant and capable of changing a relevant decision or stopping boundary.
+
+## Predeclared objects
+
+Before Milestone 3A analysis, the protocol must freeze:
+
+- the latent risk-state space and terminal action set;
+- the evidence-family taxonomy;
+- the provenance graph schema and dependency keys;
+- the baseline family and primary loss definition;
+- the development-seed set used for threshold calibration;
+- the untouched confirmatory-seed set reserved for Milestone 3B.
+
+## Measurable eligibility conditions
+
+For an acquisition action `a`, current belief `b`, and previously observed evidence history `H`:
+
+### 1. Provenance heterogeneity
+
+Let `H_prov(a,H)` equal one only when all of the following preregistered graph conditions hold:
+
+1. the candidate evidence set contains at least two distinct evidence families;
+2. it contains at least two distinct generator-root nodes;
+3. the corresponding dependency signatures are not identical over the frozen keys `generator`, `dataset`, `environment`, `oracle`, and `instrumentation`;
+4. the graph contains no edge tagged `shared_generator=true` joining the selected roots.
+
+The evidence-family list, graph schema, root-selection rule and dependency tags must be frozen before confirmatory data are accessed.
+
+### 2. Discriminative power
+
+Using natural logarithms, define the raw Jensen-Shannon divergence
+
+`D_raw(a) = JS(P(O_a | S=good), P(O_a | S=bad))`.
+
+`D_raw` is measured in **nats** and lies in `[0, ln 2]` for the binary risk state. The eligibility calculation uses the normalized quantity
+
+`D(a) = D_raw(a) / ln 2`,
+
+which lies in `[0,1]`. The condition is `D(a) >= delta_D`.
+
+### 3. Conditional non-redundancy
+
+Define
+
+`U_raw(a | H) = I(S ; O_a | O_H)`
+
+using natural logarithms, so the raw value is measured in **nats**. In the binary-state benchmark it is bounded above by the residual state entropy `H(S | O_H) <= ln 2`. To make the scale comparable across cells and future state spaces, use
+
+`U(a | H) = U_raw(a | H) / H(S | O_H)`
+
+when `H(S | O_H) > epsilon_H`. This normalized value lies in `[0,1]`. If the denominator is at or below `epsilon_H`, the cell is labelled `UNINFORMATIVE_BY_CONSTRUCTION` and is not eligible for H3-D. The condition is `U(a | H) >= delta_U`.
+
+### 4. Decision-boundary reachability
+
+Define
+
+`B(a,b) = P_o[d*(tau(b,a,o)) != d*(b) or s*(tau(b,a,o)) != s*(b)]`,
+
+where `d*` is the admissible terminal action, `s*` is the continue/stop decision, and `tau` is the frozen belief-update operator. `B` lies in `[0,1]`. The condition is `B(a,b) >= delta_B`.
+
+## Frozen eligibility rule
+
+A cell is eligible only if
+
+`E(a,b,H) = 1[H_prov=1 and D>=delta_D and U>=delta_U and B>=delta_B]`.
+
+The numerical values of `delta_D`, `delta_U`, `delta_B`, and `epsilon_H` may be calibrated only on new Milestone 3A development seeds. They must be justified and frozen before any Milestone 3B confirmatory seed is opened. Confirmatory retuning, relabelling or threshold relaxation is prohibited.
+
+## Symmetric minimum-support rule
+
+The interaction analysis is testable only when both groups meet preregistered support requirements:
+
+- `n_eligible >= n_eligible_min`;
+- `n_ineligible >= n_ineligible_min`.
+
+Both minima must be numerical, symmetric in status, frozen before confirmation, and checked for every confirmatory comparison stratum used by the primary analysis. A highly imbalanced split, including a benchmark with almost all cells in one group, cannot be rescued by reporting only the populated subgroup.
+
+## Confirmatory estimand
+
+Let
+
+`Delta_L(g) = E[L_ED-POMDP - L_baseline | E=g]`, for `g in {0,1}`.
+
+The primary H3-D estimand is the interaction
+
+`Delta_interaction = Delta_L(1) - Delta_L(0)`.
+
+With lower loss preferred, H3-D requires a favourable eligible-cell effect and a negative interaction showing that the advantage is greater in eligible than in ineligible cells. The preregistration must also freeze:
+
+- the baseline comparison family and multiplicity correction;
+- total-evidence-cost comparability bounds;
+- the unsafe-GO non-inferiority margin;
+- effect-size thresholds and confidence or posterior criteria;
+- handling of missing, structurally undefined and `UNINFORMATIVE_BY_CONSTRUCTION` cells.
+
+## Permitted dispositions
+
+- `SUPPORTED_STEP3B`: all preregistered confirmatory criteria pass.
+- `NOT_SUPPORTED_STEP3B`: the benchmark is testable but one or more confirmatory criteria fail.
+- `NOT_TESTABLE_IN_BENCHMARK`: either group fails its minimum-support rule, the eligibility variables cannot be computed under the frozen protocol, or the planned interaction is otherwise unidentified.
+
+`NOT_TESTABLE_IN_BENCHMARK` must not be reported as evidence for or against H3-D, and it must not trigger post-hoc eligibility changes.
+
+## Stage-gate consequence
+
+- **Milestone 2R exit:** this operationalisation framework, its units, normalization rules, symmetric support rule, interaction estimand and non-testable disposition are documented and reviewable.
+- **Milestone 3B entry:** all numerical thresholds, group minima, effect criteria, code, multiplicity rules and seed partitions are frozen after Milestone 3A development work and before confirmatory access.
+'''
+          Path("benchmark/protocol/H3D_OPERATIONALISATION_GATE.md").write_text(protocol, encoding="utf-8")
+
+          replace_one(
+              "docs/POST_STEP2_BET_REGISTER.md",
+              """### H3-D — Conditional value of information\n\nVOI provides benefit only when available evidence is heterogeneous, sufficiently discriminating, non-redundant, and capable of crossing a relevant decision boundary.\n""",
+              """### H3-D — Conditional value of information\n\nVOI provides benefit only when available evidence is heterogeneous, sufficiently discriminating, non-redundant, and capable of crossing a relevant decision boundary.\n\n#### H3-D falsifiability and operationalisation gate\n\nH3-D is not eligible for confirmatory testing until all four qualifiers are computed under a frozen rule:\n\n- provenance heterogeneity from a preregistered evidence-family taxonomy and dependency graph;\n- normalized Jensen-Shannon discrimination `D = JS / ln(2)` in `[0,1]`, with the raw value retained in nats;\n- normalized conditional information gain `U = I(S;O_a|O_H) / H(S|O_H)` in `[0,1]`, with the raw value retained in nats and low-residual-entropy cells marked `UNINFORMATIVE_BY_CONSTRUCTION`;\n- decision-boundary reachability `B`, the predictive probability that acquisition changes the admissible terminal action or continue/stop decision.\n\nA cell is eligible only when `H_prov=1`, `D>=delta_D`, `U>=delta_U`, and `B>=delta_B`. Thresholds may be calibrated only on new Milestone 3A development seeds and must be frozen before any Milestone 3B confirmatory seed is opened. Retuning or relabelling after confirmatory access is prohibited.\n\nThe primary estimand is the eligibility-by-policy interaction, not an eligible-only subgroup effect. The preregistration must freeze numerical minimum counts for **both** eligible and ineligible cells. If either group is undersized, H3-D is `NOT_TESTABLE_IN_BENCHMARK`, not supported or refuted. Full definitions are governed by [`benchmark/protocol/H3D_OPERATIONALISATION_GATE.md`](../benchmark/protocol/H3D_OPERATIONALISATION_GATE.md).\n""",
+          )
+
+          replace_one(
+              "roadmap/RESEARCH_TRACKS.md",
+              """## Milestone 3A — Exploratory mechanism benchmark\n\n- New development seeds only.\n- Adaptive stopping, heterogeneous costs, joint risk/evidence-quality terminal rules, and explicit CONDITIONAL GO controls.\n- Diagnostics of boundary reachability and policy distinguishability.\n- No confirmatory claim.\n\n## Milestone 3B — New preregistered benchmark\n\nPrimary endpoint family:\n""",
+              """## Milestone 3A — Exploratory mechanism benchmark\n\n- New development seeds only.\n- Adaptive stopping, heterogeneous costs, joint risk/evidence-quality terminal rules, and explicit CONDITIONAL GO controls.\n- Diagnostics of boundary reachability and policy distinguishability.\n- Calibration of H3-D eligibility thresholds using normalized discrimination, normalized conditional information gain, provenance heterogeneity, and boundary-reachability metrics.\n- No confirmatory claim.\n\n## Milestone 3B — New preregistered benchmark\n\n**Mandatory entry gate:** H3-D metrics, units, normalization rules, numerical thresholds, symmetric minimum counts for eligible and ineligible cells, the eligibility-by-policy interaction estimand, effect criteria, multiplicity rules, analysis code and untouched confirmatory seeds must all be frozen before confirmatory access. Failure of either group to meet its minimum count yields `NOT_TESTABLE_IN_BENCHMARK`, not retrospective relabelling.\n\nPrimary endpoint family:\n""",
+          )
+
+          replace_one(
+              "reviewer/reviewer_companion.tex",
+              """Is the safety pattern confirmatory? & No. Unsafe-GO results remain descriptive and outside the original multiplicity family. & H3-E requires a new preregistered safety endpoint. \\\\\n\\bottomrule""",
+              """Is the safety pattern confirmatory? & No. Unsafe-GO results remain descriptive and outside the original multiplicity family. & H3-E requires a new preregistered safety endpoint. \\\\\nIs H3-D currently confirmatory and fully falsifiable? & Not yet as a confirmatory hypothesis. Its qualitative conditions now have measurable definitions, but numerical thresholds and symmetric group minima must be calibrated on 3A development seeds and frozen before 3B. & H3-D operationalisation is documented in the protocol gate; approval of 2R does not authorize confirmatory testing. \\\\\n\\bottomrule""",
+          )
+
+          replace_one(
+              "reviewer/reviewer_companion.tex",
+              """  \\item Block industrial progression until both theory and data gates pass.\n\\end{enumerate}""",
+              """  \\item Block industrial progression until both theory and data gates pass.\n  \\item Require H3-D units, normalization, numerical thresholds, symmetric eligible/ineligible minimum counts, interaction estimand, analysis code, and non-testable disposition to be frozen before Milestone 3B.\n\\end{enumerate}""",
+          )
+
+          replace_one(
+              "reviewer/reviewer_companion.tex",
+              """Approval of Milestone 2R means approval of the bounded reset and its progression gates. It does not mean approval of ED-POMDP operational superiority, industrial readiness, or the candidate hypotheses.""",
+              """Approval of Milestone 2R means approval of the bounded reset and its progression gates. It does not mean approval of ED-POMDP operational superiority, industrial readiness, or the candidate hypotheses. In particular, H3-D remains a candidate only: Milestone 3B is blocked until its numerical thresholds, symmetric minimum counts for both eligibility groups, interaction estimand, multiplicity rule, effect criteria, code, and untouched seed boundary are frozen.""",
+          )
+
+          replace_one(
+              "paper/milestone2r_theory_claim_reset.tex",
+              """\\textbf{H3-D --- Conditional value of information.} VOI provides benefit only when available evidence is heterogeneous, sufficiently discriminating, non-redundant, and capable of crossing a relevant decision boundary.\n\n\\textbf{H3-E --- Safety.} Evidence-quality-aware terminal rules reduce unsafe-\\go{} rate under controlled degradation at comparable total evidence cost.\n\nThese are candidate hypotheses, not promoted claims. Their exact estimands, multiplicity family, effect thresholds, and refutation criteria must be frozen before confirmation.""",
+              """\\textbf{H3-D --- Conditional value of information.} VOI provides benefit only when available evidence is heterogeneous, sufficiently discriminating, non-redundant, and capable of crossing a relevant decision boundary.\n\n\\textbf{H3-E --- Safety.} Evidence-quality-aware terminal rules reduce unsafe-\\go{} rate under controlled degradation at comparable total evidence cost.\n\nThese are candidate hypotheses, not promoted claims. Their exact estimands, multiplicity family, effect thresholds, and refutation criteria must be frozen before confirmation.\n\n\\subsection{2R.4 H3-D falsifiability gate}\n\nH3-D is not confirmatory until its four qualifiers are operationalised under a frozen protocol. Provenance heterogeneity is computed from a preregistered evidence-family taxonomy and dependency graph. Discriminative power uses Jensen--Shannon divergence with natural logarithms: the raw value is retained in nats and normalized by $\\ln 2$ to $D\\in[0,1]$. Conditional non-redundancy uses $I(S;O_a\\mid O_H)$ in nats, normalized by residual state entropy when that entropy exceeds a frozen $\\epsilon_H$, giving $U\\in[0,1]$. Boundary reachability is the predictive probability $B\\in[0,1]$ that acquisition changes the admissible terminal action or the continue/stop decision.\n\nA cell is eligible only if the provenance rule holds and $D\\geq\\delta_D$, $U\\geq\\delta_U$, and $B\\geq\\delta_B$. The thresholds may be calibrated only on new Milestone 3A development seeds and must be frozen before any Milestone 3B confirmatory seed is opened. The primary estimand is an eligibility-by-policy interaction. Numerical minimum counts are required for both eligible and ineligible groups; failure of either minimum yields \\texttt{NOT\\_TESTABLE\\_IN\\_BENCHMARK}, not retrospective reclassification. The complete gate is recorded in \\texttt{benchmark/protocol/H3D\\_OPERATIONALISATION\\_GATE.md}.""",
+          )
+
+          replace_one(
+              "reviewer/guide_fr_milestone2r.tex",
+              """\\textbf{H3-D - VOI conditionnelle.} La VOI n'apporte un avantage que lorsque les preuves sont hétérogènes, discriminantes, peu redondantes et capables de franchir une frontière décisionnelle pertinente.\n\n\\textbf{H3-E - Sécurité.} Une règle tenant compte de la qualité des preuves réduit le taux d'unsafe GO sous dégradation contrôlée, à coût de preuve comparable.\n\nCes hypothèses sont des candidates. Elles ne deviennent confirmatoires qu'après définition des estimands, seuils d'effet, multiplicité, critères de réfutation et protocole gelé.""",
+              """\\textbf{H3-D - VOI conditionnelle.} La VOI n'apporte un avantage que lorsque les preuves sont hétérogènes, discriminantes, peu redondantes et capables de franchir une frontière décisionnelle pertinente.\n\n\\textbf{H3-E - Sécurité.} Une règle tenant compte de la qualité des preuves réduit le taux d'unsafe GO sous dégradation contrôlée, à coût de preuve comparable.\n\nCes hypothèses sont des candidates. Elles ne deviennent confirmatoires qu'après définition des estimands, seuils d'effet, multiplicité, critères de réfutation et protocole gelé.\n\n\\subsection{2R.4 Gate de falsifiabilité de H3-D}\n\nH3-D ne peut pas entrer en phase confirmatoire tant que ses quatre qualificatifs ne sont pas calculés selon une règle gelée. L'hétérogénéité provient d'une taxonomie de familles de preuves et d'un graphe de dépendance préenregistrés. Le pouvoir discriminant utilise la divergence de Jensen--Shannon avec logarithmes naturels : la valeur brute est conservée en nats et normalisée par $\\ln 2$, donnant $D\\in[0,1]$. La non-redondance utilise $I(S;O_a\\mid O_H)$ en nats, normalisée par l'entropie résiduelle lorsque celle-ci dépasse un $\\epsilon_H$ gelé, donnant $U\\in[0,1]$. La portée décisionnelle est la probabilité prédictive $B\\in[0,1]$ que l'acquisition modifie l'action terminale admissible ou la décision continuer/arrêter.\n\nUne cellule n'est éligible que si la règle de provenance est satisfaite et si $D\\geq\\delta_D$, $U\\geq\\delta_U$ et $B\\geq\\delta_B$. Les seuils sont calibrés uniquement sur les nouvelles seeds de développement 3A puis gelés avant toute ouverture des seeds confirmatoires 3B. L'estimand principal est une interaction éligibilité--politique. Des nombres minimaux numériques sont requis de façon symétrique pour les groupes éligible et inéligible ; l'insuffisance de l'un des deux conduit à \\texttt{NOT\\_TESTABLE\\_IN\\_BENCHMARK}, jamais à une reclassification a posteriori. Le gate complet est enregistré dans \\texttt{benchmark/protocol/H3D\\_OPERATIONALISATION\\_GATE.md}.""",
+          )
+
+          replace_one(
+              "README.md",
+              """- [`docs/POST_STEP2_BET_REGISTER.md`](docs/POST_STEP2_BET_REGISTER.md) — revised bets P0–P5 and candidate hypotheses H3-A–H3-E.\n""",
+              """- [`docs/POST_STEP2_BET_REGISTER.md`](docs/POST_STEP2_BET_REGISTER.md) — revised bets P0–P5 and candidate hypotheses H3-A–H3-E.\n- [`benchmark/protocol/H3D_OPERATIONALISATION_GATE.md`](benchmark/protocol/H3D_OPERATIONALISATION_GATE.md) — measurable H3-D eligibility, normalization, symmetric support, interaction estimand, and 3B entry gate.\n""",
+          )
+
+          replace_one(
+              "scripts/check_package.py",
+              '    "docs/POST_STEP2_BET_REGISTER.md",\n    "roadmap/RESEARCH_TRACKS.md",',
+              '    "docs/POST_STEP2_BET_REGISTER.md",\n    "benchmark/protocol/H3D_OPERATIONALISATION_GATE.md",\n    "roadmap/RESEARCH_TRACKS.md",',
+          )
+
+          replace_one(
+              "scripts/check_current_status.py",
+              '    "docs/POST_STEP2_BET_REGISTER.md",\n    "roadmap/RESEARCH_TRACKS.md",',
+              '    "docs/POST_STEP2_BET_REGISTER.md",\n    "benchmark/protocol/H3D_OPERATIONALISATION_GATE.md",\n    "roadmap/RESEARCH_TRACKS.md",',
+          )
+
+          replace_one(
+              "scripts/check_current_status.py",
+              '        "Epistemic taxonomy: NONE to SYNTHETIC",\n    ],\n    "reviewer/guide_fr_milestone2r.tex": [',
+              '        "Epistemic taxonomy: NONE to SYNTHETIC",\n        "2R.4 H3-D falsifiability gate",\n    ],\n    "reviewer/guide_fr_milestone2r.tex": [',
+          )
+
+          replace_one(
+              "scripts/check_current_status.py",
+              '        "Pourquoi ce pivot n\'est pas une rationalisation post-hoc",\n    ],\n}',
+              '        "Pourquoi ce pivot n\'est pas une rationalisation post-hoc",\n        "2R.4 Gate de falsifiabilité de H3-D",\n    ],\n    "docs/POST_STEP2_BET_REGISTER.md": [\n        "H3-D falsifiability and operationalisation gate",\n        "NOT_TESTABLE_IN_BENCHMARK",\n    ],\n    "benchmark/protocol/H3D_OPERATIONALISATION_GATE.md": [\n        "Symmetric minimum-support rule",\n        "Delta_interaction",\n        "D_raw",\n        "U_raw",\n    ],\n    "roadmap/RESEARCH_TRACKS.md": [\n        "Mandatory entry gate",\n        "symmetric minimum counts",\n    ],\n}',
+          )
+          PY
+
+      - name: Commit final H3-D review closure
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          rm -f .github/workflows/finalize-milestone2r-h3d.yml
+          git add -A
+          git commit -m 'Close H3-D reviewer reserve with falsifiable 3B entry gate'
+          git push origin HEAD:milestone-2r-theory-claim-reset

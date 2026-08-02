@@ -1,41 +1,11 @@
 name: build-documents
 on: [push, pull_request]
 
-permissions:
-  contents: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Apply one-shot H3-D documentation finalization
-        if: ${{ github.event_name == 'push' && hashFiles('.github/workflows/finalize-milestone2r-h3d.yml') != '' }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-
-          workflow = Path('.github/workflows/finalize-milestone2r-h3d.yml')
-          lines = workflow.read_text(encoding='utf-8').splitlines()
-          start = lines.index("          python3 - <<'PY'") + 1
-          end = next(i for i in range(start, len(lines)) if lines[i] == "          PY")
-          script_lines = []
-          for line in lines[start:end]:
-              script_lines.append(line[10:] if line.startswith('          ') else line)
-          script = '\n'.join(script_lines) + '\n'
-          exec(compile(script, str(workflow), 'exec'))
-          PY
-          rm -f .github/workflows/finalize-milestone2r-h3d.yml
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -A
-          git commit -m 'Close H3-D reviewer reserve with falsifiable 3B entry gate'
-          git push origin HEAD:milestone-2r-theory-claim-reset
 
       - name: Verify committed close-out PDF manifest
         run: sha256sum -c paper/step2_closeout.sha256

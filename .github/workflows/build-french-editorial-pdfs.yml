@@ -1,0 +1,87 @@
+name: build-french-editorial-pdfs
+
+on:
+  push:
+    branches:
+      - review/editorial-fr-v1.9
+    paths:
+      - 'docs/fr/latex/**'
+      - '.github/workflows/build-french-editorial-pdfs.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the review branch
+        uses: actions/checkout@v4
+        with:
+          ref: review/editorial-fr-v1.9
+          fetch-depth: 0
+
+      - name: Require the validated v1.8 publication base
+        run: |
+          test -f docs/fr/latex/base/ED_POMDP_En_Clair_FR_v1.8.pdf || {
+            echo 'Missing docs/fr/latex/base/ED_POMDP_En_Clair_FR_v1.8.pdf'
+            exit 1
+          }
+
+      - name: Compile both French documents with LuaLaTeX
+        uses: xu-cheng/latex-action@v3
+        with:
+          working_directory: docs/fr/latex
+          root_file: |
+            main-guide.tex
+            companion.tex
+          latexmk_use_lualatex: true
+          args: -interaction=nonstopmode -halt-on-error -file-line-error
+
+      - name: Publish reviewer PDFs and verify page counts
+        run: |
+          cp docs/fr/latex/main-guide.pdf docs/fr/ED_POMDP_En_Clair_FR_v1.9.pdf
+          cp docs/fr/latex/companion.pdf docs/fr/ED_POMDP_Belief_to_Action_Companion_FR_v1.0.pdf
+          python -m pip install --quiet pypdf==6.0.0
+          python - <<'PY'
+          from pathlib import Path
+          from pypdf import PdfReader
+
+          expected = {
+              Path('docs/fr/ED_POMDP_En_Clair_FR_v1.9.pdf'): 31,
+              Path('docs/fr/ED_POMDP_Belief_to_Action_Companion_FR_v1.0.pdf'): 9,
+          }
+          for path, pages in expected.items():
+              actual = len(PdfReader(path).pages)
+              if actual != pages:
+                  raise SystemExit(f'{path}: expected {pages} pages, found {actual}')
+              print(f'PASS {path}: {actual} pages')
+          PY
+          (
+            cd docs/fr
+            sha256sum \
+              latex/base/ED_POMDP_En_Clair_FR_v1.8.pdf \
+              ED_POMDP_En_Clair_FR_v1.9.pdf \
+              ED_POMDP_Belief_to_Action_Companion_FR_v1.0.pdf \
+              > SHA256SUMS
+          )
+          rm -f docs/fr/.handoff-pending
+
+      - name: Commit generated PDFs to the pull-request branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            docs/fr/ED_POMDP_En_Clair_FR_v1.9.pdf \
+            docs/fr/ED_POMDP_Belief_to_Action_Companion_FR_v1.0.pdf \
+            docs/fr/SHA256SUMS \
+            docs/fr/.handoff-pending
+          if git diff --cached --quiet; then
+            echo 'Generated PDFs are already current.'
+          else
+            git commit -m 'Build French editorial reviewer PDFs'
+            git push origin HEAD:review/editorial-fr-v1.9
+          fi

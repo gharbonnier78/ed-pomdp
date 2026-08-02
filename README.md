@@ -14,6 +14,12 @@ This repository develops **Evidence-Driven Partially Observable Markov Decision 
   <a href="./reviewer/reviewer_companion.pdf"><img src="https://img.shields.io/badge/Open-Reviewer%20Companion-B71C1C?style=for-the-badge&logo=adobeacrobatreader&logoColor=white" alt="Open Reviewer Companion PDF"></a>
 </p>
 
+<p align="center">
+  <a href="./docs/fr/ED_POMDP_En_Clair_FR_v1.9.pdf"><img src="https://img.shields.io/badge/FR%20only-Guide%20ED--POMDP%20en%20clair-1565C0?style=for-the-badge&logo=adobeacrobatreader&logoColor=white" alt="Open French-only ED-POMDP plain-language guide PDF"></a>
+  <a href="./docs/fr/ED_POMDP_Belief_to_Action_Companion_FR_v1.0.pdf"><img src="https://img.shields.io/badge/FR%20only-Companion%20croyance%20vers%20action-6A1B9A?style=for-the-badge&logo=adobeacrobatreader&logoColor=white" alt="Open French-only belief-to-action advanced companion PDF"></a>
+</p>
+<p align="center"><sub>French-only pedagogical documents submitted through a separate editorial review gate.</sub></p>
+
 ## Status
 
 Steps 1 and 1.1 are shipped. **Step 2 is closed after frozen execution, independent statistical review, post-hoc mechanism diagnosis, and epistemic claim adjudication.**

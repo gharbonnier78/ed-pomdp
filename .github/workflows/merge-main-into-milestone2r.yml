@@ -1,0 +1,66 @@
+name: merge-main-into-milestone2r
+
+on:
+  push:
+    branches:
+      - milestone-2r-theory-claim-reset
+    paths:
+      - '.github/workflows/merge-main-into-milestone2r.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  merge-main:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out PR 12 branch
+        uses: actions/checkout@v4
+        with:
+          ref: milestone-2r-theory-claim-reset
+          fetch-depth: 0
+
+      - name: Merge current main and preserve the reviewed README resolution
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp README.md /tmp/README.milestone2r.resolved
+          git fetch origin main
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          set +e
+          git merge --no-ff --no-commit origin/main
+          merge_status=$?
+          set -e
+
+          conflicts="$(git diff --name-only --diff-filter=U || true)"
+          unexpected="$(printf '%s\n' "$conflicts" | sed '/^$/d;/^README.md$/d')"
+          if [ -n "$unexpected" ]; then
+            echo 'Unexpected merge conflicts:'
+            printf '%s\n' "$unexpected"
+            git merge --abort || true
+            exit 1
+          fi
+
+          cp /tmp/README.milestone2r.resolved README.md
+          git add README.md
+          rm -f .github/workflows/merge-main-into-milestone2r.yml
+          git add -A
+
+          if git ls-files -u | grep -q .; then
+            echo 'Unresolved index entries remain.'
+            git ls-files -u
+            git merge --abort || true
+            exit 1
+          fi
+
+          if [ "$merge_status" -ne 0 ] && [ -z "$conflicts" ]; then
+            echo "Merge failed without a normal content conflict (status $merge_status)."
+            git merge --abort || true
+            exit 1
+          fi
+
+          git commit -m 'Merge main after PR 11 and resolve README for Milestone 2R'
+          git push origin HEAD:milestone-2r-theory-claim-reset

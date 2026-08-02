@@ -13,14 +13,17 @@ jobs:
       - name: Preserve committed close-out PDF
         run: cp paper/step2_closeout.pdf /tmp/step2_closeout.committed.pdf
 
-      - uses: xu-cheng/latex-action@v3
+      - name: Compile active LaTeX corpus
+        uses: xu-cheng/latex-action@v3
         with:
           root_file: |
             paper/main.tex
             paper/step2_closeout.tex
+            paper/milestone2r_theory_claim_reset.tex
             research_program/research_program.tex
             survey/related_work.tex
             reviewer/reviewer_companion.tex
+            reviewer/guide_fr_milestone2r.tex
             ontology/evidence_ontology.tex
             appendix/mathematical_appendix.tex
             benchmark/results/STEP_2_7_EXECUTIVE_STATUS_NOTE.tex
@@ -46,16 +49,33 @@ jobs:
           root_file: paper/step2_closeout.tex
           work_in_root_file_dir: true
 
-      - name: Verify bit-for-bit PDF reproducibility
+      - name: Verify bit-for-bit close-out reproducibility
         run: |
           cmp /tmp/step2_closeout.first.pdf paper/step2_closeout.pdf
           cmp /tmp/step2_closeout.committed.pdf paper/step2_closeout.pdf
           sha256sum -c paper/step2_closeout.sha256
-          sha256sum /tmp/step2_closeout.committed.pdf \
-                    /tmp/step2_closeout.first.pdf \
-                    paper/step2_closeout.pdf
 
-      - run: python3 scripts/check_package.py
+      - name: Verify package and current scientific status
+        run: |
+          python3 scripts/check_current_status.py
+          python3 scripts/check_package.py
+
+      - name: Publish v1.4 document bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: ed-pomdp-v1.4-documents
+          if-no-files-found: error
+          path: |
+            paper/main.pdf
+            paper/step2_closeout.pdf
+            paper/milestone2r_theory_claim_reset.pdf
+            research_program/research_program.pdf
+            reviewer/reviewer_companion.pdf
+            reviewer/guide_fr_milestone2r.pdf
+            survey/related_work.pdf
+            ontology/evidence_ontology.pdf
+            appendix/mathematical_appendix.pdf
+            benchmark/results/STEP_2_7_EXECUTIVE_STATUS_NOTE.pdf
 
   test-runtime:
     runs-on: ubuntu-latest

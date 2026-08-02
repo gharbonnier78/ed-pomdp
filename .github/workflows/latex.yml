@@ -7,6 +7,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Apply one-shot H3-D documentation finalization
+        if: ${{ hashFiles('.github/workflows/finalize-milestone2r-h3d.yml') != '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          import textwrap
+
+          workflow = Path('.github/workflows/finalize-milestone2r-h3d.yml')
+          text = workflow.read_text(encoding='utf-8')
+          match = re.search(r"python3 - <<'PY'\n(.*?)\n          PY", text, flags=re.S)
+          if not match:
+              raise SystemExit('Could not extract embedded finalization script')
+          script = textwrap.dedent(match.group(1))
+          exec(compile(script, str(workflow), 'exec'))
+          PY
+          rm -f .github/workflows/finalize-milestone2r-h3d.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Close H3-D reviewer reserve with falsifiable 3B entry gate'
+          git push origin HEAD:milestone-2r-theory-claim-reset
+
       - name: Verify committed close-out PDF manifest
         run: sha256sum -c paper/step2_closeout.sha256
 

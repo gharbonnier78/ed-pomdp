@@ -1,11 +1,12 @@
-name: Expand ED-POMDP LinkedIn carousel package
+name: Expand ED-POMDP LinkedIn carousel publication
 
 on:
   push:
     branches:
       - carousel-linkedin-publication-v1
     paths:
-      - "publications/linkedin/ed-pomdp-carousel-v1.0/_upload/ed-pomdp-carousel-v1.0-package.zip"
+      - "publications/linkedin/ed-pomdp-carousel-v1.0/_upload/ed_pomdp_carousel_linkedin_v1.0.pdf"
+      - ".github/workflows/expand-linkedin-carousel-package.yml"
 
 permissions:
   contents: write
@@ -21,28 +22,46 @@ jobs:
       - name: Install verification tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y poppler-utils unzip
+          sudo apt-get install -y poppler-utils
           python -m pip install --disable-pip-version-check pypdf pillow
 
-      - name: Verify and unpack publication package
+      - name: Verify uploaded publication PDF
         env:
-          EXPECTED_ZIP_SHA256: b3cc5e26ff948d2547cd6e434b8da0a11d82fb2fc0aa624917aaddddd666855f
+          EXPECTED_PDF_SHA256: 94f2fd2f1d1c8ff17709c359a7cb833e30ecc6eef5c90151c4bba64f31f431a3
         run: |
           set -euo pipefail
           TARGET="publications/linkedin/ed-pomdp-carousel-v1.0"
-          UPLOAD="$TARGET/_upload/ed-pomdp-carousel-v1.0-package.zip"
+          UPLOAD="$TARGET/_upload/ed_pomdp_carousel_linkedin_v1.0.pdf"
           test -f "$UPLOAD"
-          printf '%s  %s\n' "$EXPECTED_ZIP_SHA256" "$UPLOAD" | sha256sum -c -
-          rm -rf /tmp/ed-pomdp-carousel-v1.0
-          mkdir -p /tmp/ed-pomdp-carousel-v1.0
-          unzip -q "$UPLOAD" -d /tmp/ed-pomdp-carousel-v1.0
-          cp -a /tmp/ed-pomdp-carousel-v1.0/. "$TARGET/"
+          printf '%s  %s\n' "$EXPECTED_PDF_SHA256" "$UPLOAD" | sha256sum -c -
 
-      - name: Validate PDF, A4 geometry, images, and checksums
+      - name: Publish PDF and render 19 A4 page images
+        run: |
+          set -euo pipefail
+          TARGET="publications/linkedin/ed-pomdp-carousel-v1.0"
+          UPLOAD="$TARGET/_upload/ed_pomdp_carousel_linkedin_v1.0.pdf"
+          PDF="$TARGET/ed_pomdp_carousel_linkedin_v1.0.pdf"
+          rm -rf "$TARGET/images"
+          mkdir -p "$TARGET/images"
+          cp "$UPLOAD" "$PDF"
+          pdftoppm -jpeg -r 96 "$PDF" "$TARGET/images/page" >/dev/null
+          for file in "$TARGET"/images/page-*.jpg; do
+            base="$(basename "$file")"
+            number="${base#page-}"
+            number="${number%.jpg}"
+            padded="$(printf '%02d' "$((10#$number))")"
+            mv "$file" "$TARGET/images/page-$padded.jpg"
+          done
+
+      - name: Build and verify checksums, geometry, and page count
         run: |
           set -euo pipefail
           TARGET="publications/linkedin/ed-pomdp-carousel-v1.0"
           cd "$TARGET"
+          {
+            sha256sum ed_pomdp_carousel_linkedin_v1.0.pdf
+            find images -maxdepth 1 -type f -name 'page-*.jpg' -print0 | sort -z | xargs -0 sha256sum
+          } > SHA256SUMS
           sha256sum -c SHA256SUMS
           test "$(find images -maxdepth 1 -type f -name 'page-*.jpg' | wc -l)" = "19"
           python - <<'PY'
@@ -75,6 +94,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add publications/linkedin/ed-pomdp-carousel-v1.0 .github/workflows/expand-linkedin-carousel-package.yml
+          git add -A publications/linkedin/ed-pomdp-carousel-v1.0 .github/workflows/expand-linkedin-carousel-package.yml
           git commit -m "Add verified LinkedIn carousel publication assets"
           git push origin HEAD:carousel-linkedin-publication-v1

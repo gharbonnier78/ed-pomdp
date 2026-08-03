@@ -1,0 +1,80 @@
+name: Expand ED-POMDP LinkedIn carousel package
+
+on:
+  push:
+    branches:
+      - carousel-linkedin-publication-v1
+    paths:
+      - "publications/linkedin/ed-pomdp-carousel-v1.0/_upload/ed-pomdp-carousel-v1.0-package.zip"
+
+permissions:
+  contents: write
+
+jobs:
+  expand-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install verification tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils unzip
+          python -m pip install --disable-pip-version-check pypdf pillow
+
+      - name: Verify and unpack publication package
+        env:
+          EXPECTED_ZIP_SHA256: b3cc5e26ff948d2547cd6e434b8da0a11d82fb2fc0aa624917aaddddd666855f
+        run: |
+          set -euo pipefail
+          TARGET="publications/linkedin/ed-pomdp-carousel-v1.0"
+          UPLOAD="$TARGET/_upload/ed-pomdp-carousel-v1.0-package.zip"
+          test -f "$UPLOAD"
+          printf '%s  %s\n' "$EXPECTED_ZIP_SHA256" "$UPLOAD" | sha256sum -c -
+          rm -rf /tmp/ed-pomdp-carousel-v1.0
+          mkdir -p /tmp/ed-pomdp-carousel-v1.0
+          unzip -q "$UPLOAD" -d /tmp/ed-pomdp-carousel-v1.0
+          cp -a /tmp/ed-pomdp-carousel-v1.0/. "$TARGET/"
+
+      - name: Validate PDF, A4 geometry, images, and checksums
+        run: |
+          set -euo pipefail
+          TARGET="publications/linkedin/ed-pomdp-carousel-v1.0"
+          cd "$TARGET"
+          sha256sum -c SHA256SUMS
+          test "$(find images -maxdepth 1 -type f -name 'page-*.jpg' | wc -l)" = "19"
+          python - <<'PY'
+          from pathlib import Path
+          from pypdf import PdfReader
+          from PIL import Image
+
+          pdf = Path('ed_pomdp_carousel_linkedin_v1.0.pdf')
+          reader = PdfReader(str(pdf))
+          assert len(reader.pages) == 19, len(reader.pages)
+          for index, page in enumerate(reader.pages, start=1):
+              width = float(page.mediabox.width)
+              height = float(page.mediabox.height)
+              assert abs(width - 1055.0) < 0.01, (index, width)
+              assert abs(height - 1491.0) < 0.01, (index, height)
+          images = sorted(Path('images').glob('page-*.jpg'))
+          assert len(images) == 19, len(images)
+          for image_path in images:
+              with Image.open(image_path) as image:
+                  assert image.size == (1407, 1988), (image_path, image.size)
+          PY
+          test "$(pdfinfo ed_pomdp_carousel_linkedin_v1.0.pdf | awk '/^Pages:/ {print $2}')" = "19"
+
+      - name: Remove staging material and one-time workflow
+        run: |
+          rm -rf publications/linkedin/ed-pomdp-carousel-v1.0/_upload
+          rm -f .github/workflows/expand-linkedin-carousel-package.yml
+
+      - name: Commit verified publication assets
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add publications/linkedin/ed-pomdp-carousel-v1.0 .github/workflows/expand-linkedin-carousel-package.yml
+          git commit -m "Add verified LinkedIn carousel publication assets"
+          git push origin HEAD:carousel-linkedin-publication-v1

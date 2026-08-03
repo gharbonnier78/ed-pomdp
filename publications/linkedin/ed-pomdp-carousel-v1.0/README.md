@@ -10,6 +10,7 @@ This directory freezes the **19-page LinkedIn publication package** for the ED-P
 - Page images: [`images/`](images/)
 - Page order and titles: [`manifest.json`](manifest.json)
 - Integrity manifest: [`SHA256SUMS`](SHA256SUMS)
+- Validation: 19 PDF pages, 19 page images, uniform A4 portrait geometry, and verified SHA-256 checksums
 
 ## Purpose and scientific boundary
 

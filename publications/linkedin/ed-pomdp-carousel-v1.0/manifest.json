@@ -1,0 +1,47 @@
+{
+  "package": "ED-POMDP LinkedIn Carousel",
+  "version": "1.0",
+  "publication_date": "2026-08-02",
+  "author": "Guillaume Harbonnier",
+  "purpose": "LinkedIn outreach and pedagogical publication snapshot",
+  "canonical_pdf": "ed_pomdp_carousel_linkedin_v1.0.pdf",
+  "format": {
+    "orientation": "portrait",
+    "page_ratio": "A4",
+    "pdf_media_box_points": [1055, 1491],
+    "rendered_image_pixels": [1407, 1988],
+    "image_format": "JPEG",
+    "image_render_dpi": 96
+  },
+  "pages": [
+    {"pdf_page": 1, "visible_label": "0 / 10", "title": "Why was this study needed?", "image": "images/page-01.jpg"},
+    {"pdf_page": 2, "visible_label": "0 / 10", "title": "Why are we here?", "image": "images/page-02.jpg"},
+    {"pdf_page": 3, "visible_label": "1 / 10", "title": "The Same Metric Can Hide Two Different Realities", "image": "images/page-03.jpg"},
+    {"pdf_page": 4, "visible_label": "2 / 10", "title": "Deciding Under Partial Observability - conceptual view", "image": "images/page-04.jpg"},
+    {"pdf_page": 5, "visible_label": "2 / 10", "title": "Deciding Under Partial Observability - mathematical loop", "image": "images/page-05.jpg"},
+    {"pdf_page": 6, "visible_label": "3 / 10", "title": "The Hidden State Is Joint: System Risk and Evidence Quality", "image": "images/page-06.jpg"},
+    {"pdf_page": 7, "visible_label": "4 / 10", "title": "The Core Objective: Maximize Expected Value Under Uncertainty", "image": "images/page-07.jpg"},
+    {"pdf_page": 8, "visible_label": "5 / 10", "title": "Evidence Can Improve Decisions Over Time", "image": "images/page-08.jpg"},
+    {"pdf_page": 9, "visible_label": "6 / 10", "title": "The Policy Chooses the Next Best Action", "image": "images/page-09.jpg"},
+    {"pdf_page": 10, "visible_label": "6 / 10", "title": "Measuring Value: Reward and Cost in ED-POMDP", "image": "images/page-10.jpg"},
+    {"pdf_page": 11, "visible_label": "7 / 10", "title": "Transition and Observation Models", "image": "images/page-11.jpg"},
+    {"pdf_page": 12, "visible_label": "8 / 10", "title": "Costs, Rewards and Decision Trade-offs", "image": "images/page-12.jpg"},
+    {"pdf_page": 13, "visible_label": "8 / 10", "title": "From Tests to Decisions: An Adaptive Journey", "image": "images/page-13.jpg"},
+    {"pdf_page": 14, "visible_label": "9 / 10", "title": "From Belief to Decision: An End-to-End Example", "image": "images/page-14.jpg"},
+    {"pdf_page": 15, "visible_label": "10 / 10", "title": "Key Takeaways and Next Steps", "image": "images/page-15.jpg"},
+    {"pdf_page": 16, "visible_label": "10B / 10B", "title": "What the Study Did Not Prove - and What Comes Next", "image": "images/page-16.jpg"},
+    {"pdf_page": 17, "visible_label": "10 / 10", "title": "Conclusion: Deciding with Evidence, Delivering with Confidence", "image": "images/page-17.jpg"},
+    {"pdf_page": 18, "visible_label": "10 / 10", "title": "Conclusion 2: Where AI Helps, Where RO Shines, and Why Hybrid Wins", "image": "images/page-18.jpg"},
+    {"pdf_page": 19, "visible_label": "10 / 10", "title": "Conclusion 2b: Techniques, Tools, and Math/Stat Foundations", "image": "images/page-19.jpg"}
+  ],
+  "scientific_boundary": {
+    "broad_superiority_claim": "not supported by the frozen Step 2 benchmark",
+    "canonical_sources": [
+      "paper/step2_closeout.pdf",
+      "paper/milestone2r_theory_claim_reset.tex",
+      "docs/CLAIMS.md",
+      "benchmark/protocol/H3D_OPERATIONALISATION_GATE.md"
+    ],
+    "note": "This visual package is explanatory outreach, not the canonical scientific record."
+  }
+}

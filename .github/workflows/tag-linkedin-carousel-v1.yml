@@ -1,0 +1,45 @@
+name: Tag ED-POMDP LinkedIn carousel v1.0
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "publications/linkedin/ed-pomdp-carousel-v1.0/**"
+      - ".github/workflows/tag-linkedin-carousel-v1.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  tag-publication:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install PDF verification tool
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+
+      - name: Verify frozen publication package
+        run: |
+          set -euo pipefail
+          cd publications/linkedin/ed-pomdp-carousel-v1.0
+          sha256sum -c SHA256SUMS
+          test "$(pdfinfo ed_pomdp_carousel_linkedin_v1.0.pdf | awk '/^Pages:/ {print $2}')" = "19"
+          test "$(find images -maxdepth 1 -type f -name 'page-*.jpg' | wc -l)" = "19"
+
+      - name: Create immutable publication tag
+        env:
+          TAG: ed-pomdp-linkedin-carousel-2026-08-02-v1.0
+        run: |
+          set -euo pipefail
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists; leaving it unchanged."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG" -m "ED-POMDP LinkedIn carousel publication v1.0"
+          git push origin "$TAG"

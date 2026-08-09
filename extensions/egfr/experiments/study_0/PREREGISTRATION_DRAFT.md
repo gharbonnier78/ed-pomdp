@@ -24,13 +24,13 @@ The development simulator will generate:
 
 An initial candidate mechanism is:
 
-[
-z_jsimmathcal N(0,I_d),quad v_isimmathcal N(0,I_d),
-]
+\[
+z_j\sim\mathcal N(0,I_d),\qquad v_i\sim\mathcal N(0,I_d),
+\]
 
-[
-p_{ji}=sigma(z_j^	op v_i+gamma^	op x_{ji}),quad O_{ji}sim Bernoulli(p_{ji}).
-]
+\[
+p_{ji}=\sigma(z_j^\top v_i+\gamma^\top x_{ji}),\qquad O_{ji}\sim\operatorname{Bernoulli}(p_{ji}).
+\]
 
 Detection probability, information gain and utility remain separate variables.
 
@@ -75,9 +75,9 @@ For each held-out project, retrieve the top three untried actions.
 
 Primary endpoint:
 
-[
-Delta_{retrieval}=NDCG@3(M2)-max_{bin{B1,B2,B3}}NDCG@3(b).
-]
+\[
+\Delta_{retrieval}=NDCG@3(M2)-\max_{b\in\{B1,B2,B3\}}NDCG@3(b).
+\]
 
 Secondary endpoints:
 
@@ -123,15 +123,7 @@ Simulator-seed sensitivity is reported separately from project-sampling uncertai
 
 ### G0 — reproducibility
 
-Pass requires the same frozen manifest to reproduce:
-
-- simulator configuration and seeds;
-- split identifiers;
-- masked and evaluation-only matrix hashes;
-- method configuration;
-- predictions;
-- metrics;
-- gate outcomes.
+Pass requires the same frozen manifest to reproduce simulator configuration and seeds, splits, matrix hashes, method configuration, predictions, metrics and gate outcomes.
 
 ### G1 — retrieval
 

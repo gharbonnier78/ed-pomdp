@@ -1,0 +1,95 @@
+schema_version: "0.1"
+extension: egfr
+last_revision: "2026-08-09"
+authority:
+  status: experimental_extension
+  autonomous_decision_authority: false
+  human_validation_required: true
+  canonical_repository_claim_registry: ../../docs/CLAIMS.md
+
+claims:
+  - id: EGFR-CLM-RET-001
+    statement: >
+      On held-out synthetic project families, a hybrid content and collaborative
+      recommender retrieves useful untried falsification actions better than the
+      strongest preregistered simple baseline.
+    type: falsifiable_hypothesis
+    maturity: concept
+    evidence_level: NONE
+    evidence_polarity: UNTESTED
+    disposition: NOT_TESTED
+    gate: G1
+    primary_estimand: "NDCG@3(M2) - max(NDCG@3(B1), NDCG@3(B2), NDCG@3(B3))"
+    independent_unit: project
+    analysis: paired_project_clustered_interval
+    margin: null
+    margin_freeze_rule: development_pilot_before_confirmatory_run
+    refutation: >
+      The preregistered interval does not clear the practical margin against the
+      strongest eligible baseline.
+    non_transfer: >
+      Passing on synthetic data would not establish industrial effectiveness.
+
+  - id: EGFR-CLM-BUNDLE-001
+    statement: >
+      EGFR emits executable, schema-valid and provenance-complete falsification
+      bundles without converting unknowns into negative evidence.
+    type: falsifiable_hypothesis
+    maturity: concept
+    evidence_level: NONE
+    evidence_polarity: UNTESTED
+    disposition: NOT_TESTED
+    gate: G2
+    primary_endpoints:
+      - mandatory_field_validity
+      - provenance_completeness
+      - simulator_state_consistency
+      - explicit_unknown_preservation
+    refutation: >
+      Any mandatory semantic invariant fails at a rate above the preregistered
+      tolerance, or unsupported provenance is presented as observed fact.
+
+  - id: EGFR-CLM-DEC-001
+    statement: >
+      At an equal total evidence budget, EGFR candidates combined with a
+      transparent selector reduce project-level decision regret relative to the
+      strongest eligible baseline selector.
+    type: future_falsifiable_hypothesis
+    maturity: deferred_until_G1_G2
+    evidence_level: NONE
+    evidence_polarity: UNTESTED
+    disposition: DEFERRED
+    gate: G3
+    dependency:
+      - EGFR-CLM-RET-001
+      - EGFR-CLM-BUNDLE-001
+    refutation: >
+      The preregistered paired project-level interval does not clear the
+      practical regret margin.
+    boundary: >
+      GO-ED-POMDP is one possible selector; this claim may not be used to
+      reinterpret CLM-VOI-001 or the Step 2 adjudication.
+
+  - id: EGFR-CLM-ROB-001
+    statement: >
+      EGFR preserves minimum retrieval performance and calibrated abstention
+      under preregistered logging bias and held-out project-family shift.
+    type: future_falsifiable_hypothesis
+    maturity: deferred_until_G1_G2
+    evidence_level: NONE
+    evidence_polarity: UNTESTED
+    disposition: DEFERRED
+    gate: G4
+    regimes:
+      - approximately_random_masking
+      - popularity_biased_masking
+      - suspicion_expertise_biased_masking
+      - held_out_family_shift
+
+non_claims:
+  - historical_similarity_identifies_causal_utility
+  - recommendations_are_correct_necessary_or_optimal
+  - synthetic_results_transfer_to_industry
+  - ai_generated_retex_is_valid_without_review
+  - a_weighted_score_resolves_contested_objectives
+  - egfr_repairs_or_supersedes_step2_findings

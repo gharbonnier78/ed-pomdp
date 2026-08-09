@@ -33,33 +33,33 @@ EGFR is an optional upstream candidate generator. It does not rescue or reinterp
 
 A recommendation is a falsification proposal bundle:
 
-[
-p=(a,c,H,A,o^{-},d,C,q,pi),
-]
+\[
+p=(a,c,H,A,o^{-},d,C,q,\pi),
+\]
 
-where a is the action, c the challenged claim, H the current hypothesis, A an alternative, o-minus a falsifying observation, d the expected discriminative value, C the cost and constraints, q the uncertainty, and pi the provenance.
+where \(a\) is the action, \(c\) the challenged claim, \(H\) the current hypothesis, \(A\) an alternative, \(o^{-}\) a falsifying observation, \(d\) the expected discriminative value, \(C\) the cost and constraints, \(q\) the uncertainty, and \(\pi\) the provenance.
 
 “Not falsified in tested conditions” must never be rewritten as “proven true.”
 
 ## Explicit unknowns
 
-For project j and action i:
+For project \(j\) and action \(i\):
 
-[
-Y_{ji}in{?,	ext{not relevant},	ext{inconclusive}}cupmathbb{R}^k.
-]
+\[
+Y_{ji}\in\{?,\text{not relevant},\text{inconclusive}\}\cup\mathbb{R}^k.
+\]
 
-Crucially, ? is not zero. A question mark means untried, missing or insufficiently observed. Zero means an evaluated component was observed to be zero. Treating missing cells as negative evidence encodes organizational blind spots as truth.
+Crucially, \(?\neq 0\). A question mark means untried, missing or insufficiently observed. Zero means an evaluated component was observed to be zero. Treating missing cells as negative evidence encodes organizational blind spots as truth.
 
 Each field must carry provenance: automatically observed, human declared, model inferred, or human reviewed.
 
 ## Conditional utility
 
-For action a, belief b and visible objective weights w:
+For action \(a\), belief \(b\) and visible objective weights \(w\):
 
-[
-U(amid b,w)=w_RDelta R(a)+w_I IG(amid b)+w_CDelta Coverage(a)+w_DDelta DecisionConfidence(a)-w_E Cost(a)-w_T Delay(a).
-]
+\[
+U(a\mid b,w)=w_R\Delta R(a)+w_I IG(a\mid b)+w_C\Delta Coverage(a)+w_D\Delta DecisionConfidence(a)-w_E Cost(a)-w_T Delay(a).
+\]
 
 Weights are contestable. When objectives conflict, EGFR should expose named scenarios or a Pareto set rather than conceal the conflict in one score.
 
@@ -67,10 +67,9 @@ Weights are contestable. When objectives conflict, EGFR should expose named scen
 
 Historical execution is not randomized:
 
-[
-P(A=amid S=s)
-eq P(A=a).
-]
+\[
+P(A=a\mid S=s)\neq P(A=a).
+\]
 
 Experts may select difficult tests only when they already suspect a problem. Popular tests may be over-recorded; negative and inconclusive outcomes may be under-recorded. EGFR can therefore learn habit and selection bias rather than utility.
 
@@ -90,7 +89,7 @@ Generate synthetic projects, failure hypotheses, actions, costs and noisy observ
 | M2 | Hybrid content plus collaborative model |
 | U0 | Simulator oracle, evaluation-only upper bound |
 
-Hold out complete project families. Evaluate top-k retrieval with Recall@k, NDCG@k, action utility, rare-failure coverage and calibrated abstention under shift.
+Hold out complete project families. Evaluate top-\(k\) retrieval with Recall@\(k\), NDCG@\(k\), action utility, rare-failure coverage and calibrated abstention under shift.
 
 The project is the primary independent unit. Intervals must be paired and clustered by project; cells within one project are not independent.
 

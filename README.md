@@ -120,6 +120,13 @@ The French editorial documents merged in PR #11 remain published separately unde
 - Brier and ECE remain secondary mechanism diagnostics, not substitutes for decision value.
 - The industrial pilot must not be used to rescue an unstable theory.
 
+## Experimental extensions
+
+- [Evidence-Guided Falsification Recommender (EGFR)](extensions/egfr/README.md) — bounded experimental extension for traceable falsification proposals; no EGFR experiment has yet been executed.
+- [EGFR as a governed MDP/POMDP research proposition](extensions/egfr/RESEARCH_PROPOSAL_MDP_POMDP.md) — scientific derivation, research gap, falsifiable programme, limitations, and links to Adaptive Stress Testing, NASA airborne collision-avoidance stress testing, autonomous-vehicle AST, and RETECS.
+
+These extensions do not repair, reinterpret, or supersede the adjudicated Step 2 results.
+
 ## Build and verification
 
 ```bash

@@ -16,6 +16,10 @@ It does not claim to identify the true or optimal next test. It proposes candida
 
 This separates candidate generation from decision support. Similarity, collaborative filtering and structured retrieval can support candidate generation. Selection additionally requires beliefs, expected information, costs, constraints and possibly GO-ED-POMDP.
 
+## Scientific positioning
+
+The MDP/POMDP basis, its limits, the research gap, and the falsifiable comparative programme are documented in [EGFR as a governed MDP/POMDP research proposition](RESEARCH_PROPOSAL_MDP_POMDP.md). The note relates EGFR to Adaptive Stress Testing, NASA airborne collision-avoidance stress testing, autonomous-vehicle AST, and RETECS while distinguishing adjacent applied evidence from evidence for EGFR itself.
+
 ## Architectural boundary
 
 | Component | Responsibility | Explicit non-responsibility |
